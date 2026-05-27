@@ -30,6 +30,9 @@
     "apps/gilfoyle": {
       "name": "@tarani/gilfoyle",
       "version": "0.1.0",
+      "dependencies": {
+        "@tarani/shared": "workspace:*",
+      },
     },
     "apps/kotler": {
       "name": "@tarani/kotler",

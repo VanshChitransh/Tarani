@@ -6,6 +6,10 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "bun run src/index.ts",
-    "build": "echo 'No build step yet for gilfoyle'"
+    "build": "echo 'No build step yet for gilfoyle'",
+    "smoke:parse": "bun run scripts/smoke-parse.ts"
+  },
+  "dependencies": {
+    "@tarani/shared": "workspace:*"
   }
 }
