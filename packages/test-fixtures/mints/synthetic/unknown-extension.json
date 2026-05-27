@@ -1,0 +1,40 @@
+{
+  "interface": "FungibleToken",
+  "id": "UnknownExtMint1111111111111111111111111111",
+  "content": {
+    "json_uri": "https://example.com/metadata/unknown.json",
+    "metadata": {
+      "name": "Future Extension Token",
+      "symbol": "FUTURE",
+      "description": "Synthetic mint that ships an extension the parser has never seen before",
+      "token_standard": "Fungible"
+    }
+  },
+  "authorities": [],
+  "ownership": {
+    "ownership_model": "token"
+  },
+  "mutable": true,
+  "burnt": false,
+  "token_info": {
+    "symbol": "FUTURE",
+    "decimals": 6,
+    "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+    "mint_authority": "FutureAuth11111111111111111111111111111111",
+    "freeze_authority": null,
+    "supply": "1000000"
+  },
+  "mint_extensions": {
+    "metadata_pointer": {
+      "authority": "FutureAuth11111111111111111111111111111111",
+      "metadata_address": "UnknownExtMint1111111111111111111111111111"
+    },
+    "quantum_resistant_signer": {
+      "scheme": "dilithium-3",
+      "verifier": "QvSigVerify1111111111111111111111111111111"
+    },
+    "alien_extension_42": {
+      "payload": "unknown-by-design"
+    }
+  }
+}
