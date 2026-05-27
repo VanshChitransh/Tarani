@@ -1,0 +1,33 @@
+# OS
+.DS_Store
+
+# Legacy/local folders to keep out of this new repo
+tarani-kit/
+tarani-kit-main/
+
+# Dependencies
+node_modules/
+
+# Build outputs
+.next/
+dist/
+build/
+coverage/
+
+# Logs
+*.log
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Bun/lock
+bun.lockb
+
+# IDE
+.vscode/
+.idea/
+
+# Misc
+*.tsbuildinfo
