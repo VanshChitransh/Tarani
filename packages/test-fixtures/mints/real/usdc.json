@@ -1,0 +1,36 @@
+{
+  "interface": "FungibleToken",
+  "id": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "content": {
+    "$schema": "https://schema.metaplex.com/nft1.0.json",
+    "json_uri": "",
+    "metadata": {
+      "name": "USD Coin",
+      "symbol": "USDC",
+      "description": "USDC is a fully-backed US dollar stablecoin issued by Circle.",
+      "token_standard": "Fungible"
+    },
+    "links": {
+      "image": "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v/logo.png"
+    }
+  },
+  "authorities": [
+    {
+      "address": "2wmVCSfPxGPjrnMMn7rchp4uaeoTqN39mXFC2zhPdri9",
+      "scopes": ["full"]
+    }
+  ],
+  "ownership": {
+    "ownership_model": "token"
+  },
+  "mutable": true,
+  "burnt": false,
+  "token_info": {
+    "symbol": "USDC",
+    "decimals": 6,
+    "token_program": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+    "mint_authority": "BJE5MMbqXjVwjAF7oxwPYXnTXDyspzZyt4vwenNw5ruG",
+    "freeze_authority": "7dGbd2QZcCKcTndnHcTL8q7SMVXAkp688NTQYwrRCrar",
+    "supply": "8147825036000000"
+  }
+}

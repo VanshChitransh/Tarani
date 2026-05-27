@@ -1,0 +1,419 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`parseMintProfile snapshots > matches snapshot for minimalMetadata 1`] = `
+{
+  "authorities": {
+    "freeze": {
+      "address": null,
+      "isRenounced": true,
+      "kind": "freeze",
+    },
+    "metadata": {
+      "address": null,
+      "isRenounced": true,
+      "kind": "metadata",
+    },
+    "mint": {
+      "address": null,
+      "isRenounced": true,
+      "kind": "mint",
+    },
+    "update": {
+      "address": null,
+      "isRenounced": true,
+      "kind": "update",
+    },
+  },
+  "decimals": 0,
+  "extensions": [],
+  "fetchedAt": "2026-05-28T12:00:00.000Z",
+  "metadata": {
+    "decimals": 0,
+    "hasOnChainName": false,
+    "hasOnChainSymbol": false,
+    "quality": "missing",
+  },
+  "mint": "MinimalT22Mint11111111111111111111111111111",
+  "programId": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  "supply": "0",
+  "warnings": [
+    {
+      "code": "MISSING_METADATA_NAME",
+      "message": "Mint has no resolvable name",
+      "path": "content.metadata.name",
+    },
+    {
+      "code": "MISSING_METADATA_SYMBOL",
+      "message": "Mint has no resolvable symbol",
+      "path": "content.metadata.symbol",
+    },
+    {
+      "code": "MISSING_METADATA_URI",
+      "message": "Mint has no metadata URI",
+      "path": "content.json_uri",
+    },
+  ],
+}
+`;
+
+exports[`parseMintProfile snapshots > matches snapshot for pyusd 1`] = `
+{
+  "authorities": {
+    "freeze": {
+      "address": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
+      "isRenounced": false,
+      "kind": "freeze",
+    },
+    "metadata": {
+      "address": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
+      "isRenounced": false,
+      "kind": "metadata",
+    },
+    "mint": {
+      "address": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
+      "isRenounced": false,
+      "kind": "mint",
+    },
+    "update": {
+      "address": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
+      "isRenounced": false,
+      "kind": "update",
+    },
+  },
+  "decimals": 6,
+  "extensions": [
+    {
+      "kind": "metadataPointer",
+      "parameters": {
+        "authority": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
+        "metadata_address": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+      },
+      "raw": {
+        "authority": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
+        "metadata_address": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+      },
+      "rawKind": "metadata_pointer",
+    },
+    {
+      "kind": "mintCloseAuthority",
+      "parameters": {
+        "close_authority": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
+      },
+      "raw": {
+        "close_authority": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
+      },
+      "rawKind": "mint_close_authority",
+    },
+    {
+      "kind": "permanentDelegate",
+      "parameters": {
+        "delegate": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
+      },
+      "raw": {
+        "delegate": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
+      },
+      "rawKind": "permanent_delegate",
+    },
+    {
+      "kind": "tokenMetadata",
+      "parameters": {
+        "additional_metadata": [],
+        "authority": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
+        "mint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+        "name": "PayPal USD",
+        "symbol": "PYUSD",
+        "uri": "https://token-metadata.paxos.com/pyusd_metadata/prod/solana/pyusd_metadata.json",
+      },
+      "raw": {
+        "additional_metadata": [],
+        "authority": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
+        "mint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+        "name": "PayPal USD",
+        "symbol": "PYUSD",
+        "uri": "https://token-metadata.paxos.com/pyusd_metadata/prod/solana/pyusd_metadata.json",
+      },
+      "rawKind": "token_metadata",
+    },
+    {
+      "kind": "transferFeeConfig",
+      "parameters": {
+        "newer_transfer_fee": {
+          "epoch": "0",
+          "maximum_fee": "0",
+          "transfer_fee_basis_points": "0",
+        },
+        "older_transfer_fee": {
+          "epoch": "0",
+          "maximum_fee": "0",
+          "transfer_fee_basis_points": "0",
+        },
+        "transfer_fee_config_authority": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
+        "withdraw_withheld_authority": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
+        "withheld_amount": "0",
+      },
+      "raw": {
+        "newer_transfer_fee": {
+          "epoch": "0",
+          "maximum_fee": "0",
+          "transfer_fee_basis_points": "0",
+        },
+        "older_transfer_fee": {
+          "epoch": "0",
+          "maximum_fee": "0",
+          "transfer_fee_basis_points": "0",
+        },
+        "transfer_fee_config_authority": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
+        "withdraw_withheld_authority": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
+        "withheld_amount": "0",
+      },
+      "rawKind": "transfer_fee_config",
+    },
+  ],
+  "fetchedAt": "2026-05-28T12:00:00.000Z",
+  "metadata": {
+    "decimals": 6,
+    "hasOnChainName": true,
+    "hasOnChainSymbol": true,
+    "name": "PayPal USD",
+    "quality": "complete",
+    "symbol": "PYUSD",
+    "uri": "https://token-metadata.paxos.com/pyusd_metadata/prod/solana/pyusd_metadata.json",
+  },
+  "mint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+  "programId": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  "supply": "298473625104000",
+  "warnings": [],
+}
+`;
+
+exports[`parseMintProfile snapshots > matches snapshot for transferHookToken 1`] = `
+{
+  "authorities": {
+    "freeze": {
+      "address": null,
+      "isRenounced": true,
+      "kind": "freeze",
+    },
+    "metadata": {
+      "address": null,
+      "isRenounced": true,
+      "kind": "metadata",
+    },
+    "mint": {
+      "address": null,
+      "isRenounced": true,
+      "kind": "mint",
+    },
+    "update": {
+      "address": null,
+      "isRenounced": true,
+      "kind": "update",
+    },
+  },
+  "decimals": 9,
+  "extensions": [
+    {
+      "kind": "metadataPointer",
+      "parameters": {
+        "authority": null,
+        "metadata_address": "HoNeYy4S3p5N1RfRy7Sw1FZuYxnDpQpqxXJEUmwwHZGv",
+      },
+      "raw": {
+        "authority": null,
+        "metadata_address": "HoNeYy4S3p5N1RfRy7Sw1FZuYxnDpQpqxXJEUmwwHZGv",
+      },
+      "rawKind": "metadata_pointer",
+    },
+    {
+      "kind": "nonTransferable",
+      "parameters": {},
+      "raw": {},
+      "rawKind": "non_transferable",
+    },
+    {
+      "kind": "tokenMetadata",
+      "parameters": {
+        "additional_metadata": [],
+        "authority": null,
+        "mint": "HoNeYy4S3p5N1RfRy7Sw1FZuYxnDpQpqxXJEUmwwHZGv",
+        "name": "Hivemapper",
+        "symbol": "HONEY",
+        "uri": "https://example.com/metadata/honey.json",
+      },
+      "raw": {
+        "additional_metadata": [],
+        "authority": null,
+        "mint": "HoNeYy4S3p5N1RfRy7Sw1FZuYxnDpQpqxXJEUmwwHZGv",
+        "name": "Hivemapper",
+        "symbol": "HONEY",
+        "uri": "https://example.com/metadata/honey.json",
+      },
+      "rawKind": "token_metadata",
+    },
+    {
+      "kind": "transferHook",
+      "parameters": {
+        "authority": "HHkVVZ1xJ9P3WkfNYjT2yiyHmZ9o5sDgKwQbAjJzALjW",
+        "program_id": "HookProg1111111111111111111111111111111111",
+      },
+      "raw": {
+        "authority": "HHkVVZ1xJ9P3WkfNYjT2yiyHmZ9o5sDgKwQbAjJzALjW",
+        "program_id": "HookProg1111111111111111111111111111111111",
+      },
+      "rawKind": "transfer_hook",
+    },
+  ],
+  "fetchedAt": "2026-05-28T12:00:00.000Z",
+  "metadata": {
+    "decimals": 9,
+    "hasOnChainName": true,
+    "hasOnChainSymbol": true,
+    "name": "Hivemapper",
+    "quality": "complete",
+    "symbol": "HONEY",
+    "uri": "https://example.com/metadata/honey.json",
+  },
+  "mint": "HoNeYy4S3p5N1RfRy7Sw1FZuYxnDpQpqxXJEUmwwHZGv",
+  "programId": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  "supply": "10000000000000000000",
+  "warnings": [],
+}
+`;
+
+exports[`parseMintProfile snapshots > matches snapshot for unknownExtension 1`] = `
+{
+  "authorities": {
+    "freeze": {
+      "address": null,
+      "isRenounced": true,
+      "kind": "freeze",
+    },
+    "metadata": {
+      "address": "FutureAuth11111111111111111111111111111111",
+      "isRenounced": false,
+      "kind": "metadata",
+    },
+    "mint": {
+      "address": "FutureAuth11111111111111111111111111111111",
+      "isRenounced": false,
+      "kind": "mint",
+    },
+    "update": {
+      "address": null,
+      "isRenounced": true,
+      "kind": "update",
+    },
+  },
+  "decimals": 6,
+  "extensions": [
+    {
+      "kind": "unknown",
+      "parameters": {
+        "payload": "unknown-by-design",
+      },
+      "raw": {
+        "payload": "unknown-by-design",
+      },
+      "rawKind": "alien_extension_42",
+    },
+    {
+      "kind": "metadataPointer",
+      "parameters": {
+        "authority": "FutureAuth11111111111111111111111111111111",
+        "metadata_address": "UnknownExtMint1111111111111111111111111111",
+      },
+      "raw": {
+        "authority": "FutureAuth11111111111111111111111111111111",
+        "metadata_address": "UnknownExtMint1111111111111111111111111111",
+      },
+      "rawKind": "metadata_pointer",
+    },
+    {
+      "kind": "unknown",
+      "parameters": {
+        "scheme": "dilithium-3",
+        "verifier": "QvSigVerify1111111111111111111111111111111",
+      },
+      "raw": {
+        "scheme": "dilithium-3",
+        "verifier": "QvSigVerify1111111111111111111111111111111",
+      },
+      "rawKind": "quantum_resistant_signer",
+    },
+  ],
+  "fetchedAt": "2026-05-28T12:00:00.000Z",
+  "metadata": {
+    "decimals": 6,
+    "hasOnChainName": false,
+    "hasOnChainSymbol": false,
+    "name": "Future Extension Token",
+    "quality": "complete",
+    "symbol": "FUTURE",
+    "uri": "https://example.com/metadata/unknown.json",
+  },
+  "mint": "UnknownExtMint1111111111111111111111111111",
+  "programId": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+  "supply": "1000000",
+  "warnings": [
+    {
+      "code": "UNKNOWN_EXTENSION",
+      "message": "Encountered unknown Token-2022 extension: quantum_resistant_signer",
+      "path": "mint_extensions.quantum_resistant_signer",
+    },
+    {
+      "code": "UNKNOWN_EXTENSION",
+      "message": "Encountered unknown Token-2022 extension: alien_extension_42",
+      "path": "mint_extensions.alien_extension_42",
+    },
+  ],
+}
+`;
+
+exports[`parseMintProfile snapshots > matches snapshot for usdc 1`] = `
+{
+  "authorities": {
+    "freeze": {
+      "address": "7dGbd2QZcCKcTndnHcTL8q7SMVXAkp688NTQYwrRCrar",
+      "isRenounced": false,
+      "kind": "freeze",
+    },
+    "metadata": {
+      "address": null,
+      "isRenounced": true,
+      "kind": "metadata",
+    },
+    "mint": {
+      "address": "BJE5MMbqXjVwjAF7oxwPYXnTXDyspzZyt4vwenNw5ruG",
+      "isRenounced": false,
+      "kind": "mint",
+    },
+    "update": {
+      "address": "2wmVCSfPxGPjrnMMn7rchp4uaeoTqN39mXFC2zhPdri9",
+      "isRenounced": false,
+      "kind": "update",
+    },
+  },
+  "decimals": 6,
+  "extensions": [],
+  "fetchedAt": "2026-05-28T12:00:00.000Z",
+  "metadata": {
+    "decimals": 6,
+    "hasOnChainName": false,
+    "hasOnChainSymbol": false,
+    "name": "USD Coin",
+    "quality": "partial",
+    "symbol": "USDC",
+    "uri": "",
+  },
+  "mint": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+  "programId": "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA",
+  "supply": "8147825036000000",
+  "warnings": [
+    {
+      "code": "MISSING_METADATA_URI",
+      "message": "Mint has no metadata URI",
+      "path": "content.json_uri",
+    },
+  ],
+}
+`;
