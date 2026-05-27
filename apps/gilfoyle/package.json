@@ -7,9 +7,12 @@
   "scripts": {
     "dev": "bun run src/index.ts",
     "build": "echo 'No build step yet for gilfoyle'",
-    "smoke:parse": "bun run scripts/smoke-parse.ts"
+    "smoke:parse": "bun run scripts/smoke-parse.ts",
+    "validate:rules": "bun run scripts/validate-rules.ts"
   },
   "dependencies": {
-    "@tarani/shared": "workspace:*"
+    "@tarani/shared": "workspace:*",
+    "ajv": "^8.20.0",
+    "ajv-formats": "^3.0.1"
   }
 }

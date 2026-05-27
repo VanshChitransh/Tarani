@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://tarani.dev/schemas/venueRule.schema.json",
+  "title": "VenueRule",
+  "description": "Per-venue compatibility rule file. Day 1 scaffold; populated venue-by-venue on Day 2.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["venue", "version", "last_updated", "features", "notes"],
+  "properties": {
+    "venue": {
+      "type": "string",
+      "enum": ["jupiter", "raydium", "orca", "phantom", "solflare"],
+      "description": "Venue identifier. Must match a known VenueId in @tarani/shared."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$",
+      "description": "Semver-shaped rule pack version."
+    },
+    "last_updated": {
+      "type": "string",
+      "format": "date",
+      "description": "ISO 8601 date (YYYY-MM-DD) of last manual review."
+    },
+    "features": {
+      "type": "array",
+      "description": "Per-feature compatibility entries. May be empty on Day 1.",
+      "items": { "$ref": "#/definitions/feature" }
+    },
+    "notes": {
+      "type": "array",
+      "description": "Free-form notes about the rule pack as a whole.",
+      "items": { "type": "string", "minLength": 1 }
+    }
+  },
+  "definitions": {
+    "feature": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "status"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Token-2022 extension kind or capability identifier."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["supported", "partial", "blocked", "conditional", "unknown"]
+        },
+        "confidence": {
+          "type": "string",
+          "enum": ["high", "medium", "low"]
+        },
+        "evidence": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 },
+          "description": "URLs or rule references backing this entry."
+        },
+        "notes": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}
