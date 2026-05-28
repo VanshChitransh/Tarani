@@ -1,6 +1,14 @@
 export const COMPATIBILITY_SOURCE_VALUES = ["probe", "heuristic", "override"] as const;
 
-export const VENUE_IDS = ["jupiter", "raydium", "orca", "phantom", "solflare"] as const;
+export const VENUE_IDS = [
+  "jupiter",
+  "raydium",
+  "orca",
+  "phantom",
+  "solflare",
+  "solscan",
+  "solana-explorer",
+] as const;
 
 export const COMPATIBILITY_EVIDENCE_KINDS = ["rule", "probe", "doc"] as const;
 
