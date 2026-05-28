@@ -12,14 +12,13 @@
     "dev:frontend": "bun run --filter @tarani/pixel dev",
     "dev:backend": "bun run --filter @tarani/gilfoyle dev",
     "dev:simulator": "bun run --filter @tarani/kotler dev",
-    "build": "bun run --filter @tarani/pixel build",
-    "build:all": "bun run --filter @tarani/pixel build && bun run --filter @tarani/gilfoyle build && bun run --filter @tarani/kotler build",
+    "build": "bun run --filter @tarani/pixel build && bun run --filter @tarani/gilfoyle build && bun run --filter @tarani/kotler build",
     "lint": "bunx eslint .",
     "format": "bunx prettier --write .",
     "typecheck": "bunx tsc --noEmit",
     "test": "bunx vitest run",
     "check": "bun run lint && bun run typecheck && bun run test",
-    "check:ci": "bun run check && bun run build:all",
+    "check:ci": "bun run check && bun run build",
     "prepare": "husky"
   },
   "dependencies": {
