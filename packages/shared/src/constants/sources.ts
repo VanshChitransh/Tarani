@@ -64,6 +64,10 @@ export const SCENARIO_KINDS = [
   "wrap_sol",
   "associated_token_create",
   "freeze_check",
+  "transfer_hook",
+  "transfer_fee",
+  "memo_required",
+  "metadata_check",
 ] as const;
 
 export const MONITOR_EVENT_KINDS = [

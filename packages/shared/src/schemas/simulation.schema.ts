@@ -13,11 +13,13 @@ export const scenarioResultSchema = z.object({
   summary: z.string().min(1),
   durationMs: z.number().int().nonnegative(),
   failureCode: z.string().optional(),
+  logs: z.array(z.string()).optional(),
 });
 
 export const simulationReportSchema = z.object({
   mint: z.string().min(32).max(44),
   results: z.array(scenarioResultSchema),
+  validatorMode: z.enum(["live", "heuristic"]),
   generatedAt: z.iso.datetime(),
 });
 
