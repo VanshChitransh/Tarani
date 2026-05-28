@@ -1,7 +1,45 @@
 {
   "venue": "solflare",
-  "version": "0.1.0",
-  "last_updated": "2026-05-28",
-  "features": [],
-  "notes": []
+  "version": "0.2.0",
+  "last_updated": "2026-05-29",
+  "features": [
+    {
+      "id": "permanentDelegate",
+      "status": "conditional",
+      "confidence": "medium",
+      "evidence": ["https://solflare.com/blog/token-extensions-support"],
+      "notes": ["Solflare shows a warning banner for permanent delegate tokens before any action"]
+    },
+    {
+      "id": "transferFeeConfig",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://solflare.com/blog/token-extensions-support"],
+      "notes": ["Solflare displays the fee amount in the send flow and requires user confirmation"]
+    },
+    {
+      "id": "nonTransferable",
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": ["https://solflare.com/blog/token-extensions-support"],
+      "notes": ["Non-transferable tokens cannot be sent; Solflare disables the send action"]
+    },
+    {
+      "id": "transferHook",
+      "status": "supported",
+      "confidence": "medium",
+      "evidence": ["https://solflare.com/blog/token-extensions-support"],
+      "notes": ["Solflare supports transfer-hook tokens with a user-visible warning"]
+    },
+    {
+      "id": "confidentialTransferMint",
+      "status": "partial",
+      "confidence": "low",
+      "evidence": ["https://spl.solana.com/token-2022/extensions#confidential-transfers"],
+      "notes": ["Solflare may render the token but confidential balance display is unverified"]
+    }
+  ],
+  "notes": [
+    "Day 2 first-cut rules; Solflare behavior sourced from public blog and community reports"
+  ]
 }

@@ -1,7 +1,43 @@
 {
   "venue": "raydium",
-  "version": "0.1.0",
-  "last_updated": "2026-05-28",
-  "features": [],
-  "notes": []
+  "version": "0.2.0",
+  "last_updated": "2026-05-29",
+  "features": [
+    {
+      "id": "transferFeeConfig",
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": ["https://docs.raydium.io/raydium/pool-creation/creating-a-clmm-pool-and-farm"],
+      "notes": ["Raydium CLMM does not support transfer-fee tokens in standard pools"]
+    },
+    {
+      "id": "transferHook",
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": ["https://docs.raydium.io/raydium/pool-creation/creating-a-clmm-pool-and-farm"],
+      "notes": ["Transfer hooks are not supported in Raydium CLMM or AMM pools"]
+    },
+    {
+      "id": "permanentDelegate",
+      "status": "conditional",
+      "confidence": "medium",
+      "evidence": ["https://docs.raydium.io/raydium/"],
+      "notes": ["Permanent delegate is technically allowed but may trigger UI warnings"]
+    },
+    {
+      "id": "nonTransferable",
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": ["https://spl.solana.com/token-2022/extensions#non-transferable-tokens"],
+      "notes": ["Non-transferable tokens cannot be deposited into Raydium pools"]
+    },
+    {
+      "id": "confidentialTransferMint",
+      "status": "blocked",
+      "confidence": "medium",
+      "evidence": ["https://spl.solana.com/token-2022/extensions#confidential-transfers"],
+      "notes": ["Confidential transfer amounts are incompatible with Raydium's on-chain price math"]
+    }
+  ],
+  "notes": ["Day 2 first-cut rules; refine on Day 6 with probe evidence"]
 }
