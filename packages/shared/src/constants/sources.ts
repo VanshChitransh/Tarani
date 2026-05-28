@@ -52,6 +52,7 @@ export const RISK_CATEGORIES = [
   "authority",
   "metadata",
   "extension",
+  "compatibility",
   "supply",
   "ownership",
   "liquidity",
