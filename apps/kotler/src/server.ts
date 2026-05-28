@@ -6,7 +6,7 @@ const PORT = Number(process.env.KOTLER_PORT ?? 3001);
 export function startServer(): void {
   Bun.serve({
     port: PORT,
-    async fetch(req) {
+    async fetch(req: Request) {
       const url = new URL(req.url);
 
       if (url.pathname === "/health" && req.method === "GET") {
@@ -40,7 +40,7 @@ export function startServer(): void {
 
       return Response.json({ ok: false, error: "Not found" }, { status: 404 });
     },
-    error(err) {
+    error(err: Error) {
       console.error("[kotler] Unhandled server error:", err);
       return Response.json({ ok: false, error: "Internal server error" }, { status: 500 });
     },

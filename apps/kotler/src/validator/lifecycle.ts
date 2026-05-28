@@ -1,4 +1,4 @@
-import { spawn, type ChildProcess } from "child_process";
+import { spawn, spawnSync, type ChildProcess } from "child_process";
 import { createConnection } from "net";
 
 export class ValidatorBootTimeoutError extends Error {
@@ -15,8 +15,8 @@ export interface ValidatorHandle {
 }
 
 export async function isValidatorBinaryAvailable(): Promise<boolean> {
-  const proc = Bun.spawnSync(["which", "solana-test-validator"]);
-  return proc.exitCode === 0;
+  const proc = spawnSync("which", ["solana-test-validator"]);
+  return proc.status === 0;
 }
 
 export async function findFreePort(start = 8899): Promise<number> {
@@ -66,7 +66,7 @@ export async function waitForValidator(port: number, timeoutMs = 30_000): Promis
     } catch {
       // still booting
     }
-    await Bun.sleep(500);
+    await new Promise<void>((resolve) => setTimeout(resolve, 500));
   }
   throw new ValidatorBootTimeoutError(port, timeoutMs);
 }

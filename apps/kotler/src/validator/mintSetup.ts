@@ -29,7 +29,7 @@ function extensionTypeForKind(kind: string): ExtensionType | null {
     transferFeeConfig: ExtensionType.TransferFeeConfig,
     defaultAccountState: ExtensionType.DefaultAccountState,
     permanentDelegate: ExtensionType.PermanentDelegate,
-    nonTransferable: ExtensionType.NonTransferableMint,
+    nonTransferable: ExtensionType.NonTransferable,
     memoTransfer: ExtensionType.MemoTransfer,
     // transferHook and confidentialTransferMint skipped — hook program may not exist in test env
   };
