@@ -1,0 +1,45 @@
+{
+  "venue": "solscan",
+  "version": "0.2.0",
+  "last_updated": "2026-05-29",
+  "features": [
+    {
+      "id": "transferFeeConfig",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://solscan.io/token/EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"],
+      "notes": ["Solscan renders transfer fee config in the token extensions panel"]
+    },
+    {
+      "id": "transferHook",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://solscan.io"],
+      "notes": ["Solscan shows transfer hook program address in the extensions tab"]
+    },
+    {
+      "id": "nonTransferable",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://solscan.io"],
+      "notes": ["Solscan displays non-transferable flag clearly in token details"]
+    },
+    {
+      "id": "confidentialTransferMint",
+      "status": "partial",
+      "confidence": "medium",
+      "evidence": ["https://solscan.io"],
+      "notes": ["Solscan shows the extension exists but cannot display encrypted balances"]
+    },
+    {
+      "id": "permanentDelegate",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://solscan.io"],
+      "notes": ["Solscan shows permanent delegate address in extensions panel"]
+    }
+  ],
+  "notes": [
+    "Day 2 first-cut rules; Solscan displays all Token-2022 extensions as metadata — no execution path"
+  ]
+}

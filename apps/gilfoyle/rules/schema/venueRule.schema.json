@@ -9,7 +9,7 @@
   "properties": {
     "venue": {
       "type": "string",
-      "enum": ["jupiter", "raydium", "orca", "phantom", "solflare"],
+      "enum": ["jupiter", "raydium", "orca", "phantom", "solflare", "solscan", "solana-explorer"],
       "description": "Venue identifier. Must match a known VenueId in @tarani/shared."
     },
     "version": {

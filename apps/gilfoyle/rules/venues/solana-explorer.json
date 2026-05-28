@@ -1,0 +1,45 @@
+{
+  "venue": "solana-explorer",
+  "version": "0.2.0",
+  "last_updated": "2026-05-29",
+  "features": [
+    {
+      "id": "transferFeeConfig",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://explorer.solana.com"],
+      "notes": ["Solana Explorer renders transfer fee configuration in the token account view"]
+    },
+    {
+      "id": "transferHook",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://explorer.solana.com"],
+      "notes": ["Solana Explorer shows transfer hook program ID in the extensions section"]
+    },
+    {
+      "id": "nonTransferable",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://explorer.solana.com"],
+      "notes": ["Solana Explorer displays the non-transferable extension label on the mint page"]
+    },
+    {
+      "id": "confidentialTransferMint",
+      "status": "partial",
+      "confidence": "low",
+      "evidence": ["https://explorer.solana.com"],
+      "notes": ["Solana Explorer shows the extension is present but cannot decode encrypted state"]
+    },
+    {
+      "id": "permanentDelegate",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://explorer.solana.com"],
+      "notes": ["Solana Explorer shows permanent delegate address in the token extensions panel"]
+    }
+  ],
+  "notes": [
+    "Day 2 first-cut rules; Solana Explorer is a read-only display venue — no execution, only rendering"
+  ]
+}

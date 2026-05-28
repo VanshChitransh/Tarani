@@ -33,9 +33,9 @@ const fixtureProfile: MintProfile = {
 };
 
 describe("runCompatibilityEngine", () => {
-  it("returns exactly 5 results", () => {
+  it("returns exactly 7 results", () => {
     const results = runCompatibilityEngine(fixtureProfile);
-    expect(results).toHaveLength(5);
+    expect(results).toHaveLength(7);
   });
 
   it("results are in VENUE_IDS order", () => {

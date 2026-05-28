@@ -28,7 +28,7 @@ afterEach(() => {
 // --- happy path ---
 
 describe("POST /api/analyze — success", () => {
-  it("returns ok:true with profile and 5 compatibility results", async () => {
+  it("returns ok:true with profile and 7 compatibility results", async () => {
     vi.spyOn(HeliusClient.prototype, "fetchMintAsset").mockResolvedValue(transferHookAsset);
 
     const res = await POST(makeRequest({ mint: FIXTURE_MINT }));
@@ -37,7 +37,7 @@ describe("POST /api/analyze — success", () => {
     expect(res.status).toBe(200);
     expect(body.ok).toBe(true);
     expect(body.data.profile.mint).toBe(FIXTURE_MINT);
-    expect(body.data.compatibility).toHaveLength(5);
+    expect(body.data.compatibility).toHaveLength(7);
     expect(body.data.compatibility.map((r: { venue: string }) => r.venue)).toEqual([...VENUE_IDS]);
     expect(body.data.risks).toEqual([]);
     expect(body.data.recommendations).toEqual([]);
