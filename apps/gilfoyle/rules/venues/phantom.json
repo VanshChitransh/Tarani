@@ -1,7 +1,45 @@
 {
   "venue": "phantom",
-  "version": "0.1.0",
-  "last_updated": "2026-05-28",
-  "features": [],
-  "notes": []
+  "version": "0.2.0",
+  "last_updated": "2026-05-29",
+  "features": [
+    {
+      "id": "nonTransferable",
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": ["https://phantom.app/learn/developers/tokens"],
+      "notes": ["Non-transferable tokens cannot be sent from Phantom; send button is disabled"]
+    },
+    {
+      "id": "transferHook",
+      "status": "supported",
+      "confidence": "medium",
+      "evidence": ["https://phantom.app/learn/developers/tokens"],
+      "notes": ["Phantom displays transfer-hook tokens but shows a warning banner to the user"]
+    },
+    {
+      "id": "transferFeeConfig",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://phantom.app/learn/developers/tokens"],
+      "notes": ["Phantom shows transfer fee info in the send UI; user confirms before sending"]
+    },
+    {
+      "id": "permanentDelegate",
+      "status": "conditional",
+      "confidence": "medium",
+      "evidence": ["https://phantom.app/learn/developers/tokens"],
+      "notes": ["Phantom flags permanent delegate in token detail view as a risk indicator"]
+    },
+    {
+      "id": "confidentialTransferMint",
+      "status": "partial",
+      "confidence": "low",
+      "evidence": ["https://spl.solana.com/token-2022/extensions#confidential-transfers"],
+      "notes": ["Phantom may display the token but confidential balances may not render correctly"]
+    }
+  ],
+  "notes": [
+    "Day 2 first-cut rules; Phantom wallet behavior sourced from public docs and community reports"
+  ]
 }
