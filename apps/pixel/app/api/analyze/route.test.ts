@@ -39,8 +39,9 @@ describe("POST /api/analyze — success", () => {
     expect(body.data.profile.mint).toBe(FIXTURE_MINT);
     expect(body.data.compatibility).toHaveLength(7);
     expect(body.data.compatibility.map((r: { venue: string }) => r.venue)).toEqual([...VENUE_IDS]);
-    expect(body.data.risks).toEqual([]);
-    expect(body.data.recommendations).toEqual([]);
+    expect(Array.isArray(body.data.risks)).toBe(true);
+    expect(body.data.risks.length).toBeGreaterThan(0);
+    expect(Array.isArray(body.data.recommendations)).toBe(true);
     expect(typeof body.data.generatedAt).toBe("string");
   });
 

@@ -3,3 +3,4 @@ export * from "./parser";
 export * from "./rules";
 export * from "./adapters";
 export * from "./risk";
+export * from "./recommendations";

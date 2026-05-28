@@ -1,5 +1,7 @@
 import type { AnalyzeReport } from "@tarani/shared";
 import { CompatibilityMatrix } from "../../../components/CompatibilityMatrix";
+import { RiskSection } from "../../../components/RiskSection";
+import { RecommendationList } from "../../../components/RecommendationList";
 
 interface Props {
   params: Promise<{ mint: string }>;
@@ -45,6 +47,22 @@ export default async function ReportPage({ params }: Props) {
         </h2>
         <CompatibilityMatrix results={result.compatibility} />
       </section>
+
+      <section>
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400 mb-3">
+          Risk Findings
+        </h2>
+        <RiskSection risks={result.risks} />
+      </section>
+
+      {result.recommendations.length > 0 && (
+        <section>
+          <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400 mb-3">
+            Recommendations
+          </h2>
+          <RecommendationList recommendations={result.recommendations} />
+        </section>
+      )}
 
       <section>
         <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400 mb-3">

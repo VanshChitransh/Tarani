@@ -11,6 +11,8 @@ import {
   HeliusClientError,
   parseMintProfile,
   runCompatibilityEngine,
+  scoreRisk,
+  generateRecommendations,
 } from "@tarani/gilfoyle";
 
 const ERROR_HTTP_STATUS: Record<ApiErrorCode, number> = {
@@ -43,13 +45,15 @@ export async function POST(req: Request) {
     const asset = await client.fetchMintAsset(parsed.data.mint);
     const profile = parseMintProfile(asset);
     const compatibility = runCompatibilityEngine(profile);
+    const risks = scoreRisk(profile, compatibility);
+    const recommendations = generateRecommendations(risks, compatibility);
     const body: AnalyzeResponse = {
       ok: true,
       data: {
         profile,
         compatibility,
-        risks: [],
-        recommendations: [],
+        risks,
+        recommendations,
         generatedAt: new Date().toISOString(),
       },
     };
