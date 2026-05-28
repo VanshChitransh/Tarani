@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@tarani/gilfoyle": "workspace:*",
     "@tarani/shared": "workspace:*",
     "next": "^15.5.3",
     "react": "^19.1.1",
