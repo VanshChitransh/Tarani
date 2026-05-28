@@ -2,6 +2,7 @@ import type { AnalyzeReport } from "@tarani/shared";
 import { CompatibilityMatrix } from "../../../components/CompatibilityMatrix";
 import { RiskSection } from "../../../components/RiskSection";
 import { RecommendationList } from "../../../components/RecommendationList";
+import { SimulationSection } from "../../../components/SimulationSection";
 
 interface Props {
   params: Promise<{ mint: string }>;
@@ -63,6 +64,13 @@ export default async function ReportPage({ params }: Props) {
           <RecommendationList recommendations={result.recommendations} />
         </section>
       )}
+
+      <section>
+        <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400 mb-3">
+          Simulation
+        </h2>
+        <SimulationSection mint={mint} />
+      </section>
 
       <section>
         <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400 mb-3">
