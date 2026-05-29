@@ -1,6 +1,6 @@
 import type { CompatibilityDiff, CompatibilitySnapshot, MonitorRecord } from "@tarani/shared";
 import { randomUUID } from "crypto";
-import type { DbDriver } from "./db.js";
+import type { DbDriver } from "./db";
 
 const MAX_MINTS = parseInt(process.env.MAX_MONITORED_MINTS ?? "100", 10);
 

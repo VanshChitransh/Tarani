@@ -1,5 +1,5 @@
-export { initDb } from "./db.js";
-export type { DbDriver } from "./db.js";
+export { initDb } from "./db";
+export type { DbDriver } from "./db";
 export {
   configure,
   addMint,
@@ -11,4 +11,4 @@ export {
   getLatestSnapshot,
   saveDiff,
   getLatestDiff,
-} from "./store.js";
+} from "./store";
