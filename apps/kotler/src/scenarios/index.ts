@@ -5,6 +5,8 @@ import { transferHookScenario } from "./transferHook";
 import { transferFeeScenario } from "./transferFee";
 import { memoRequiredScenario } from "./memoRequired";
 import { metadataCheckScenario } from "./metadataCheck";
+import { swapScenario } from "./swap";
+import { wrapSolScenario } from "./wrapSol";
 
 export const SCENARIO_REGISTRY: Partial<Record<ScenarioKind, ScenarioEntry>> = {
   transfer: transferScenario,
@@ -12,4 +14,6 @@ export const SCENARIO_REGISTRY: Partial<Record<ScenarioKind, ScenarioEntry>> = {
   transfer_fee: transferFeeScenario,
   memo_required: memoRequiredScenario,
   metadata_check: metadataCheckScenario,
+  swap: swapScenario,
+  wrap_sol: wrapSolScenario,
 };

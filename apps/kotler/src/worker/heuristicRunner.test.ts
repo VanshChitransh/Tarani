@@ -29,7 +29,7 @@ describe("runHeuristic", () => {
   });
 
   it("silently skips unknown scenario kinds", () => {
-    const results = runHeuristic(BASE_PROFILE, ["swap" as ScenarioKind]);
+    const results = runHeuristic(BASE_PROFILE, ["freeze_check" as ScenarioKind]);
     expect(results).toHaveLength(0);
   });
 

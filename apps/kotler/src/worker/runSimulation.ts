@@ -10,6 +10,8 @@ const DEFAULT_SCENARIOS: ScenarioKind[] = [
   "transfer_fee",
   "memo_required",
   "metadata_check",
+  "swap",
+  "wrap_sol",
 ];
 
 export async function runSimulation(request: SimulationRequest): Promise<SimulationReport> {
