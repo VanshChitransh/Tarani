@@ -22,6 +22,10 @@ coverage/
 .env.local
 .env.*.local
 
+# SQLite monitoring DB
+monitor.db
+*.db
+
 # Bun/lock
 bun.lockb
 
