@@ -7,7 +7,11 @@ import {
 } from "./compatibility.schema";
 import { mintProfileSchema } from "./mint.schema";
 import { recommendationSchema, riskFindingSchema } from "./risk.schema";
-import { badgeDataSchema, scenarioKindSchema, simulationReportSchema } from "./simulation.schema";
+import {
+  badgeDataSchema as simulationBadgeDataSchema,
+  scenarioKindSchema,
+  simulationReportSchema,
+} from "./simulation.schema";
 
 export const apiErrorCodeSchema = z.enum(API_ERROR_CODE_VALUES);
 
@@ -67,7 +71,7 @@ export const simulationRequestSchema = z.object({
 
 export const simulationResponseSchema = apiResponseSchema(simulationReportSchema);
 
-export const badgeResponseSchema = apiResponseSchema(badgeDataSchema);
+export const badgeResponseSchema = apiResponseSchema(simulationBadgeDataSchema);
 
 export const monitorRequestSchema = z.object({
   mint: z.string().min(32).max(44),
@@ -112,3 +116,33 @@ export const monitorDetailSchema = monitorRecordSchema.extend({
 });
 
 export const monitorDetailResponseSchema = apiResponseSchema(monitorDetailSchema);
+
+export const alertWebhookSchema = z.object({
+  id: z.string(),
+  url: z.string().url(),
+  addedAt: z.iso.datetime(),
+  active: z.boolean(),
+});
+
+export const registerWebhookRequestSchema = z.object({
+  url: z.string().url(),
+});
+
+export const registerWebhookResponseSchema = apiResponseSchema(alertWebhookSchema);
+
+export const webhookListResponseSchema = apiResponseSchema(z.array(alertWebhookSchema));
+
+export const alertEventSchema = z.object({
+  mint: z.string(),
+  diffs: z.array(compatibilityDiffSchema),
+  detectedAt: z.iso.datetime(),
+});
+
+export const badgeDataSchema = z.object({
+  mint: z.string(),
+  supportedCount: z.number().int().nonnegative(),
+  totalCount: z.number().int().nonnegative(),
+  blockedCount: z.number().int().nonnegative(),
+  grade: z.enum(["A", "B", "C", "F"]),
+  generatedAt: z.iso.datetime(),
+});

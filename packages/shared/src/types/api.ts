@@ -1,11 +1,14 @@
 import type { z } from "zod";
 import type {
+  alertEventSchema,
+  alertWebhookSchema,
   analyzeModeSchema,
   analyzeReportSchema,
   analyzeRequestSchema,
   analyzeResponseSchema,
   apiErrorCodeSchema,
   apiErrorSchema,
+  badgeDataSchema,
   badgeResponseSchema,
   compatibilityDiffKindSchema,
   compatibilityDiffSchema,
@@ -20,6 +23,7 @@ import type {
   prelaunchAuthoritiesSchema,
   prelaunchConfigSchema,
   prelaunchExtensionSchema,
+  registerWebhookRequestSchema,
   simulationRequestSchema,
   simulationResponseSchema,
 } from "../schemas/api.schema";
@@ -53,3 +57,8 @@ export type MonitorDetailResponse = z.infer<typeof monitorDetailResponseSchema>;
 export type CompatibilityDiffKind = z.infer<typeof compatibilityDiffKindSchema>;
 export type CompatibilityDiff = z.infer<typeof compatibilityDiffSchema>;
 export type CompatibilitySnapshot = z.infer<typeof compatibilitySnapshotSchema>;
+
+export type AlertWebhook = z.infer<typeof alertWebhookSchema>;
+export type RegisterWebhookRequest = z.infer<typeof registerWebhookRequestSchema>;
+export type AlertEvent = z.infer<typeof alertEventSchema>;
+export type BadgeData = z.infer<typeof badgeDataSchema>;
