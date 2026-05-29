@@ -12,6 +12,7 @@
     "dev:frontend": "bun run --filter @tarani/pixel dev",
     "dev:backend": "bun run --filter @tarani/gilfoyle dev",
     "dev:simulator": "bun run --filter @tarani/kotler dev",
+    "dev:sentinel": "bun run apps/sentinel/src/index.ts",
     "build": "bun run --filter @tarani/pixel build && bun run --filter @tarani/gilfoyle build && bun run --filter @tarani/kotler build",
     "lint": "bunx eslint .",
     "format": "bunx prettier --write .",

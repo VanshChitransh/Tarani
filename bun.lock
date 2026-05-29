@@ -68,6 +68,19 @@
         "tailwindcss": "^3",
       },
     },
+    "apps/sentinel": {
+      "name": "@tarani/sentinel",
+      "version": "0.1.0",
+      "dependencies": {
+        "@tarani/gilfoyle": "workspace:*",
+        "@tarani/monitor-store": "workspace:*",
+        "@tarani/shared": "workspace:*",
+        "better-sqlite3": "*",
+      },
+      "devDependencies": {
+        "@types/better-sqlite3": "*",
+      },
+    },
     "packages/monitor-store": {
       "name": "@tarani/monitor-store",
       "version": "0.1.0",
@@ -418,6 +431,8 @@
     "@tarani/monitor-store": ["@tarani/monitor-store@workspace:packages/monitor-store"],
 
     "@tarani/pixel": ["@tarani/pixel@workspace:apps/pixel"],
+
+    "@tarani/sentinel": ["@tarani/sentinel@workspace:apps/sentinel"],
 
     "@tarani/shared": ["@tarani/shared@workspace:packages/shared"],
 
