@@ -33,7 +33,7 @@ async function recheckMint(mint: string): Promise<void> {
 
     const baseline = getLatestSnapshot(mint);
     if (baseline) {
-      const diffs = diffCompatibility(baseline, current);
+      const diffs = diffCompatibility(baseline.results, current.results);
       if (diffs.length > 0) {
         saveDiff(mint, diffs);
         console.log(`[sentinel] ${mint}: ${diffs.length} diff(s) detected`);
