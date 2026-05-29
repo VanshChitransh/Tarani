@@ -6,6 +6,9 @@ import {
   type ApiError,
   type ApiErrorCode,
 } from "@tarani/shared";
+import { checkRateLimit, getClientIp } from "../../../src/lib/rateLimiter";
+
+const MAX_BODY_BYTES = 10_240;
 
 const ERROR_HTTP_STATUS: Record<ApiErrorCode, number> = {
   BAD_REQUEST: 400,
@@ -22,6 +25,16 @@ function errorResponse(error: ApiError) {
 }
 
 export async function POST(req: Request) {
+  const cl = req.headers.get("content-length");
+  if (cl && parseInt(cl, 10) > MAX_BODY_BYTES) {
+    return errorResponse({ code: "BAD_REQUEST", message: "Request body too large" });
+  }
+
+  const ip = getClientIp(req);
+  if (!checkRateLimit(`simulate:${ip}`, 5, 60_000)) {
+    return errorResponse({ code: "RATE_LIMITED", message: "Too many requests" });
+  }
+
   const raw = await req.json().catch(() => null);
   const parsed = simulationRequestSchema.safeParse(raw);
   if (!parsed.success) {

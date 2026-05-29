@@ -8,6 +8,9 @@ import {
 } from "@tarani/shared";
 import { addMint, listMints } from "@tarani/monitor-store";
 import { ensureDb } from "../../../src/lib/db";
+import { checkRateLimit, getClientIp } from "../../../src/lib/rateLimiter";
+
+const MAX_BODY_BYTES = 10_240;
 
 const ERROR_HTTP_STATUS: Record<ApiErrorCode, number> = {
   BAD_REQUEST: 400,
@@ -24,6 +27,16 @@ function errorResponse(error: ApiError) {
 
 export async function POST(req: Request) {
   ensureDb();
+
+  const cl = req.headers.get("content-length");
+  if (cl && parseInt(cl, 10) > MAX_BODY_BYTES) {
+    return errorResponse({ code: "BAD_REQUEST", message: "Request body too large" });
+  }
+
+  const ip = getClientIp(req);
+  if (!checkRateLimit(`monitor:${ip}`, 20, 60_000)) {
+    return errorResponse({ code: "RATE_LIMITED", message: "Too many requests" });
+  }
 
   const raw = await req.json().catch(() => null);
   const parsed = monitorRequestSchema.safeParse(raw);
