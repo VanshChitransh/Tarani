@@ -23,7 +23,7 @@ export const simulationReportSchema = z.object({
   generatedAt: z.iso.datetime(),
 });
 
-export const badgeDataSchema = z.object({
+export const simulationBadgeDataSchema = z.object({
   mint: z.string().min(32).max(44),
   overall: compatibilityStatusSchema,
   venues: z.array(

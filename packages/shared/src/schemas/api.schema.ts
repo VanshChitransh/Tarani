@@ -8,7 +8,7 @@ import {
 import { mintProfileSchema } from "./mint.schema";
 import { recommendationSchema, riskFindingSchema } from "./risk.schema";
 import {
-  badgeDataSchema as simulationBadgeDataSchema,
+  simulationBadgeDataSchema,
   scenarioKindSchema,
   simulationReportSchema,
 } from "./simulation.schema";

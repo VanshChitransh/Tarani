@@ -75,10 +75,6 @@
         "@tarani/gilfoyle": "workspace:*",
         "@tarani/monitor-store": "workspace:*",
         "@tarani/shared": "workspace:*",
-        "better-sqlite3": "*",
-      },
-      "devDependencies": {
-        "@types/better-sqlite3": "*",
       },
     },
     "packages/monitor-store": {
