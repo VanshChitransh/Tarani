@@ -2,7 +2,8 @@ import Database from "better-sqlite3";
 import path from "path";
 import { initDb, configure } from "@tarani/monitor-store";
 
-const DB_PATH = process.env.MONITOR_DB_PATH ?? path.join(process.cwd(), "monitor.db");
+const DB_PATH =
+  process.env.MONITOR_DB_PATH ?? path.join(process.env.TMPDIR ?? "/tmp", "tarani-monitor.db");
 
 let initialized = false;
 
