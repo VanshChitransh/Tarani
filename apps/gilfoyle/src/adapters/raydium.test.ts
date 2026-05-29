@@ -65,9 +65,9 @@ describe("raydiumAdapter", () => {
     expect(venueCompatibilityResultSchema.safeParse(result).success).toBe(true);
   });
 
-  it("returns unknown when profile has no matching extensions", async () => {
+  it("returns supported when profile has no extensions", async () => {
     const profile = { ...baseProfile, extensions: [] };
     const result = await raydiumAdapter.evaluate({ profile, rule: baseRule });
-    expect(result.status).toBe("unknown");
+    expect(result.status).toBe("supported");
   });
 });

@@ -118,8 +118,20 @@ describe("aggregateConfidence", () => {
 // --- evaluateRule ---
 
 describe("evaluateRule", () => {
-  it("returns unknown when no features match the profile's extensions", () => {
+  it("returns supported with high confidence when token has no extensions", () => {
     const profile = makeProfile([]);
+    const rule = makeRule("jupiter", [
+      { id: "transferFeeConfig", status: "blocked", confidence: "high", evidence: [], notes: [] },
+    ]);
+    const result = evaluateRule(profile, rule);
+    expect(result.status).toBe("supported");
+    expect(result.confidence).toBe("high");
+    expect(result.venue).toBe("jupiter");
+    expect(result.source).toBe("heuristic");
+  });
+
+  it("returns unknown when token has extensions but none match rule features", () => {
+    const profile = makeProfile(["nonTransferable"]);
     const rule = makeRule("jupiter", [
       { id: "transferFeeConfig", status: "blocked", confidence: "high", evidence: [], notes: [] },
     ]);

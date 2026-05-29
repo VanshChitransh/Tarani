@@ -83,6 +83,17 @@ function collectNotes(verdicts: FeatureVerdict[]): string[] {
 }
 
 export function evaluateRule(profile: MintProfile, rule: VenueRule): VenueCompatibilityResult {
+  if (profile.extensions.length === 0) {
+    return {
+      venue: rule.venue,
+      status: "supported",
+      source: "heuristic",
+      confidence: "high",
+      evidence: [],
+      notes: [],
+    };
+  }
+
   const verdicts: FeatureVerdict[] = rule.features
     .map((f) => evaluateFeature(profile, f))
     .filter((v): v is FeatureVerdict => v !== null);
