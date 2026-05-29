@@ -77,7 +77,7 @@ export default function PrelaunchPage() {
           <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400 mb-3">
             Extensions
           </h2>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             {EXTENSION_OPTIONS.map(({ kind, label }) => (
               <label key={kind} className="flex items-center gap-2 text-sm text-neutral-700">
                 <input
@@ -138,7 +138,7 @@ export default function PrelaunchPage() {
           <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400 mb-3">
             Metadata (optional)
           </h2>
-          <div className="flex gap-3">
+          <div className="flex flex-col sm:flex-row gap-3">
             <input
               type="text"
               placeholder="Name"
@@ -146,7 +146,7 @@ export default function PrelaunchPage() {
               onChange={(e) =>
                 setConfig((prev) => ({ ...prev, name: e.target.value || undefined }))
               }
-              className="border border-neutral-200 rounded px-3 py-1.5 text-sm w-40 focus:outline-none focus:ring-1 focus:ring-neutral-400"
+              className="border border-neutral-200 rounded px-3 py-1.5 text-sm sm:w-40 focus:outline-none focus:ring-1 focus:ring-neutral-400"
             />
             <input
               type="text"
@@ -155,7 +155,7 @@ export default function PrelaunchPage() {
               onChange={(e) =>
                 setConfig((prev) => ({ ...prev, symbol: e.target.value || undefined }))
               }
-              className="border border-neutral-200 rounded px-3 py-1.5 text-sm w-28 focus:outline-none focus:ring-1 focus:ring-neutral-400"
+              className="border border-neutral-200 rounded px-3 py-1.5 text-sm sm:w-28 focus:outline-none focus:ring-1 focus:ring-neutral-400"
             />
           </div>
         </div>

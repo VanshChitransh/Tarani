@@ -121,61 +121,63 @@ export default function DashboardPage() {
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <section>
-        <table className="w-full text-sm border-collapse">
-          <thead>
-            <tr className="border-b border-neutral-200 text-left text-neutral-500">
-              <th className="pb-2 font-medium">Mint</th>
-              <th className="pb-2 font-medium">Added</th>
-              <th className="pb-2 font-medium">Last Checked</th>
-              <th className="pb-2 font-medium">Changes</th>
-              <th className="pb-2 font-medium"></th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <tr key={i} className="border-b border-neutral-100">
-                  {Array.from({ length: 5 }).map((_, j) => (
-                    <td key={j} className="py-3 pr-4">
-                      <div className="bg-neutral-100 animate-pulse rounded h-4 w-full" />
-                    </td>
-                  ))}
-                </tr>
-              ))
-            ) : mints.length === 0 ? (
-              <tr>
-                <td colSpan={5} className="py-8 text-center text-neutral-400">
-                  No mints tracked yet. Add a mint above to start monitoring.
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm border-collapse">
+            <thead>
+              <tr className="border-b border-neutral-200 text-left text-neutral-500">
+                <th className="pb-2 font-medium">Mint</th>
+                <th className="pb-2 font-medium">Added</th>
+                <th className="pb-2 font-medium">Last Checked</th>
+                <th className="pb-2 font-medium">Changes</th>
+                <th className="pb-2 font-medium"></th>
               </tr>
-            ) : (
-              mints.map((m) => (
-                <tr key={m.mint} className="border-b border-neutral-100 hover:bg-neutral-50">
-                  <td className="py-3 pr-4 font-mono text-xs">
-                    <Link href={`/report/${m.mint}`} className="text-neutral-700 hover:underline">
-                      {truncateMint(m.mint)}
-                    </Link>
-                  </td>
-                  <td className="py-3 pr-4 text-neutral-600">{formatDate(m.addedAt)}</td>
-                  <td className="py-3 pr-4 text-neutral-600">{formatDate(m.lastCheckedAt)}</td>
-                  <td className="py-3 pr-4 text-neutral-600">
-                    {m.latestDiff === null
-                      ? "Not yet checked"
-                      : `${m.latestDiff.length} change${m.latestDiff.length === 1 ? "" : "s"}`}
-                  </td>
-                  <td className="py-3 text-right">
-                    <button
-                      onClick={() => handleRemove(m.mint)}
-                      className="text-xs text-red-500 hover:text-red-700"
-                    >
-                      Remove
-                    </button>
+            </thead>
+            <tbody>
+              {loading ? (
+                Array.from({ length: 3 }).map((_, i) => (
+                  <tr key={i} className="border-b border-neutral-100">
+                    {Array.from({ length: 5 }).map((_, j) => (
+                      <td key={j} className="py-3 pr-4">
+                        <div className="bg-neutral-100 animate-pulse rounded h-4 w-full" />
+                      </td>
+                    ))}
+                  </tr>
+                ))
+              ) : mints.length === 0 ? (
+                <tr>
+                  <td colSpan={5} className="py-8 text-center text-neutral-400">
+                    No mints tracked yet. Add a mint above to start monitoring.
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                mints.map((m) => (
+                  <tr key={m.mint} className="border-b border-neutral-100 hover:bg-neutral-50">
+                    <td className="py-3 pr-4 font-mono text-xs">
+                      <Link href={`/report/${m.mint}`} className="text-neutral-700 hover:underline">
+                        {truncateMint(m.mint)}
+                      </Link>
+                    </td>
+                    <td className="py-3 pr-4 text-neutral-600">{formatDate(m.addedAt)}</td>
+                    <td className="py-3 pr-4 text-neutral-600">{formatDate(m.lastCheckedAt)}</td>
+                    <td className="py-3 pr-4 text-neutral-600">
+                      {m.latestDiff === null
+                        ? "Not yet checked"
+                        : `${m.latestDiff.length} change${m.latestDiff.length === 1 ? "" : "s"}`}
+                    </td>
+                    <td className="py-3 text-right">
+                      <button
+                        onClick={() => handleRemove(m.mint)}
+                        className="text-xs text-red-500 hover:text-red-700"
+                      >
+                        Remove
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </section>
     </main>
   );
