@@ -51,7 +51,7 @@ async function recheckMint(mint: string): Promise<void> {
   }
 }
 
-async function tick(): Promise<void> {
+export async function tick(): Promise<void> {
   const mints = listMints();
   if (mints.length === 0) {
     console.log("[sentinel] No mints to recheck");
