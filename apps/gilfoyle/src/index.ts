@@ -4,3 +4,4 @@ export * from "./rules";
 export * from "./adapters";
 export * from "./risk";
 export * from "./recommendations";
+export { diffCompatibility } from "./diff";
