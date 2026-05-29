@@ -9,9 +9,10 @@ function result(
   return {
     venue,
     status,
+    source: "heuristic",
     confidence: "high",
     evidence: [],
-    checkedAt: new Date().toISOString(),
+    notes: [],
   };
 }
 

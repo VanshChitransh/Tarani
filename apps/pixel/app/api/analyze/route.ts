@@ -13,6 +13,7 @@ import {
   runCompatibilityEngine,
   scoreRisk,
   generateRecommendations,
+  buildPrelaunchProfile,
 } from "@tarani/gilfoyle";
 
 const ERROR_HTTP_STATUS: Record<ApiErrorCode, number> = {
@@ -40,15 +41,38 @@ export async function POST(req: Request) {
     });
   }
 
-  const { mint, mode } = parsed.data;
+  const { mint, mode, config } = parsed.data;
 
-  if (mode !== "prelaunch" && !mint) {
+  if (mode === "prelaunch") {
+    if (!config) {
+      return errorResponse({
+        code: "BAD_REQUEST",
+        message: "config is required for prelaunch mode",
+      });
+    }
+    const profile = buildPrelaunchProfile(config);
+    const compatibility = runCompatibilityEngine(profile);
+    const risks = scoreRisk(profile, compatibility);
+    const recommendations = generateRecommendations(risks, compatibility);
+    return NextResponse.json({
+      ok: true,
+      data: {
+        profile,
+        compatibility,
+        risks,
+        recommendations,
+        generatedAt: new Date().toISOString(),
+      },
+    });
+  }
+
+  if (!mint) {
     return errorResponse({ code: "BAD_REQUEST", message: "mint is required" });
   }
 
   const client = new HeliusClient();
   try {
-    const asset = await client.fetchMintAsset(mint!);
+    const asset = await client.fetchMintAsset(mint);
     const profile = parseMintProfile(asset);
     const compatibility = runCompatibilityEngine(profile);
     const risks = scoreRisk(profile, compatibility);
