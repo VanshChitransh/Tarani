@@ -33,27 +33,27 @@ const fixtureProfile: MintProfile = {
 };
 
 describe("runCompatibilityEngine", () => {
-  it("returns exactly 7 results", () => {
-    const results = runCompatibilityEngine(fixtureProfile);
+  it("returns exactly 7 results", async () => {
+    const results = await runCompatibilityEngine(fixtureProfile);
     expect(results).toHaveLength(7);
   });
 
-  it("results are in VENUE_IDS order", () => {
-    const results = runCompatibilityEngine(fixtureProfile);
+  it("results are in VENUE_IDS order", async () => {
+    const results = await runCompatibilityEngine(fixtureProfile);
     const venues = results.map((r) => r.venue);
     expect(venues).toEqual([...VENUE_IDS]);
   });
 
-  it("every result validates against venueCompatibilityResultSchema", () => {
-    const results = runCompatibilityEngine(fixtureProfile);
+  it("every result validates against venueCompatibilityResultSchema", async () => {
+    const results = await runCompatibilityEngine(fixtureProfile);
     for (const result of results) {
       const parsed = venueCompatibilityResultSchema.safeParse(result);
       expect(parsed.success, `${result.venue} failed schema validation`).toBe(true);
     }
   });
 
-  it("every result has source heuristic", () => {
-    const results = runCompatibilityEngine(fixtureProfile);
+  it("every result has source heuristic", async () => {
+    const results = await runCompatibilityEngine(fixtureProfile);
     for (const result of results) {
       expect(result.source).toBe("heuristic");
     }

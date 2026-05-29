@@ -51,21 +51,21 @@ describe("jupiterAdapter", () => {
     expect(jupiterAdapter.venue).toBe("jupiter");
   });
 
-  it("returns a VenueCompatibilityResult for a matching profile", () => {
-    const result = jupiterAdapter.evaluate({ profile: baseProfile, rule: baseRule });
+  it("returns a VenueCompatibilityResult for a matching profile", async () => {
+    const result = await jupiterAdapter.evaluate({ profile: baseProfile, rule: baseRule });
     expect(result.venue).toBe("jupiter");
     expect(result.status).toBe("blocked");
     expect(result.source).toBe("heuristic");
   });
 
-  it("output validates against venueCompatibilityResultSchema", () => {
-    const result = jupiterAdapter.evaluate({ profile: baseProfile, rule: baseRule });
+  it("output validates against venueCompatibilityResultSchema", async () => {
+    const result = await jupiterAdapter.evaluate({ profile: baseProfile, rule: baseRule });
     expect(venueCompatibilityResultSchema.safeParse(result).success).toBe(true);
   });
 
-  it("returns unknown when profile has no matching extensions", () => {
+  it("returns unknown when profile has no matching extensions", async () => {
     const profile = { ...baseProfile, extensions: [] };
-    const result = jupiterAdapter.evaluate({ profile, rule: baseRule });
+    const result = await jupiterAdapter.evaluate({ profile, rule: baseRule });
     expect(result.status).toBe("unknown");
   });
 });

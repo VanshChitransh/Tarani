@@ -20,7 +20,11 @@ const ADAPTERS: Record<(typeof VENUE_IDS)[number], VenueAdapter> = {
   "solana-explorer": solanaExplorerAdapter,
 };
 
-export function runCompatibilityEngine(profile: MintProfile): VenueCompatibilityResult[] {
+export async function runCompatibilityEngine(
+  profile: MintProfile,
+): Promise<VenueCompatibilityResult[]> {
   const rules = loadAllVenueRules();
-  return VENUE_IDS.map((venue) => ADAPTERS[venue].evaluate({ profile, rule: rules[venue] }));
+  return Promise.all(
+    VENUE_IDS.map((venue) => ADAPTERS[venue].evaluate({ profile, rule: rules[venue] })),
+  );
 }

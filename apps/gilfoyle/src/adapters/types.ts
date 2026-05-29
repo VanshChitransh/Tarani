@@ -8,5 +8,5 @@ export interface AdapterInput {
 
 export interface VenueAdapter {
   readonly venue: VenueId;
-  evaluate(input: AdapterInput): VenueCompatibilityResult;
+  evaluate(input: AdapterInput): VenueCompatibilityResult | Promise<VenueCompatibilityResult>;
 }

@@ -51,7 +51,7 @@ export async function POST(req: Request) {
       });
     }
     const profile = buildPrelaunchProfile(config);
-    const compatibility = runCompatibilityEngine(profile);
+    const compatibility = await runCompatibilityEngine(profile);
     const risks = scoreRisk(profile, compatibility);
     const recommendations = generateRecommendations(risks, compatibility);
     return NextResponse.json({
@@ -74,7 +74,7 @@ export async function POST(req: Request) {
   try {
     const asset = await client.fetchMintAsset(mint);
     const profile = parseMintProfile(asset);
-    const compatibility = runCompatibilityEngine(profile);
+    const compatibility = await runCompatibilityEngine(profile);
     const risks = scoreRisk(profile, compatibility);
     const recommendations = generateRecommendations(risks, compatibility);
     const body: AnalyzeResponse = {

@@ -49,25 +49,25 @@ const baseRule: VenueRule = {
 };
 
 describe("solscanAdapter", () => {
-  it("has venue id 'solscan'", () => {
+  it("has venue id 'solscan'", async () => {
     expect(solscanAdapter.venue).toBe("solscan");
   });
 
-  it("returns a VenueCompatibilityResult for a matching profile", () => {
-    const result = solscanAdapter.evaluate({ profile: baseProfile, rule: baseRule });
+  it("returns a VenueCompatibilityResult for a matching profile", async () => {
+    const result = await solscanAdapter.evaluate({ profile: baseProfile, rule: baseRule });
     expect(result.venue).toBe("solscan");
     expect(result.status).toBe("supported");
     expect(result.source).toBe("heuristic");
   });
 
-  it("output validates against venueCompatibilityResultSchema", () => {
-    const result = solscanAdapter.evaluate({ profile: baseProfile, rule: baseRule });
+  it("output validates against venueCompatibilityResultSchema", async () => {
+    const result = await solscanAdapter.evaluate({ profile: baseProfile, rule: baseRule });
     expect(venueCompatibilityResultSchema.safeParse(result).success).toBe(true);
   });
 
-  it("returns unknown when profile has no matching extensions", () => {
+  it("returns unknown when profile has no matching extensions", async () => {
     const profile = { ...baseProfile, extensions: [] };
-    const result = solscanAdapter.evaluate({ profile, rule: baseRule });
+    const result = await solscanAdapter.evaluate({ profile, rule: baseRule });
     expect(result.status).toBe("unknown");
   });
 });

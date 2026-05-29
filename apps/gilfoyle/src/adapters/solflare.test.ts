@@ -49,25 +49,25 @@ const baseRule: VenueRule = {
 };
 
 describe("solflareAdapter", () => {
-  it("has venue id 'solflare'", () => {
+  it("has venue id 'solflare'", async () => {
     expect(solflareAdapter.venue).toBe("solflare");
   });
 
-  it("returns a VenueCompatibilityResult for a matching profile", () => {
-    const result = solflareAdapter.evaluate({ profile: baseProfile, rule: baseRule });
+  it("returns a VenueCompatibilityResult for a matching profile", async () => {
+    const result = await solflareAdapter.evaluate({ profile: baseProfile, rule: baseRule });
     expect(result.venue).toBe("solflare");
     expect(result.status).toBe("conditional");
     expect(result.source).toBe("heuristic");
   });
 
-  it("output validates against venueCompatibilityResultSchema", () => {
-    const result = solflareAdapter.evaluate({ profile: baseProfile, rule: baseRule });
+  it("output validates against venueCompatibilityResultSchema", async () => {
+    const result = await solflareAdapter.evaluate({ profile: baseProfile, rule: baseRule });
     expect(venueCompatibilityResultSchema.safeParse(result).success).toBe(true);
   });
 
-  it("returns unknown when profile has no matching extensions", () => {
+  it("returns unknown when profile has no matching extensions", async () => {
     const profile = { ...baseProfile, extensions: [] };
-    const result = solflareAdapter.evaluate({ profile, rule: baseRule });
+    const result = await solflareAdapter.evaluate({ profile, rule: baseRule });
     expect(result.status).toBe("unknown");
   });
 });

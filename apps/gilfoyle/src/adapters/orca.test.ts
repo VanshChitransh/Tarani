@@ -47,25 +47,25 @@ const baseRule: VenueRule = {
 };
 
 describe("orcaAdapter", () => {
-  it("has venue id 'orca'", () => {
+  it("has venue id 'orca'", async () => {
     expect(orcaAdapter.venue).toBe("orca");
   });
 
-  it("returns a VenueCompatibilityResult for a matching profile", () => {
-    const result = orcaAdapter.evaluate({ profile: baseProfile, rule: baseRule });
+  it("returns a VenueCompatibilityResult for a matching profile", async () => {
+    const result = await orcaAdapter.evaluate({ profile: baseProfile, rule: baseRule });
     expect(result.venue).toBe("orca");
     expect(result.status).toBe("conditional");
     expect(result.source).toBe("heuristic");
   });
 
-  it("output validates against venueCompatibilityResultSchema", () => {
-    const result = orcaAdapter.evaluate({ profile: baseProfile, rule: baseRule });
+  it("output validates against venueCompatibilityResultSchema", async () => {
+    const result = await orcaAdapter.evaluate({ profile: baseProfile, rule: baseRule });
     expect(venueCompatibilityResultSchema.safeParse(result).success).toBe(true);
   });
 
-  it("returns unknown when profile has no matching extensions", () => {
+  it("returns unknown when profile has no matching extensions", async () => {
     const profile = { ...baseProfile, extensions: [] };
-    const result = orcaAdapter.evaluate({ profile, rule: baseRule });
+    const result = await orcaAdapter.evaluate({ profile, rule: baseRule });
     expect(result.status).toBe("unknown");
   });
 });
