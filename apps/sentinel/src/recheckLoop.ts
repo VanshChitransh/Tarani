@@ -11,6 +11,7 @@ import {
   saveDiff,
   updateLastChecked,
 } from "@tarani/monitor-store";
+import { dispatchAlerts } from "./alertDispatcher";
 
 const MAX_CONSECUTIVE_FAILURES = 3;
 const failureCounts = new Map<string, number>();
@@ -36,6 +37,7 @@ async function recheckMint(mint: string): Promise<void> {
       const diffs = diffCompatibility(baseline.results, current.results);
       if (diffs.length > 0) {
         saveDiff(mint, diffs);
+        await dispatchAlerts(mint, diffs);
         console.log(`[sentinel] ${mint}: ${diffs.length} diff(s) detected`);
       }
     }

@@ -30,6 +30,13 @@ const CREATE_TABLES_SQL = `
     detected_at TEXT NOT NULL,
     diffs_json TEXT NOT NULL
   );
+
+  CREATE TABLE IF NOT EXISTS alert_webhooks (
+    id TEXT PRIMARY KEY,
+    url TEXT NOT NULL,
+    added_at TEXT NOT NULL,
+    active INTEGER NOT NULL DEFAULT 1
+  );
 `;
 
 export function initDb(db: DbDriver): DbDriver {

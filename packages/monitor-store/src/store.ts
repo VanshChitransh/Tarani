@@ -1,4 +1,9 @@
-import type { CompatibilityDiff, CompatibilitySnapshot, MonitorRecord } from "@tarani/shared";
+import type {
+  AlertWebhook,
+  CompatibilityDiff,
+  CompatibilitySnapshot,
+  MonitorRecord,
+} from "@tarani/shared";
 import { randomUUID } from "crypto";
 import type { DbDriver } from "./db";
 
@@ -111,4 +116,35 @@ export function getLatestDiff(mint: string): CompatibilityDiff[] | null {
 
   if (!row) return null;
   return JSON.parse(row.diffs_json);
+}
+
+type WebhookRow = { id: string; url: string; added_at: string; active: number };
+
+function rowToWebhook(row: WebhookRow): AlertWebhook {
+  return {
+    id: row.id,
+    url: row.url,
+    addedAt: row.added_at,
+    active: row.active === 1,
+  };
+}
+
+export function addWebhook(url: string): AlertWebhook {
+  const id = randomUUID();
+  const addedAt = new Date().toISOString();
+  db()
+    .prepare("INSERT INTO alert_webhooks (id, url, added_at, active) VALUES (?, ?, ?, 1)")
+    .run(id, url, addedAt);
+  return { id, url, addedAt, active: true };
+}
+
+export function listWebhooks(): AlertWebhook[] {
+  const rows = db()
+    .prepare("SELECT * FROM alert_webhooks WHERE active = 1 ORDER BY added_at ASC")
+    .all() as WebhookRow[];
+  return rows.map(rowToWebhook);
+}
+
+export function removeWebhook(id: string): void {
+  db().prepare("DELETE FROM alert_webhooks WHERE id = ?").run(id);
 }

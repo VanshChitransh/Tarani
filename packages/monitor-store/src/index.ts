@@ -11,4 +11,7 @@ export {
   getLatestSnapshot,
   saveDiff,
   getLatestDiff,
+  addWebhook,
+  listWebhooks,
+  removeWebhook,
 } from "./store";
