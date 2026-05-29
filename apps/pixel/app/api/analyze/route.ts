@@ -40,9 +40,15 @@ export async function POST(req: Request) {
     });
   }
 
+  const { mint, mode } = parsed.data;
+
+  if (mode !== "prelaunch" && !mint) {
+    return errorResponse({ code: "BAD_REQUEST", message: "mint is required" });
+  }
+
   const client = new HeliusClient();
   try {
-    const asset = await client.fetchMintAsset(parsed.data.mint);
+    const asset = await client.fetchMintAsset(mint!);
     const profile = parseMintProfile(asset);
     const compatibility = runCompatibilityEngine(profile);
     const risks = scoreRisk(profile, compatibility);

@@ -77,3 +77,5 @@ export const MONITOR_EVENT_KINDS = [
   "metadata_change",
   "supply_change",
 ] as const;
+
+export const COMPATIBILITY_DIFF_KINDS = ["improved", "degraded", "changed"] as const;
