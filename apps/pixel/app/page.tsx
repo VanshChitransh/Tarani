@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
@@ -12,16 +12,23 @@ const SAMPLE_MINTS = [
 export default function HomePage() {
   const router = useRouter();
   const [mint, setMint] = useState("");
+  const [isPending, startTransition] = useTransition();
+
+  function navigate(address: string) {
+    startTransition(() => {
+      router.push(`/report/${address}`);
+    });
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     const trimmed = mint.trim();
     if (trimmed.length < 32) return;
-    router.push(`/report/${trimmed}`);
+    navigate(trimmed);
   }
 
   function tryMint(address: string) {
-    router.push(`/report/${address}`);
+    navigate(address);
   }
 
   return (
@@ -40,15 +47,19 @@ export default function HomePage() {
             type="text"
             value={mint}
             onChange={(e) => setMint(e.target.value)}
+            disabled={isPending}
             placeholder="Paste a mint address…"
-            className="flex-1 border border-neutral-200 rounded-lg px-3 py-2.5 text-sm font-mono placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-400 transition-colors"
+            className="flex-1 border border-neutral-200 rounded-lg px-3 py-2.5 text-sm font-mono placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-400 transition-colors disabled:opacity-60"
           />
           <button
             type="submit"
-            disabled={mint.trim().length < 32}
-            className="px-5 py-2.5 text-sm font-medium rounded-lg bg-neutral-900 text-white hover:bg-neutral-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            disabled={mint.trim().length < 32 || isPending}
+            className="px-5 py-2.5 text-sm font-medium rounded-lg bg-neutral-900 text-white hover:bg-neutral-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors inline-flex items-center gap-2"
           >
-            Analyze
+            {isPending && (
+              <span className="h-3.5 w-3.5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+            )}
+            {isPending ? "Analyzing…" : "Analyze"}
           </button>
         </div>
 
@@ -59,7 +70,8 @@ export default function HomePage() {
               key={address}
               type="button"
               onClick={() => tryMint(address)}
-              className="text-xs text-neutral-500 hover:text-neutral-900 border border-neutral-200 hover:border-neutral-400 rounded px-2 py-0.5 transition-colors font-mono"
+              disabled={isPending}
+              className="text-xs text-neutral-500 hover:text-neutral-900 border border-neutral-200 hover:border-neutral-400 rounded px-2 py-0.5 transition-colors font-mono disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {label}
             </button>

@@ -7,6 +7,7 @@ import { SimulationSection } from "../../../components/SimulationSection";
 import { MonitorButton } from "../../../components/MonitorButton";
 import { BadgeSection } from "../../../components/BadgeSection";
 import { CopyButton } from "../../../components/CopyButton";
+import { NoExtensionsToast } from "../../../components/NoExtensionsToast";
 
 interface Props {
   params: Promise<{ mint: string }>;
@@ -79,6 +80,8 @@ export default async function ReportPage({ params }: Props) {
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-10 space-y-10">
+      <NoExtensionsToast extensionCount={result.profile.extensions.length} />
+
       {/* Header */}
       <div className="pb-8 border-b border-neutral-100">
         <div className="flex items-start gap-3 flex-wrap">
