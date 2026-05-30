@@ -4,8 +4,5 @@
   "installCommand": "bun install --frozen-lockfile",
   "buildCommand": "bun run --filter @tarani/pixel build",
   "outputDirectory": "apps/pixel/.next",
-  "env": {
-    "HELIUS_API_KEY": "@helius_api_key"
-  },
   "crons": []
 }
