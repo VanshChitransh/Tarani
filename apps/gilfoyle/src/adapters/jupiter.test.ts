@@ -55,7 +55,7 @@ describe("jupiterAdapter", () => {
     const result = await jupiterAdapter.evaluate({ profile: baseProfile, rule: baseRule });
     expect(result.venue).toBe("jupiter");
     expect(result.status).toBe("blocked");
-    expect(result.source).toBe("heuristic");
+    expect(["heuristic", "probe"]).toContain(result.source);
   });
 
   it("output validates against venueCompatibilityResultSchema", async () => {

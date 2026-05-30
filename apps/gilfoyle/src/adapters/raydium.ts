@@ -49,5 +49,5 @@ export async function runRaydiumCompatibility(
     observedAt: new Date().toISOString(),
   };
 
-  return { ...base, evidence: [...base.evidence, probeEvidence] };
+  return { ...base, source: "probe", evidence: [...base.evidence, probeEvidence] };
 }

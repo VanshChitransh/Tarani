@@ -53,8 +53,8 @@ export async function runJupiterCompatibility(
   const evidence = [...base.evidence, probeEvidence];
 
   if (probeResult === "no_route" && base.status === "supported") {
-    return { ...base, status: "partial", evidence };
+    return { ...base, source: "probe", status: "partial", evidence };
   }
 
-  return { ...base, evidence };
+  return { ...base, source: "probe", evidence };
 }

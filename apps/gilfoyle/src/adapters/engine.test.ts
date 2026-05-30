@@ -60,10 +60,10 @@ describe("runCompatibilityEngine", () => {
     }
   });
 
-  it("every result has source heuristic", async () => {
+  it("every result has a valid source", async () => {
     const results = await runCompatibilityEngine(fixtureProfile);
     for (const result of results) {
-      expect(result.source).toBe("heuristic");
+      expect(["heuristic", "probe", "override"]).toContain(result.source);
     }
   });
 });
