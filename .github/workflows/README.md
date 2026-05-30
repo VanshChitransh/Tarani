@@ -12,6 +12,15 @@
   - Builds all apps
   - Deploys to Vercel only if secrets are configured
 
+- `rule-freshness.yml`: Runs daily at 09:00 UTC (and on manual dispatch).
+  - Runs `bun run check:freshness`, which fails when any venue rule in
+    `apps/gilfoyle/rules/venues/*.json` is older than the staleness threshold.
+  - A failed scheduled run triggers GitHub's automatic failure email. To receive it:
+    Settings -> Notifications -> Actions -> enable email, "send notifications for failed
+    workflows only". The email goes to whoever last edited this workflow file on `main`.
+  - Note: scheduled workflows only run from the default branch, so this must be merged
+    to `main` to start firing.
+
 ## Required secrets for deployment
 
 Set these in GitHub repo settings -> Secrets and variables -> Actions:

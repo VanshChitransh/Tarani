@@ -1,0 +1,34 @@
+name: Rule Freshness
+
+# Time-based watchdog for Gap 6: the venue rules are hand-maintained JSON that silently
+# drifts. CI only catches staleness on the next PR/push; this runs on a clock so you get
+# nagged even when nobody is touching the repo.
+on:
+  schedule:
+    # 09:00 UTC every day. Cron is always UTC and only runs on the default branch.
+    - cron: "0 9 * * *"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  freshness:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.9
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      # Exits non-zero when any venue rule is stale. A failed scheduled run triggers
+      # GitHub's automatic failure email to the workflow's last editor.
+      - name: Check rule freshness
+        run: bun run check:freshness

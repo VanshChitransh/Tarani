@@ -19,6 +19,7 @@
     "typecheck": "bunx tsc --noEmit",
     "test": "bunx vitest run",
     "check": "bun run lint && bun run typecheck && bun run test",
+    "check:freshness": "bun run --filter @tarani/gilfoyle check:freshness",
     "check:ci": "bun run check && bun run build",
     "prepare": "husky"
   },
