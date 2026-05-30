@@ -38,6 +38,13 @@ export function buildPrelaunchProfile(config: PrelaunchConfig): MintProfile {
         address: authorities.updateRenounced ? null : PLACEHOLDER_AUTHORITY,
         isRenounced: authorities.updateRenounced,
       },
+      ...(authorities.metadataRenounced !== undefined && {
+        metadata: {
+          kind: "metadata" as const,
+          address: authorities.metadataRenounced ? null : PLACEHOLDER_AUTHORITY,
+          isRenounced: authorities.metadataRenounced,
+        },
+      }),
     },
     metadata: {
       name,

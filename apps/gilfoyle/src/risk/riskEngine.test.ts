@@ -117,6 +117,61 @@ describe("checkPermanentDelegatePresentAndActive", () => {
   });
 });
 
+describe("checkUpdateAuthorityLive", () => {
+  it("fires when update authority is live", () => {
+    const profile: MintProfile = {
+      ...BASE_PROFILE,
+      authorities: {
+        ...BASE_PROFILE.authorities,
+        update: { kind: "update", address: "11111111111111111111111111111112", isRenounced: false },
+      },
+    };
+    const findings = scoreRisk(profile, NO_COMPAT);
+    expect(findings.some((f) => f.id === "update-authority-live")).toBe(true);
+  });
+
+  it("does NOT fire when update authority is renounced", () => {
+    const findings = scoreRisk(BASE_PROFILE, NO_COMPAT);
+    expect(findings.some((f) => f.id === "update-authority-live")).toBe(false);
+  });
+});
+
+describe("checkMetadataAuthorityLive", () => {
+  it("fires when a live metadata authority is present", () => {
+    const profile: MintProfile = {
+      ...BASE_PROFILE,
+      authorities: {
+        ...BASE_PROFILE.authorities,
+        metadata: {
+          kind: "metadata",
+          address: "11111111111111111111111111111112",
+          isRenounced: false,
+        },
+      },
+    };
+    const findings = scoreRisk(profile, NO_COMPAT);
+    expect(findings.some((f) => f.id === "metadata-authority-live")).toBe(true);
+  });
+
+  it("does NOT fire when there is no metadata authority at all", () => {
+    // BASE_PROFILE omits authorities.metadata — absence is not a risk.
+    const findings = scoreRisk(BASE_PROFILE, NO_COMPAT);
+    expect(findings.some((f) => f.id === "metadata-authority-live")).toBe(false);
+  });
+
+  it("does NOT fire when the metadata authority is renounced", () => {
+    const profile: MintProfile = {
+      ...BASE_PROFILE,
+      authorities: {
+        ...BASE_PROFILE.authorities,
+        metadata: { kind: "metadata", address: null, isRenounced: true },
+      },
+    };
+    const findings = scoreRisk(profile, NO_COMPAT);
+    expect(findings.some((f) => f.id === "metadata-authority-live")).toBe(false);
+  });
+});
+
 // --- Extension checks ---
 
 describe("checkNonTransferableWithHook", () => {

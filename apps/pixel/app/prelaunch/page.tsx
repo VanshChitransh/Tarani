@@ -6,20 +6,39 @@ import { RiskSection } from "../../components/RiskSection";
 import { RecommendationList } from "../../components/RecommendationList";
 import type { AnalyzeReport, PrelaunchConfig } from "@tarani/shared";
 
+// Mirrors EXTENSION_KINDS in @tarani/shared (the "unknown" kind is intentionally
+// not user-selectable). Kind strings must match the enum exactly or the API rejects them.
 const EXTENSION_OPTIONS = [
   { kind: "transferFeeConfig", label: "Transfer Fee" },
   { kind: "transferHook", label: "Transfer Hook" },
+  { kind: "permanentDelegate", label: "Permanent Delegate" },
   { kind: "nonTransferable", label: "Non-Transferable" },
-  { kind: "pausable", label: "Pausable" },
+  { kind: "interestBearingConfig", label: "Interest Bearing" },
+  { kind: "defaultAccountState", label: "Default Account State" },
   { kind: "memoTransfer", label: "Memo Required" },
+  { kind: "cpiGuard", label: "CPI Guard" },
+  { kind: "pausable", label: "Pausable" },
+  { kind: "mintCloseAuthority", label: "Mint Close Authority" },
+  { kind: "scaledUiAmountConfig", label: "Scaled UI Amount" },
+  { kind: "confidentialTransferMint", label: "Confidential Transfer" },
+  { kind: "confidentialTransferFeeConfig", label: "Confidential Transfer Fee" },
   { kind: "metadataPointer", label: "Metadata Pointer" },
-  { kind: "interestBearing", label: "Interest Bearing" },
+  { kind: "tokenMetadata", label: "Token Metadata" },
+  { kind: "groupPointer", label: "Group Pointer" },
+  { kind: "tokenGroup", label: "Token Group" },
+  { kind: "groupMemberPointer", label: "Group Member Pointer" },
+  { kind: "tokenGroupMember", label: "Token Group Member" },
 ] as const;
 
 const DEFAULT_CONFIG: PrelaunchConfig = {
   extensions: [],
   decimals: 6,
-  authorities: { mintRenounced: true, freezeRenounced: true, updateRenounced: true },
+  authorities: {
+    mintRenounced: true,
+    freezeRenounced: true,
+    updateRenounced: true,
+    metadataRenounced: true,
+  },
 };
 
 export default function PrelaunchPage() {
@@ -119,12 +138,13 @@ export default function PrelaunchPage() {
                 { key: "mintRenounced", label: "Mint authority renounced" },
                 { key: "freezeRenounced", label: "Freeze authority renounced" },
                 { key: "updateRenounced", label: "Update authority renounced" },
+                { key: "metadataRenounced", label: "Metadata authority renounced" },
               ] as const
             ).map(({ key, label }) => (
               <label key={key} className="flex items-center gap-2 text-sm text-neutral-700">
                 <input
                   type="checkbox"
-                  checked={config.authorities[key]}
+                  checked={!!config.authorities[key]}
                   onChange={(e) => toggleAuthority(key, e.target.checked)}
                   className="rounded border-neutral-300"
                 />

@@ -21,6 +21,22 @@ export const REMEDIATIONS: Record<string, RemediationTemplate> = {
       "Use `spl-token authorize <MINT> freeze --disable`.",
     links: ["https://spl.solana.com/token#set-authority"],
   },
+  "update-authority-live": {
+    title: "Consider renouncing the update authority",
+    description:
+      "Once your token's metadata is final, renouncing the update authority makes the name, symbol, " +
+      "and image immutable — protecting holders from a post-launch rebrand or impersonation. " +
+      "If you must retain it (e.g., to fix a broken image URI), hold it in a multisig and disclose that.",
+    links: ["https://spl.solana.com/token#set-authority"],
+  },
+  "metadata-authority-live": {
+    title: "Consider renouncing the metadata authority",
+    description:
+      "The Token-2022 metadata authority can rewrite on-chain name, symbol, and URI. Renounce it to " +
+      "lock the token's identity, or assign it to a multisig if updates may still be required. " +
+      "Disclose the authority address and its governance to holders.",
+    links: ["https://spl.solana.com/token-2022/extensions#token-metadata"],
+  },
   "permanent-delegate-present": {
     title: "Document permanent delegate behavior clearly",
     description:

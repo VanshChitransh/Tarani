@@ -38,6 +38,8 @@ export const prelaunchAuthoritiesSchema = z.object({
   mintRenounced: z.boolean(),
   freezeRenounced: z.boolean(),
   updateRenounced: z.boolean(),
+  // Optional for backward compatibility with callers that predate the metadata authority.
+  metadataRenounced: z.boolean().optional(),
 });
 
 export const prelaunchConfigSchema = z.object({
