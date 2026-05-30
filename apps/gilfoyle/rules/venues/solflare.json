@@ -1,45 +1,133 @@
 {
   "venue": "solflare",
-  "version": "0.2.0",
-  "last_updated": "2026-05-29",
+  "version": "1.0.0",
+  "last_updated": "2026-05-31",
   "features": [
-    {
-      "id": "permanentDelegate",
-      "status": "conditional",
-      "confidence": "medium",
-      "evidence": ["https://solflare.com/blog/token-extensions-support"],
-      "notes": ["Solflare shows a warning banner for permanent delegate tokens before any action"]
-    },
     {
       "id": "transferFeeConfig",
       "status": "supported",
-      "confidence": "high",
-      "evidence": ["https://solflare.com/blog/token-extensions-support"],
-      "notes": ["Solflare displays the fee amount in the send flow and requires user confirmation"]
+      "confidence": "low",
+      "evidence": [
+        "https://www.helius.dev/blog/what-is-token-2022",
+        "https://learn.backpack.exchange/articles/what-are-solana-token-extensions"
+      ],
+      "notes": [
+        "Solflare is listed among major wallets that support Token Extensions, which includes fee-on-transfer tokens. No Solflare-specific doc confirms the exact send-flow fee display."
+      ]
     },
     {
-      "id": "nonTransferable",
-      "status": "blocked",
-      "confidence": "high",
-      "evidence": ["https://solflare.com/blog/token-extensions-support"],
-      "notes": ["Non-transferable tokens cannot be sent; Solflare disables the send action"]
+      "id": "permanentDelegate",
+      "status": "conditional",
+      "confidence": "low",
+      "evidence": [
+        "https://help.solflare.com/en/articles/9267797-understanding-delegations-aka-spending-approvals-in-solflare"
+      ],
+      "notes": [
+        "Solflare detects and warns when a transaction changes token account authority/delegation. This is the SPL approval flow rather than a documented permanentDelegate flag, but it is the closest analog."
+      ]
     },
     {
       "id": "transferHook",
+      "status": "conditional",
+      "confidence": "low",
+      "evidence": ["https://www.helius.dev/blog/what-is-token-2022"],
+      "notes": [
+        "Solflare supports Token Extensions generally; transfer-hook sends build extra accounts but are typically surfaced with a warning (mechanical inference, no per-extension doc)."
+      ]
+    },
+    {
+      "id": "interestBearingConfig",
       "status": "supported",
-      "confidence": "medium",
-      "evidence": ["https://solflare.com/blog/token-extensions-support"],
-      "notes": ["Solflare supports transfer-hook tokens with a user-visible warning"]
+      "confidence": "low",
+      "evidence": ["https://www.helius.dev/blog/what-is-token-2022"],
+      "notes": [
+        "Display-only extension; Solflare renders Token-2022 mints (not separately documented per extension)."
+      ]
+    },
+    {
+      "id": "scaledUiAmountConfig",
+      "status": "supported",
+      "confidence": "low",
+      "evidence": ["https://solana.com/docs/tokens/extensions/scaled-ui-amount"],
+      "notes": [
+        "Display-only UI scaling; expected to render (low confidence, not separately documented)."
+      ]
+    },
+    {
+      "id": "metadataPointer",
+      "status": "supported",
+      "confidence": "low",
+      "evidence": ["https://github.com/solflare-wallet/token-list"],
+      "notes": ["Solflare renders Token-2022 token metadata for display."]
+    },
+    {
+      "id": "tokenMetadata",
+      "status": "supported",
+      "confidence": "low",
+      "evidence": [
+        "https://github.com/solflare-wallet/token-list",
+        "https://www.helius.dev/blog/what-is-token-2022"
+      ],
+      "notes": [
+        "Solflare displays name/symbol/image from on-chain metadata (implied by general Token Extensions support)."
+      ]
+    },
+    {
+      "id": "memoTransfer",
+      "status": "supported",
+      "confidence": "low",
+      "evidence": ["https://www.helius.dev/blog/what-is-token-2022"],
+      "notes": [
+        "Account-level extension; expected to be honored as part of general Token Extensions support (low confidence)."
+      ]
     },
     {
       "id": "confidentialTransferMint",
       "status": "partial",
       "confidence": "low",
-      "evidence": ["https://spl.solana.com/token-2022/extensions#confidential-transfers"],
-      "notes": ["Solflare may render the token but confidential balance display is unverified"]
+      "evidence": ["https://www.helius.dev/blog/what-is-token-2022"],
+      "notes": [
+        "Token may render but confidential balance display is unverified; encrypted balances do not render as plaintext."
+      ]
+    },
+    {
+      "id": "defaultAccountState",
+      "status": "conditional",
+      "confidence": "low",
+      "evidence": ["https://solana.com/docs/tokens/extensions/default-account-state"],
+      "notes": ["If accounts default to frozen, sends fail until thawed (mechanical inference)."]
+    },
+    {
+      "id": "pausable",
+      "status": "conditional",
+      "confidence": "low",
+      "evidence": ["https://solana.com/docs/tokens/extensions"],
+      "notes": ["Sends fail while the mint is paused (mechanical inference)."]
+    },
+    {
+      "id": "nonTransferable",
+      "status": "blocked",
+      "confidence": "low",
+      "evidence": [
+        "https://solana.com/docs/tokens/extensions/non-transferrable-tokens",
+        "https://help.solflare.com/en/articles/9263757-why-did-my-transaction-fail"
+      ],
+      "notes": [
+        "Non-transferable is a protocol-level restriction: the Token-2022 program rejects the Transfer instruction, so a send from Solflare fails regardless of wallet."
+      ]
+    },
+    {
+      "id": "unknown",
+      "status": "supported",
+      "confidence": "low",
+      "evidence": ["https://github.com/solflare-wallet/token-list"],
+      "notes": [
+        "Solflare renders Token-2022 mints; an unrecognized extension still displays as a balance (no documented block)."
+      ]
     }
   ],
   "notes": [
-    "Day 2 first-cut rules; Solflare behavior sourced from public blog and community reports"
+    "Solflare publicly supports Token-2022 / Token Extensions and is consistently grouped with Phantom and Backpack as a supporting wallet, but it does NOT publish a per-extension behavior document the way Phantom does.",
+    "As a result almost all Solflare verdicts are low confidence — based on general support claims plus protocol-level reasoning. Its clearest documented risk flag is the delegation/approval warning."
   ]
 }

@@ -1,60 +1,226 @@
 {
   "venue": "jupiter",
-  "version": "0.3.0",
-  "last_updated": "2026-05-30",
+  "version": "1.0.0",
+  "last_updated": "2026-05-31",
   "features": [
     {
       "id": "transferFeeConfig",
       "scope": "swap",
       "status": "supported",
       "confidence": "high",
-      "evidence": ["https://docs.jup.ag/docs/swap-api"],
-      "notes": ["Jupiter Swap routes through tokens with transfer fees"]
+      "evidence": [
+        "https://discuss.jup.ag/t/archived-jupiter-token-2022-support/21711",
+        "https://station.jup.ag/guides/jupiter-swap/swap"
+      ],
+      "notes": [
+        "Jupiter swap routes transfer-fee tokens; the fee is deducted from the received amount and quotes account for it."
+      ]
     },
     {
       "id": "transferFeeConfig",
       "scope": "limitOrders",
       "status": "blocked",
       "confidence": "high",
-      "evidence": ["https://docs.jup.ag/docs/limit-order/limit-order-api"],
-      "notes": ["Jupiter Limit Orders do not support tokens with transfer fees"]
+      "evidence": [
+        "https://support.jup.ag/hc/en-us/articles/22628276785820-Are-all-kinds-of-tokens-supported-on-Jupiter-s-Limit-order"
+      ],
+      "notes": [
+        "Transfer-tax tokens are not supported on Limit orders — creators can change the fee rate at will, causing unexpected execution."
+      ]
     },
     {
       "id": "transferFeeConfig",
       "scope": "dca",
       "status": "blocked",
       "confidence": "high",
-      "evidence": ["https://docs.jup.ag/docs/dca/dca-integration"],
-      "notes": ["Jupiter DCA does not support tokens with transfer fees"]
+      "evidence": [
+        "https://support.jup.ag/hc/en-us/articles/22634616157340-Are-all-kinds-of-tokens-supported-on-Instant-Limit-and-Recurring"
+      ],
+      "notes": [
+        "Same restriction as Limit orders: transfer-tax tokens are not supported on Recurring/DCA."
+      ]
     },
     {
       "id": "transferHook",
-      "status": "blocked",
-      "confidence": "high",
-      "evidence": ["https://docs.jup.ag/docs/swap-blocked-tokens"],
-      "notes": ["Transfer hooks block Jupiter's standard swap path"]
-    },
-    {
-      "id": "permanentDelegate",
-      "status": "conditional",
+      "status": "partial",
       "confidence": "medium",
-      "evidence": ["https://docs.jup.ag/"],
-      "notes": ["Permanent delegate is allowed but flagged in the Jupiter UI"]
+      "evidence": [
+        "https://station.jup.ag/guides/jupiter-swap/swap",
+        "https://neodyme.io/en/blog/token-2022/"
+      ],
+      "notes": [
+        "Jupiter swap can route transfer-hook mints by appending hook accounts to the instruction, but support is limited to hooks Jupiter can resolve; unresolvable hook programs cause routes to be excluded."
+      ]
     },
     {
       "id": "nonTransferable",
       "status": "blocked",
       "confidence": "high",
-      "evidence": ["https://docs.jup.ag/docs/swap-blocked-tokens"],
-      "notes": ["Non-transferable tokens cannot be swapped"]
+      "evidence": [
+        "https://neodyme.io/en/blog/token-2022/",
+        "https://discuss.jup.ag/t/archived-jupiter-token-2022-support/21711"
+      ],
+      "notes": [
+        "Non-transferable (soulbound) tokens block all transfers, so swaps are impossible by design."
+      ]
+    },
+    {
+      "id": "permanentDelegate",
+      "status": "conditional",
+      "confidence": "medium",
+      "evidence": ["https://neodyme.io/en/blog/token-2022/"],
+      "notes": [
+        "Mechanically transferable so swaps route, but a permanent delegate can drain accounts; flagged as a high-risk extension."
+      ]
     },
     {
       "id": "defaultAccountState",
       "status": "conditional",
       "confidence": "medium",
-      "evidence": ["https://spl.solana.com/token-2022/extensions#default-account-state"],
-      "notes": ["Frozen-by-default accounts may cause swap failures if user account is frozen"]
+      "evidence": ["https://neodyme.io/en/blog/token-2022/"],
+      "notes": [
+        "If accounts default to frozen, transfers fail unless the freeze authority thaws them; tradability is conditional."
+      ]
+    },
+    {
+      "id": "memoTransfer",
+      "status": "conditional",
+      "confidence": "low",
+      "evidence": ["https://neodyme.io/en/blog/token-2022/"],
+      "notes": [
+        "Requires an incoming memo on transfers; routing must include the memo or transfers to the account fail."
+      ]
+    },
+    {
+      "id": "confidentialTransferMint",
+      "status": "partial",
+      "confidence": "medium",
+      "evidence": [
+        "https://neodyme.io/en/blog/token-2022/",
+        "https://www.quicknode.com/guides/solana-development/spl-tokens/token-2022/confidential"
+      ],
+      "notes": [
+        "The extension does not block normal (public) transfers, so the mint can still be swapped via the standard path; confidential balances themselves are not routable. AMM routing operates on public balances only."
+      ]
+    },
+    {
+      "id": "confidentialTransferFeeConfig",
+      "status": "partial",
+      "confidence": "low",
+      "evidence": [
+        "https://www.quicknode.com/guides/solana-development/spl-tokens/token-2022/confidential"
+      ],
+      "notes": [
+        "Sub-extension of confidential transfer; inherits the same public-balance-only routing caveat."
+      ]
+    },
+    {
+      "id": "interestBearingConfig",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://neodyme.io/en/blog/token-2022/",
+        "https://solana.com/docs/tokens/extensions"
+      ],
+      "notes": [
+        "Display-only UI scaling; does not affect transfer mechanics, so it routes normally."
+      ]
+    },
+    {
+      "id": "scaledUiAmountConfig",
+      "status": "supported",
+      "confidence": "low",
+      "evidence": ["https://solana.com/docs/tokens/extensions"],
+      "notes": [
+        "Display-only UI scaling of amounts; underlying raw amounts are unchanged, so it routes normally."
+      ]
+    },
+    {
+      "id": "metadataPointer",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://developers.jup.ag/docs/guides/how-to-get-token-information"],
+      "notes": [
+        "Display/metadata-only; does not affect transfers. Jupiter reads it for token info."
+      ]
+    },
+    {
+      "id": "tokenMetadata",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://developers.jup.ag/docs/guides/how-to-get-token-information"],
+      "notes": ["On-chain metadata extension; display-only, no transfer impact."]
+    },
+    {
+      "id": "groupPointer",
+      "status": "supported",
+      "confidence": "low",
+      "evidence": ["https://neodyme.io/en/blog/token-2022/"],
+      "notes": ["Informational grouping pointer; does not block transfers."]
+    },
+    {
+      "id": "tokenGroup",
+      "status": "supported",
+      "confidence": "low",
+      "evidence": ["https://solana.com/docs/tokens/extensions"],
+      "notes": ["Informational grouping data; does not block transfers."]
+    },
+    {
+      "id": "groupMemberPointer",
+      "status": "supported",
+      "confidence": "low",
+      "evidence": ["https://neodyme.io/en/blog/token-2022/"],
+      "notes": ["Informational group-member pointer; does not block transfers."]
+    },
+    {
+      "id": "tokenGroupMember",
+      "status": "supported",
+      "confidence": "low",
+      "evidence": ["https://solana.com/docs/tokens/extensions"],
+      "notes": ["Informational group-member data; does not block transfers."]
+    },
+    {
+      "id": "mintCloseAuthority",
+      "status": "conditional",
+      "confidence": "medium",
+      "evidence": ["https://neodyme.io/en/blog/token-2022/"],
+      "notes": [
+        "Allows the mint to be closed and reinitialized at the same address — a known risk vector; transfers work while the mint is live but it is flagged as risky."
+      ]
+    },
+    {
+      "id": "pausable",
+      "status": "conditional",
+      "confidence": "low",
+      "evidence": [
+        "https://solana.com/docs/tokens/extensions",
+        "https://neodyme.io/en/blog/token-2022/"
+      ],
+      "notes": [
+        "When the mint is paused, all transfers fail and swaps revert; tradability depends on the pause state controlled by the authority."
+      ]
+    },
+    {
+      "id": "cpiGuard",
+      "status": "supported",
+      "confidence": "low",
+      "evidence": ["https://neodyme.io/en/blog/token-2022/"],
+      "notes": [
+        "Account-level extension that does not block standard transfers; treated as non-blocking."
+      ]
+    },
+    {
+      "id": "unknown",
+      "status": "blocked",
+      "confidence": "low",
+      "evidence": ["https://neodyme.io/en/blog/token-2022/"],
+      "notes": [
+        "Integrators are advised to use an extension allowlist; unrecognized extensions are conservatively excluded from routing."
+      ]
     }
   ],
-  "notes": ["transferFeeConfig blocks Limit Orders and DCA only — swap is supported"]
+  "notes": [
+    "Jupiter officially supports Token-2022 on Instant Swap. Scope matters: transfer-fee tokens are supported on swap but explicitly NOT on Limit orders or Recurring/DCA.",
+    "Verdicts combine Jupiter's own docs/support pages with Token-2022 mechanics (Neodyme, Solana docs); display-only extensions route normally, transfer-halting extensions block or condition swaps."
+  ]
 }

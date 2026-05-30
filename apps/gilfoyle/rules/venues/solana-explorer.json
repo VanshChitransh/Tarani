@@ -1,45 +1,170 @@
 {
   "venue": "solana-explorer",
-  "version": "0.2.0",
-  "last_updated": "2026-05-29",
+  "version": "1.0.0",
+  "last_updated": "2026-05-31",
   "features": [
     {
       "id": "transferFeeConfig",
       "status": "supported",
       "confidence": "high",
-      "evidence": ["https://explorer.solana.com"],
-      "notes": ["Solana Explorer renders transfer fee configuration in the token account view"]
+      "evidence": ["https://github.com/solana-foundation/explorer"],
+      "notes": ["Explicit transferFeeConfig case in the validator and token-extension renderer."]
     },
     {
       "id": "transferHook",
       "status": "supported",
       "confidence": "high",
-      "evidence": ["https://explorer.solana.com"],
-      "notes": ["Solana Explorer shows transfer hook program ID in the extensions section"]
+      "evidence": ["https://github.com/solana-foundation/explorer"],
+      "notes": [
+        "transferHook / transferHookAccount cases handled and rendered with description and links."
+      ]
     },
     {
-      "id": "nonTransferable",
+      "id": "defaultAccountState",
       "status": "supported",
       "confidence": "high",
-      "evidence": ["https://explorer.solana.com"],
-      "notes": ["Solana Explorer displays the non-transferable extension label on the mint page"]
-    },
-    {
-      "id": "confidentialTransferMint",
-      "status": "partial",
-      "confidence": "low",
-      "evidence": ["https://explorer.solana.com"],
-      "notes": ["Solana Explorer shows the extension is present but cannot decode encrypted state"]
+      "evidence": ["https://github.com/solana-foundation/explorer"],
+      "notes": ["defaultAccountState case present in the renderer."]
     },
     {
       "id": "permanentDelegate",
       "status": "supported",
       "confidence": "high",
-      "evidence": ["https://explorer.solana.com"],
-      "notes": ["Solana Explorer shows permanent delegate address in the token extensions panel"]
+      "evidence": ["https://github.com/solana-foundation/explorer"],
+      "notes": ["permanentDelegate case present in the renderer."]
+    },
+    {
+      "id": "nonTransferable",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://github.com/solana-foundation/explorer"],
+      "notes": ["nonTransferable / nonTransferableAccount cases present."]
+    },
+    {
+      "id": "interestBearingConfig",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://github.com/solana-foundation/explorer"],
+      "notes": ["interestBearingConfig case present."]
+    },
+    {
+      "id": "cpiGuard",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://github.com/solana-foundation/explorer"],
+      "notes": ["cpiGuard case present."]
+    },
+    {
+      "id": "memoTransfer",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://github.com/solana-foundation/explorer"],
+      "notes": ["memoTransfer case present."]
+    },
+    {
+      "id": "confidentialTransferMint",
+      "status": "partial",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/solana-foundation/explorer",
+        "https://solana.com/docs/tokens/extensions/confidential-transfer"
+      ],
+      "notes": [
+        "confidentialTransferMint / confidentialTransferAccount cases exist and are labeled; encrypted balances/amounts are ElGamal ciphertext and cannot be shown as plaintext."
+      ]
+    },
+    {
+      "id": "confidentialTransferFeeConfig",
+      "status": "partial",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/solana-foundation/explorer",
+        "https://solana.com/docs/tokens/extensions/confidential-transfer"
+      ],
+      "notes": [
+        "confidentialTransferFeeConfig / confidentialTransferFeeAmount cases present; withheld confidential fee amounts remain encrypted."
+      ]
+    },
+    {
+      "id": "metadataPointer",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://github.com/solana-foundation/explorer"],
+      "notes": ["metadataPointer case present."]
+    },
+    {
+      "id": "tokenMetadata",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://github.com/solana-foundation/explorer"],
+      "notes": ["tokenMetadata case present; name/symbol/URI rendered."]
+    },
+    {
+      "id": "groupPointer",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://github.com/solana-foundation/explorer"],
+      "notes": ["groupPointer case present."]
+    },
+    {
+      "id": "tokenGroup",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://github.com/solana-foundation/explorer"],
+      "notes": ["tokenGroup case present in the switch."]
+    },
+    {
+      "id": "groupMemberPointer",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://github.com/solana-foundation/explorer"],
+      "notes": ["groupMemberPointer case present."]
+    },
+    {
+      "id": "tokenGroupMember",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://github.com/solana-foundation/explorer"],
+      "notes": ["tokenGroupMember case present."]
+    },
+    {
+      "id": "mintCloseAuthority",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://github.com/solana-foundation/explorer"],
+      "notes": ["mintCloseAuthority case present."]
+    },
+    {
+      "id": "scaledUiAmountConfig",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://github.com/solana-foundation/explorer"],
+      "notes": [
+        "scaledUiAmountConfig case added (PR #598); a dedicated multiplier tooltip renders the value."
+      ]
+    },
+    {
+      "id": "pausable",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://github.com/solana-foundation/explorer"],
+      "notes": [
+        "pausableConfig / pausableAccount cases added (PR #598) and rendered with description and links."
+      ]
+    },
+    {
+      "id": "unknown",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://github.com/solana-foundation/explorer"],
+      "notes": [
+        "A default/unparseableExtension case returns 'Unknown Extension' so unrecognized extensions are still listed gracefully."
+      ]
     }
   ],
   "notes": [
-    "Day 2 first-cut rules; Solana Explorer is a read-only display venue — no execution, only rendering"
+    "Solana Explorer is open-source; verdicts are derived directly from source (app/validators/accounts/token-extension.ts enumerates all extension types; app/utils/token-extension.ts renders each, plus an unparseableExtension fallback).",
+    "It is fully read-only; nothing is blocked or executed. All 20 extension kinds have an explicit case, including scaledUiAmountConfig and pausableConfig (PR #598).",
+    "Confidential transfer extensions are partial only because encrypted ElGamal balances/amounts are inherently undecodable; the extension presence and config fields are still shown."
   ]
 }

@@ -1,43 +1,217 @@
 {
   "venue": "raydium",
-  "version": "0.2.0",
-  "last_updated": "2026-05-29",
+  "version": "1.0.0",
+  "last_updated": "2026-05-31",
   "features": [
     {
       "id": "transferFeeConfig",
-      "status": "blocked",
+      "status": "supported",
       "confidence": "high",
-      "evidence": ["https://docs.raydium.io/raydium/pool-creation/creating-a-clmm-pool-and-farm"],
-      "notes": ["Raydium CLMM does not support transfer-fee tokens in standard pools"]
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs",
+        "https://docs.raydium.io/raydium/for-liquidity-providers/pool-types/cpmm-constant-product"
+      ],
+      "notes": [
+        "On-chain is_supported_mint allowlists TransferFeeConfig; CPMM/CLMM read the fee and account for it. Requires a CPMM or CLMM pool — legacy AMM v4 is SPL-token only."
+      ]
+    },
+    {
+      "id": "metadataPointer",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs"
+      ],
+      "notes": ["Explicitly allowed in the is_supported_mint allowlist."]
+    },
+    {
+      "id": "tokenMetadata",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs"
+      ],
+      "notes": ["Explicitly allowed in the is_supported_mint allowlist."]
+    },
+    {
+      "id": "interestBearingConfig",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs"
+      ],
+      "notes": [
+        "Explicitly allowed; only changes UI amount display, raw balances the AMM uses are unaffected."
+      ]
+    },
+    {
+      "id": "scaledUiAmountConfig",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/raydium-io/raydium-clmm/blob/master/programs/amm/src/util/token.rs"
+      ],
+      "notes": ["Explicitly allowed (ScaledUiAmount) in the is_supported_mint allowlist."]
     },
     {
       "id": "transferHook",
       "status": "blocked",
       "confidence": "high",
-      "evidence": ["https://docs.raydium.io/raydium/pool-creation/creating-a-clmm-pool-and-farm"],
-      "notes": ["Transfer hooks are not supported in Raydium CLMM or AMM pools"]
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs"
+      ],
+      "notes": [
+        "Not in the is_supported_mint allowlist, so pool creation/swap is rejected. There is no transfer-hook program whitelist — only a per-mint MINT_WHITELIST bypass of specific addresses."
+      ]
     },
     {
       "id": "permanentDelegate",
-      "status": "conditional",
-      "confidence": "medium",
-      "evidence": ["https://docs.raydium.io/raydium/"],
-      "notes": ["Permanent delegate is technically allowed but may trigger UI warnings"]
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs"
+      ],
+      "notes": [
+        "Not in the allowlist; is_supported_mint returns false unless the mint is hard-coded in MINT_WHITELIST."
+      ]
     },
     {
       "id": "nonTransferable",
       "status": "blocked",
       "confidence": "high",
-      "evidence": ["https://spl.solana.com/token-2022/extensions#non-transferable-tokens"],
-      "notes": ["Non-transferable tokens cannot be deposited into Raydium pools"]
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs"
+      ],
+      "notes": [
+        "Not in the allowlist, and semantically incompatible with a pool — tokens cannot be transferred."
+      ]
+    },
+    {
+      "id": "defaultAccountState",
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs"
+      ],
+      "notes": [
+        "Not in the allowlist; a frozen-by-default state would also break pool vault accounts."
+      ]
+    },
+    {
+      "id": "mintCloseAuthority",
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs"
+      ],
+      "notes": [
+        "Not in the is_supported_mint allowlist; blocked for user pool mints unless whitelisted."
+      ]
     },
     {
       "id": "confidentialTransferMint",
       "status": "blocked",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs"
+      ],
+      "notes": [
+        "Not in the allowlist; confidential transfers are incompatible with an AMM that must read plaintext balances."
+      ]
+    },
+    {
+      "id": "confidentialTransferFeeConfig",
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs"
+      ],
+      "notes": ["Not in the allowlist; depends on confidential transfer, which is itself blocked."]
+    },
+    {
+      "id": "memoTransfer",
+      "status": "blocked",
       "confidence": "medium",
-      "evidence": ["https://spl.solana.com/token-2022/extensions#confidential-transfers"],
-      "notes": ["Confidential transfer amounts are incompatible with Raydium's on-chain price math"]
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs"
+      ],
+      "notes": [
+        "Account-level extension not in the mint allowlist; Raydium does not attach required memos to its vault transfers."
+      ]
+    },
+    {
+      "id": "cpiGuard",
+      "status": "blocked",
+      "confidence": "medium",
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs"
+      ],
+      "notes": [
+        "Account-level extension; the closed mint allowlist rejects any non-listed extension."
+      ]
+    },
+    {
+      "id": "groupPointer",
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs"
+      ],
+      "notes": ["Not in the allowlist."]
+    },
+    {
+      "id": "tokenGroup",
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs"
+      ],
+      "notes": ["Not in the allowlist."]
+    },
+    {
+      "id": "groupMemberPointer",
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs"
+      ],
+      "notes": ["Not in the allowlist."]
+    },
+    {
+      "id": "tokenGroupMember",
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs"
+      ],
+      "notes": ["Not in the allowlist."]
+    },
+    {
+      "id": "pausable",
+      "status": "blocked",
+      "confidence": "medium",
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs"
+      ],
+      "notes": [
+        "Newer Token-2022 extension, not in the allowlist; is_supported_mint returns false."
+      ]
+    },
+    {
+      "id": "unknown",
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/raydium-io/raydium-cp-swap/blob/master/programs/cp-swap/src/utils/token.rs"
+      ],
+      "notes": [
+        "The allowlist is closed: any extension outside the five allowed kinds returns false, so unrecognized extensions are rejected by default."
+      ]
     }
   ],
-  "notes": ["Day 2 first-cut rules; refine on Day 6 with probe evidence"]
+  "notes": [
+    "Authoritative gate is the on-chain is_supported_mint function, a CLOSED ALLOWLIST. Token-2022 mints pass only if EVERY extension is one of {TransferFeeConfig, MetadataPointer, TokenMetadata, InterestBearingConfig, ScaledUiAmount}; anything else reverts.",
+    "CPMM and current CLMM share the identical allowlist. AMM v4 (legacy) is SPL-token only and cannot host any Token-2022 mint.",
+    "There is no transfer-hook program whitelist — the only bypass is a hard-coded MINT_WHITELIST of specific mint addresses."
+  ]
 }
