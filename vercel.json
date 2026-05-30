@@ -7,5 +7,5 @@
   "env": {
     "HELIUS_API_KEY": "@helius_api_key"
   },
-  "crons": [{ "path": "/api/sentinel/tick", "schedule": "0 * * * *" }]
+  "crons": []
 }
