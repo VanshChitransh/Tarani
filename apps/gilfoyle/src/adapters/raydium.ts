@@ -22,7 +22,7 @@ export async function probeRaydiumPool(
 export const raydiumAdapter: VenueAdapter = {
   venue: "raydium",
   async evaluate(input: AdapterInput): Promise<VenueCompatibilityResult> {
-    return evaluateRule(input.profile, input.rule);
+    return runRaydiumCompatibility(input);
   },
 };
 

@@ -44,6 +44,11 @@
           "minLength": 1,
           "description": "Token-2022 extension kind or capability identifier."
         },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Venue sub-feature this rule applies to (e.g. 'swap', 'limitOrders', 'dca'). Omit for rules that apply to the venue as a whole."
+        },
         "status": {
           "type": "string",
           "enum": ["supported", "partial", "blocked", "conditional", "unknown"]

@@ -185,4 +185,103 @@ describe("evaluateRule", () => {
     const result = evaluateRule(profile, rule);
     expect(result.confidence).toBe("low");
   });
+
+  // --- scoped features ---
+
+  it("scoped rules do not affect top-level status", () => {
+    const profile = makeProfile(["transferFeeConfig"]);
+    const rule = makeRule("jupiter", [
+      {
+        id: "transferFeeConfig",
+        scope: "swap",
+        status: "supported",
+        confidence: "high",
+        evidence: [],
+        notes: [],
+      },
+      {
+        id: "transferFeeConfig",
+        scope: "limitOrders",
+        status: "blocked",
+        confidence: "high",
+        evidence: [],
+        notes: [],
+      },
+    ]);
+    const result = evaluateRule(profile, rule);
+    // No unscoped verdicts → top-level status falls back to unknown
+    expect(result.status).toBe("unknown");
+    expect(result.features).toBeDefined();
+    expect(result.features?.swap?.status).toBe("supported");
+    expect(result.features?.limitOrders?.status).toBe("blocked");
+  });
+
+  it("mixes unscoped and scoped rules correctly", () => {
+    const profile = makeProfile(["transferFeeConfig", "permanentDelegate"]);
+    const rule = makeRule("jupiter", [
+      // unscoped → drives top-level
+      {
+        id: "permanentDelegate",
+        status: "conditional",
+        confidence: "medium",
+        evidence: [],
+        notes: [],
+      },
+      // scoped → goes into features map only
+      {
+        id: "transferFeeConfig",
+        scope: "swap",
+        status: "supported",
+        confidence: "high",
+        evidence: [],
+        notes: [],
+      },
+      {
+        id: "transferFeeConfig",
+        scope: "dca",
+        status: "blocked",
+        confidence: "high",
+        evidence: [],
+        notes: [],
+      },
+    ]);
+    const result = evaluateRule(profile, rule);
+    expect(result.status).toBe("conditional");
+    expect(result.features?.swap?.status).toBe("supported");
+    expect(result.features?.dca?.status).toBe("blocked");
+  });
+
+  it("result with scoped features validates against schema", () => {
+    const profile = makeProfile(["transferFeeConfig"]);
+    const rule = makeRule("jupiter", [
+      {
+        id: "transferFeeConfig",
+        scope: "swap",
+        status: "supported",
+        confidence: "high",
+        evidence: ["https://docs.jup.ag/"],
+        notes: [],
+      },
+      {
+        id: "transferFeeConfig",
+        scope: "limitOrders",
+        status: "blocked",
+        confidence: "high",
+        evidence: ["https://docs.jup.ag/"],
+        notes: [],
+      },
+    ]);
+    const result = evaluateRule(profile, rule);
+    const parsed = venueCompatibilityResultSchema.safeParse(result);
+    expect(parsed.success).toBe(true);
+  });
+
+  it("features map is absent when no scoped rules match", () => {
+    const profile = makeProfile(["transferHook"]);
+    const rule = makeRule("jupiter", [
+      { id: "transferHook", status: "blocked", confidence: "high", evidence: [], notes: [] },
+    ]);
+    const result = evaluateRule(profile, rule);
+    expect(result.features).toBeUndefined();
+  });
 });

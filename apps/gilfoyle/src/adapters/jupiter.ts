@@ -23,8 +23,7 @@ export async function probeJupiterRoute(
 export const jupiterAdapter: VenueAdapter = {
   venue: "jupiter",
   async evaluate(input: AdapterInput): Promise<VenueCompatibilityResult> {
-    const base = evaluateRule(input.profile, input.rule);
-    return base;
+    return runJupiterCompatibility(input);
   },
 };
 

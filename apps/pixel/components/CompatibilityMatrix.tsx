@@ -1,4 +1,4 @@
-import type { VenueCompatibilityResult } from "@tarani/shared";
+import type { VenueCompatibilityResult, VenueFeatureStatus } from "@tarani/shared";
 
 const STATUS_STYLES: Record<VenueCompatibilityResult["status"], string> = {
   supported: "bg-green-100 text-green-800",
@@ -32,6 +32,22 @@ const VENUE_LABEL: Record<string, string> = {
   "solana-explorer": "Solana Explorer",
 };
 
+const SCOPE_LABEL: Record<string, string> = {
+  swap: "Swap",
+  limitOrders: "Limit Orders",
+  dca: "DCA",
+};
+
+function StatusBadge({ status }: { status: VenueFeatureStatus["status"] }) {
+  return (
+    <span
+      className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${STATUS_STYLES[status]}`}
+    >
+      {STATUS_LABEL[status]}
+    </span>
+  );
+}
+
 interface Props {
   results: VenueCompatibilityResult[];
 }
@@ -54,11 +70,20 @@ export function CompatibilityMatrix({ results }: Props) {
             <tr key={r.venue} className="border-b border-neutral-100 hover:bg-neutral-50">
               <td className="py-2 px-3 font-medium">{VENUE_LABEL[r.venue] ?? r.venue}</td>
               <td className="py-2 px-3">
-                <span
-                  className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${STATUS_STYLES[r.status]}`}
-                >
-                  {STATUS_LABEL[r.status]}
-                </span>
+                <div className="flex flex-col gap-1">
+                  {r.features ? (
+                    Object.entries(r.features).map(([scope, feat]) => (
+                      <div key={scope} className="flex items-center gap-1.5">
+                        <span className="text-xs text-neutral-400 w-20 shrink-0">
+                          {SCOPE_LABEL[scope] ?? scope}
+                        </span>
+                        <StatusBadge status={feat.status} />
+                      </div>
+                    ))
+                  ) : (
+                    <StatusBadge status={r.status} />
+                  )}
+                </div>
               </td>
               <td className="py-2 px-3 text-neutral-500 text-xs">
                 {CONFIDENCE_LABEL[r.confidence]}

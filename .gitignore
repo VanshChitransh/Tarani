@@ -35,3 +35,9 @@ bun.lockb
 
 # Misc
 *.tsbuildinfo
+
+# Solana test validator runtime state
+test-ledger/
+
+# Private project notes
+PROJECT_AUDIT.md

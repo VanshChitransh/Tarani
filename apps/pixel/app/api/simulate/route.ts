@@ -31,7 +31,8 @@ export async function POST(req: Request) {
   }
 
   const ip = getClientIp(req);
-  if (!checkRateLimit(`simulate:${ip}`, 5, 60_000)) {
+  const rateMax = process.env.NODE_ENV === "development" ? 1000 : 5;
+  if (!checkRateLimit(`simulate:${ip}`, rateMax, 60_000)) {
     return errorResponse({ code: "RATE_LIMITED", message: "Too many requests" });
   }
 

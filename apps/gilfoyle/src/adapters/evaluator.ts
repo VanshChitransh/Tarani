@@ -4,6 +4,7 @@ import type {
   ConfidenceLevel,
   MintProfile,
   VenueCompatibilityResult,
+  VenueFeatureStatus,
 } from "@tarani/shared";
 import { EXTENSION_KINDS } from "@tarani/shared";
 import type { VenueRule, VenueRuleFeature } from "../rules";
@@ -82,6 +83,16 @@ function collectNotes(verdicts: FeatureVerdict[]): string[] {
   return verdicts.flatMap((v) => v.notes);
 }
 
+function buildFeatureStatus(verdicts: FeatureVerdict[]): VenueFeatureStatus {
+  const status = pickOverallStatus(verdicts);
+  return {
+    status,
+    confidence: aggregateConfidence(verdicts, status),
+    evidence: collectEvidence(verdicts),
+    notes: collectNotes(verdicts),
+  };
+}
+
 export function evaluateRule(profile: MintProfile, rule: VenueRule): VenueCompatibilityResult {
   if (profile.extensions.length === 0) {
     return {
@@ -94,19 +105,45 @@ export function evaluateRule(profile: MintProfile, rule: VenueRule): VenueCompat
     };
   }
 
-  const verdicts: FeatureVerdict[] = rule.features
-    .map((f) => evaluateFeature(profile, f))
-    .filter((v): v is FeatureVerdict => v !== null);
+  const allVerdicts: { scope: string | undefined; verdict: FeatureVerdict }[] = rule.features
+    .map((f) => {
+      const verdict = evaluateFeature(profile, f);
+      return verdict ? { scope: f.scope, verdict } : null;
+    })
+    .filter((v): v is { scope: string | undefined; verdict: FeatureVerdict } => v !== null);
 
-  const status = pickOverallStatus(verdicts);
-  const confidence = aggregateConfidence(verdicts, status);
+  // Unscoped verdicts drive the top-level status (backward-compatible worst-wins).
+  const unscopedVerdicts = allVerdicts.filter((v) => v.scope === undefined).map((v) => v.verdict);
 
-  return {
+  // Scoped verdicts are grouped into the features map.
+  const scopedByName = new Map<string, FeatureVerdict[]>();
+  for (const { scope, verdict } of allVerdicts) {
+    if (scope !== undefined) {
+      const existing = scopedByName.get(scope) ?? [];
+      existing.push(verdict);
+      scopedByName.set(scope, existing);
+    }
+  }
+
+  const status = pickOverallStatus(unscopedVerdicts);
+  const confidence = aggregateConfidence(unscopedVerdicts, status);
+
+  const result: VenueCompatibilityResult = {
     venue: rule.venue,
     status,
     source: "heuristic",
     confidence,
-    evidence: collectEvidence(verdicts),
-    notes: collectNotes(verdicts),
+    evidence: collectEvidence(unscopedVerdicts),
+    notes: collectNotes(unscopedVerdicts),
   };
+
+  if (scopedByName.size > 0) {
+    const features: Record<string, VenueFeatureStatus> = {};
+    for (const [scope, verdicts] of scopedByName) {
+      features[scope] = buildFeatureStatus(verdicts);
+    }
+    result.features = features;
+  }
+
+  return result;
 }
