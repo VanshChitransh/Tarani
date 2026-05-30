@@ -4,9 +4,45 @@ import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
+// Real mainnet mints, all verified on-chain. The first five are Token-2022
+// (token-extensions) mints owned by TokenzQ…; USDC and USDT are legacy SPL
+// tokens (Tokenkeg…) included for contrast.
 const SAMPLE_MINTS = [
-  { label: "PYUSD", address: "CXk2AMBfi3TwaEL2468s6zP8xq9NxTXjp9gjMgzeUynM" },
-  { label: "USDC", address: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v" },
+  {
+    label: "PYUSD",
+    address: "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+    note: "PayPal USD (Token-2022)",
+  },
+  {
+    label: "USDG",
+    address: "2u1tszSeqZ3qBWF3uNGPFc8TzMk2tdiwknnRMWGWjGWH",
+    note: "Global Dollar (Token-2022)",
+  },
+  {
+    label: "USDu",
+    address: "9ckR7pPPvyPadACDTzLwK2ZAEeUJ3qGSnzPs8bVaHrSy",
+    note: "USDu stablecoin (Token-2022)",
+  },
+  {
+    label: "GLDx",
+    address: "Xsv9hRk1z5ystj9MhnA7Lq4vjSsLwzL2nxrwmwtD3re",
+    note: "Gold xStock (Token-2022)",
+  },
+  {
+    label: "PYPLx",
+    address: "XshWQWYVp5ff8CrAEsGmLVKD47nBWi3Ygn5v8wXK27G",
+    note: "PayPal xStock (Token-2022)",
+  },
+  {
+    label: "USDC",
+    address: "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+    note: "USD Coin (legacy SPL)",
+  },
+  {
+    label: "USDT",
+    address: "Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",
+    note: "Tether USD (legacy SPL)",
+  },
 ];
 
 export default function HomePage() {
@@ -62,13 +98,14 @@ export default function HomePage() {
           </button>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <span className="text-xs text-neutral-400">Try:</span>
-          {SAMPLE_MINTS.map(({ label, address }) => (
+          {SAMPLE_MINTS.map(({ label, address, note }) => (
             <button
               key={address}
               type="button"
               onClick={() => tryMint(address)}
+              title={note}
               className="text-xs text-neutral-500 hover:text-neutral-900 border border-neutral-200 hover:border-neutral-400 rounded px-2 py-0.5 transition-colors font-mono"
             >
               {label}
