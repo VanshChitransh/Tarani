@@ -28,9 +28,11 @@ describe("runHeuristic", () => {
     expect(runHeuristic(BASE_PROFILE, [])).toEqual([]);
   });
 
-  it("silently skips unknown scenario kinds", () => {
-    const results = runHeuristic(BASE_PROFILE, ["freeze_check" as ScenarioKind]);
-    expect(results).toHaveLength(0);
+  it("surfaces an explicit error result for an unregistered scenario kind", () => {
+    const results = runHeuristic(BASE_PROFILE, ["totally_unknown_kind" as ScenarioKind]);
+    expect(results).toHaveLength(1);
+    expect(results[0].outcome).toBe("error");
+    expect(results[0].failureCode).toBe("NOT_IMPLEMENTED");
   });
 
   it("runs a subset of scenarios when only some are requested", () => {

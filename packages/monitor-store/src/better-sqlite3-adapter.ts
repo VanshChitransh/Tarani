@@ -18,7 +18,10 @@ export function createBetterSqlite3Driver(syncDb: SyncDb): DbDriver {
       return {
         get: (...params) => Promise.resolve(stmt.get(...params)),
         all: (...params) => Promise.resolve(stmt.all(...params) as unknown[]),
-        run: (...params) => Promise.resolve(stmt.run(...params)),
+        run: (...params) => {
+          const info = stmt.run(...params) as { changes?: number };
+          return Promise.resolve(info?.changes ?? 0);
+        },
       };
     },
     exec: (sql) => Promise.resolve(syncDb.exec(sql)),

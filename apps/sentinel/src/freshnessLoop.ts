@@ -44,5 +44,24 @@ export async function freshnessTick(): Promise<FreshnessReport> {
 export function runFreshnessLoop(intervalMs: number = DEFAULT_FRESHNESS_INTERVAL_MS): void {
   console.log(`[sentinel] Rule-freshness loop started (interval: ${intervalMs}ms)`);
   void freshnessTick();
-  setInterval(() => void freshnessTick(), intervalMs);
+
+  // Prevent overlapping ticks: freshnessTick mutates module state (lastAlertedKey),
+  // so two concurrent runs could both pass the dedup check and double-alert.
+  let running = false;
+  setInterval(() => {
+    if (running) {
+      console.warn("[sentinel] Previous freshness tick still running; skipping this interval");
+      return;
+    }
+    running = true;
+    void (async () => {
+      try {
+        await freshnessTick();
+      } catch (err) {
+        console.error("[sentinel] freshness tick error:", err);
+      } finally {
+        running = false;
+      }
+    })();
+  }, intervalMs);
 }

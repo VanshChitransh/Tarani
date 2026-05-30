@@ -16,7 +16,8 @@ export function createTursoDriver(url: string, authToken: string): DbDriver {
           return rs.rows as unknown[];
         },
         async run(...params: unknown[]) {
-          await client.execute({ sql, args: params as InArgs });
+          const rs = await client.execute({ sql, args: params as InArgs });
+          return rs.rowsAffected;
         },
       };
     },

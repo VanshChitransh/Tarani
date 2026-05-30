@@ -208,17 +208,24 @@ export async function checkRateLimit(
   const now = Date.now();
   const cutoff = now - windowMs;
 
-  // Drop hits that have aged out of this key's window.
+  // Housekeeping only (not required for correctness): drop hits that have aged
+  // out of this key's window so the table stays small.
   await d
     .prepare("DELETE FROM rate_limit_hits WHERE bucket_key = ? AND ts < ?")
     .run(bucketKey, cutoff);
 
-  const countRow = (await d
-    .prepare("SELECT COUNT(*) as n FROM rate_limit_hits WHERE bucket_key = ? AND ts >= ?")
-    .get(bucketKey, cutoff)) as { n: number };
+  // Atomic check-and-insert: the row is inserted only if the in-window count is
+  // under the limit, evaluated inside a single statement. Because SQLite/libSQL
+  // serializes writers, the COUNT and INSERT see one consistent snapshot — no
+  // check-then-act race where two concurrent requests both pass the limit.
+  // rowsAffected tells us whether THIS request was admitted.
+  const inserted = (await d
+    .prepare(
+      `INSERT INTO rate_limit_hits (bucket_key, ts)
+       SELECT ?, ?
+       WHERE (SELECT COUNT(*) FROM rate_limit_hits WHERE bucket_key = ? AND ts >= ?) < ?`,
+    )
+    .run(bucketKey, now, bucketKey, cutoff, maxRequests)) as number;
 
-  if (countRow.n >= maxRequests) return false;
-
-  await d.prepare("INSERT INTO rate_limit_hits (bucket_key, ts) VALUES (?, ?)").run(bucketKey, now);
-  return true;
+  return inserted > 0;
 }

@@ -1,5 +1,5 @@
 import type { MintProfile, ScenarioKind, ScenarioResult } from "@tarani/shared";
-import { SCENARIO_REGISTRY } from "../scenarios";
+import { SCENARIO_REGISTRY, unimplementedScenario } from "../scenarios";
 import {
   findFreePort,
   startValidator,
@@ -38,7 +38,10 @@ export async function runLive(
     const results: ScenarioResult[] = [];
     for (const kind of scenarios) {
       const entry = SCENARIO_REGISTRY[kind];
-      if (!entry) continue;
+      if (!entry) {
+        results.push(unimplementedScenario(kind));
+        continue;
+      }
       const result = await entry.live(ctx);
       results.push(result);
     }

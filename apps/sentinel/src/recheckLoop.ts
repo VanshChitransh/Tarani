@@ -73,5 +73,24 @@ export async function tick(): Promise<void> {
 export async function runRecheckLoop(intervalMs: number): Promise<void> {
   console.log(`[sentinel] Recheck loop started (interval: ${intervalMs}ms)`);
   await tick();
-  setInterval(tick, intervalMs);
+
+  // Guard against overlap: if a tick runs longer than the interval, skip the
+  // next firing rather than letting ticks pile up and race (duplicate webhook
+  // dispatches, contended DB writes). The try/catch also stops a rejected tick
+  // from becoming an unhandled rejection that could crash the process.
+  let running = false;
+  setInterval(async () => {
+    if (running) {
+      console.warn("[sentinel] Previous recheck tick still running; skipping this interval");
+      return;
+    }
+    running = true;
+    try {
+      await tick();
+    } catch (err) {
+      console.error("[sentinel] recheck tick error:", err);
+    } finally {
+      running = false;
+    }
+  }, intervalMs);
 }
