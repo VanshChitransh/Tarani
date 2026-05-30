@@ -1,4 +1,4 @@
-import { createClient, type InArgs } from "@libsql/client";
+import { createClient, type InArgs } from "@libsql/client/web";
 import type { DbDriver, PreparedStatement } from "./db";
 
 export function createTursoDriver(url: string, authToken: string): DbDriver {
