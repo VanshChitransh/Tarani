@@ -14,9 +14,24 @@ export interface ValidatorHandle {
   stop: () => void;
 }
 
-export async function isValidatorBinaryAvailable(): Promise<boolean> {
-  const proc = spawnSync("which", ["solana-test-validator"]);
-  return proc.status === 0;
+const KNOWN_VALIDATOR_PATHS = [
+  "/root/.local/share/solana/install/active_release/bin/solana-test-validator",
+  "/home/ubuntu/.local/share/solana/install/active_release/bin/solana-test-validator",
+  "/usr/local/bin/solana-test-validator",
+];
+
+export function findValidatorBinary(): string | null {
+  // Try PATH first (works in user shell)
+  const which = spawnSync("which", ["solana-test-validator"]);
+  if (which.status === 0) return which.stdout.toString().trim();
+
+  // Fallback: check known Solana install locations (systemd has restricted PATH)
+  for (const candidate of KNOWN_VALIDATOR_PATHS) {
+    const check = spawnSync("test", ["-x", candidate]);
+    if (check.status === 0) return candidate;
+  }
+
+  return null;
 }
 
 export async function findFreePort(start = 8899): Promise<number> {
@@ -37,12 +52,13 @@ export async function findFreePort(start = 8899): Promise<number> {
 export async function startValidator(
   port: number,
   cloneAddresses: string[] = [],
+  binary = "solana-test-validator",
 ): Promise<ChildProcess> {
   const args = ["--rpc-port", String(port), "--quiet"];
   for (const addr of cloneAddresses) {
     args.push("--clone", addr);
   }
-  const proc = spawn("solana-test-validator", args, {
+  const proc = spawn(binary, args, {
     stdio: "ignore",
     detached: false,
   });

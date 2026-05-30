@@ -1,4 +1,5 @@
 import type { AnalyzeReport } from "@tarani/shared";
+import Link from "next/link";
 import { CompatibilityMatrix } from "../../../components/CompatibilityMatrix";
 import { RiskSection } from "../../../components/RiskSection";
 import { RecommendationList } from "../../../components/RecommendationList";
@@ -11,7 +12,9 @@ interface Props {
   params: Promise<{ mint: string }>;
 }
 
-async function fetchReport(mint: string): Promise<AnalyzeReport | { error: string }> {
+type FetchError = { error: string; status: number };
+
+async function fetchReport(mint: string): Promise<AnalyzeReport | FetchError> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000";
   const res = await fetch(`${baseUrl}/api/analyze`, {
     method: "POST",
@@ -22,7 +25,7 @@ async function fetchReport(mint: string): Promise<AnalyzeReport | { error: strin
   const json = (await res.json()) as
     | { ok: true; data: AnalyzeReport }
     | { ok: false; error: { message: string } };
-  if (!json.ok) return { error: json.error.message };
+  if (!json.ok) return { error: json.error.message, status: res.status };
   return json.data;
 }
 
@@ -39,11 +42,34 @@ export default async function ReportPage({ params }: Props) {
   const result = await fetchReport(mint);
 
   if ("error" in result) {
+    const isNotFound = result.status === 404;
+    const isBadRequest = result.status === 400;
+
     return (
-      <main className="max-w-3xl mx-auto px-4 py-12">
-        <div className="border border-red-200 bg-red-50 rounded-lg px-5 py-4">
-          <p className="text-sm font-medium text-red-700">Failed to load report</p>
-          <p className="text-xs text-red-500 mt-1">{result.error}</p>
+      <main className="max-w-2xl mx-auto px-4 py-20 text-center space-y-4">
+        <p className="text-4xl">{isNotFound ? "🔍" : isBadRequest ? "⚠️" : "⚡"}</p>
+        <h1 className="text-lg font-semibold text-neutral-900">
+          {isNotFound
+            ? "Mint not found"
+            : isBadRequest
+              ? "Invalid mint address"
+              : "Something went wrong"}
+        </h1>
+        <p className="text-sm text-neutral-500 leading-relaxed max-w-sm mx-auto">
+          {isNotFound
+            ? "This mint address doesn't exist on-chain or isn't indexed yet. Double-check the address and try again."
+            : isBadRequest
+              ? "The address you entered doesn't look like a valid Solana mint. Mint addresses are 32–44 characters long."
+              : result.error}
+        </p>
+        <div className="pt-2">
+          <p className="text-xs font-mono text-neutral-300 break-all mb-4">{mint}</p>
+          <Link
+            href="/"
+            className="inline-block px-4 py-2 text-sm font-medium rounded-lg bg-neutral-900 text-white hover:bg-neutral-700 transition-colors"
+          >
+            Try another mint
+          </Link>
         </div>
       </main>
     );

@@ -18,6 +18,7 @@ function extractHookProgramAddress(profile: MintProfile): string | undefined {
 export async function runLive(
   profile: MintProfile,
   scenarios: ScenarioKind[],
+  binary = "solana-test-validator",
 ): Promise<ScenarioResult[]> {
   const port = await findFreePort(8899);
   const rpcUrl = `http://127.0.0.1:${port}`;
@@ -25,7 +26,7 @@ export async function runLive(
   const hookProgram = extractHookProgramAddress(profile);
   const cloneAddresses = hookProgram ? [hookProgram] : [];
 
-  const proc = await startValidator(port, cloneAddresses);
+  const proc = await startValidator(port, cloneAddresses, binary);
 
   try {
     await waitForValidator(port);

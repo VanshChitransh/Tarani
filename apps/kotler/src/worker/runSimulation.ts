@@ -1,6 +1,6 @@
 import type { SimulationReport, SimulationRequest, ScenarioKind } from "@tarani/shared";
 import { HeliusClient, parseMintProfile } from "@tarani/gilfoyle";
-import { isValidatorBinaryAvailable, ValidatorBootTimeoutError } from "../validator/lifecycle";
+import { findValidatorBinary, ValidatorBootTimeoutError } from "../validator/lifecycle";
 import { runHeuristic } from "./heuristicRunner";
 import { runLive } from "./liveRunner";
 
@@ -22,14 +22,20 @@ export async function runSimulation(request: SimulationRequest): Promise<Simulat
   const profile = parseMintProfile(asset);
 
   const forceHeuristic = process.env.KOTLER_FORCE_HEURISTIC === "true";
-  const validatorAvailable = forceHeuristic ? false : await isValidatorBinaryAvailable();
+  const validatorBinary = forceHeuristic ? null : findValidatorBinary();
+
+  if (validatorBinary) {
+    console.log(`[kotler] Using validator binary: ${validatorBinary}`);
+  } else {
+    console.log("[kotler] solana-test-validator not found — using heuristic mode");
+  }
 
   let results;
   let validatorMode: "live" | "heuristic";
 
-  if (validatorAvailable) {
+  if (validatorBinary) {
     try {
-      results = await runLive(profile, scenarios);
+      results = await runLive(profile, scenarios, validatorBinary);
       validatorMode = "live";
     } catch (err) {
       if (err instanceof ValidatorBootTimeoutError) {
