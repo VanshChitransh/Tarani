@@ -1,12 +1,12 @@
 export interface PreparedStatement {
-  get(...params: unknown[]): unknown;
-  all(...params: unknown[]): unknown[];
-  run(...params: unknown[]): unknown;
+  get(...params: unknown[]): Promise<unknown>;
+  all(...params: unknown[]): Promise<unknown[]>;
+  run(...params: unknown[]): Promise<unknown>;
 }
 
 export interface DbDriver {
   prepare(sql: string): PreparedStatement;
-  exec(sql: string): void;
+  exec(sql: string): Promise<void>;
 }
 
 const CREATE_TABLES_SQL = `
@@ -39,7 +39,7 @@ const CREATE_TABLES_SQL = `
   );
 `;
 
-export function initDb(db: DbDriver): DbDriver {
-  db.exec(CREATE_TABLES_SQL);
+export async function initDb(db: DbDriver): Promise<DbDriver> {
+  await db.exec(CREATE_TABLES_SQL);
   return db;
 }

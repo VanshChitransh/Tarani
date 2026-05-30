@@ -5,10 +5,11 @@
   "type": "module",
   "main": "src/index.ts",
   "dependencies": {
-    "@tarani/shared": "workspace:*",
-    "better-sqlite3": "*"
+    "@libsql/client": "^0.14.0",
+    "@tarani/shared": "workspace:*"
   },
   "devDependencies": {
-    "@types/better-sqlite3": "*"
+    "@types/better-sqlite3": "*",
+    "better-sqlite3": "*"
   }
 }

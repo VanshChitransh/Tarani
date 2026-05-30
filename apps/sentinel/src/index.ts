@@ -1,15 +1,16 @@
-import { Database } from "bun:sqlite";
-import path from "path";
-import { initDb, configure } from "@tarani/monitor-store";
+import { createTursoDriver, initDb, configure } from "@tarani/monitor-store";
 import { runRecheckLoop } from "./recheckLoop";
 
-const DB_PATH = process.env.MONITOR_DB_PATH ?? path.join(process.cwd(), "monitor.db");
+const TURSO_URL = process.env.TURSO_DATABASE_URL;
+const TURSO_TOKEN = process.env.TURSO_AUTH_TOKEN ?? "";
 const INTERVAL_MS = parseInt(process.env.SENTINEL_INTERVAL_MS ?? "60000", 10);
+
+if (!TURSO_URL) throw new Error("TURSO_DATABASE_URL is not set");
 
 console.log("[sentinel] Starting...");
 
-const sqliteDb = new Database(DB_PATH);
-const db = initDb(sqliteDb as unknown as import("@tarani/monitor-store").DbDriver);
+const driver = createTursoDriver(TURSO_URL, TURSO_TOKEN);
+const db = await initDb(driver);
 configure(db);
 
 runRecheckLoop(INTERVAL_MS);

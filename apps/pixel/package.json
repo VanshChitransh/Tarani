@@ -6,7 +6,6 @@
     "@tarani/gilfoyle": "workspace:*",
     "@tarani/monitor-store": "workspace:*",
     "@tarani/shared": "workspace:*",
-    "better-sqlite3": "*",
     "next": "^15.5.3",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
@@ -18,7 +17,6 @@
   },
   "devDependencies": {
     "@tarani/test-fixtures": "workspace:*",
-    "@types/better-sqlite3": "*",
     "autoprefixer": "^10.5.0",
     "postcss": "^8.5.15",
     "tailwindcss": "^3"

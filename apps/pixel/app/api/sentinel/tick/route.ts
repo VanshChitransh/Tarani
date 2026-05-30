@@ -19,7 +19,7 @@ async function dispatchAlerts(
   mint: string,
   diffs: Awaited<ReturnType<typeof diffCompatibility>>,
 ): Promise<void> {
-  const webhooks = listWebhooks();
+  const webhooks = await listWebhooks();
   if (webhooks.length === 0) return;
   const body = JSON.stringify({ mint, diffs, detectedAt: new Date().toISOString() });
   await Promise.allSettled(
@@ -43,24 +43,24 @@ async function recheckMint(mint: string): Promise<void> {
   const now = new Date().toISOString();
   const current = { mint, capturedAt: now, results };
 
-  const baseline = getLatestSnapshot(mint);
+  const baseline = await getLatestSnapshot(mint);
   if (baseline) {
     const diffs = diffCompatibility(baseline.results, current.results);
     if (diffs.length > 0) {
-      saveDiff(mint, diffs);
+      await saveDiff(mint, diffs);
       await dispatchAlerts(mint, diffs);
     }
   }
 
-  saveSnapshot(mint, current);
-  updateLastChecked(mint, now);
+  await saveSnapshot(mint, current);
+  await updateLastChecked(mint, now);
 }
 
 export async function GET() {
   try {
-    ensureDb();
+    await ensureDb();
 
-    const mints = listMints();
+    const mints = await listMints();
     if (mints.length === 0) {
       return NextResponse.json({ ok: true, data: { rechecked: 0 } });
     }

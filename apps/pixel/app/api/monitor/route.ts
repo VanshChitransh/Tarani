@@ -26,7 +26,7 @@ function errorResponse(error: ApiError) {
 }
 
 export async function POST(req: Request) {
-  ensureDb();
+  await ensureDb();
 
   const cl = req.headers.get("content-length");
   if (cl && parseInt(cl, 10) > MAX_BODY_BYTES) {
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const record = addMint(parsed.data.mint, parsed.data.subscriberId);
+    const record = await addMint(parsed.data.mint, parsed.data.subscriberId);
     const body = monitorResponseSchema.parse({
       ok: true,
       data: { subscriptionId: record.subscriptionId, mint: record.mint },
@@ -63,8 +63,8 @@ export async function POST(req: Request) {
 }
 
 export async function GET() {
-  ensureDb();
-  const mints = listMints();
+  await ensureDb();
+  const mints = await listMints();
   const body = monitorListResponseSchema.parse({ ok: true, data: mints });
   return NextResponse.json(body);
 }

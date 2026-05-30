@@ -32,18 +32,18 @@ async function recheckMint(mint: string): Promise<void> {
     const now = new Date().toISOString();
     const current = { mint, capturedAt: now, results };
 
-    const baseline = getLatestSnapshot(mint);
+    const baseline = await getLatestSnapshot(mint);
     if (baseline) {
       const diffs = diffCompatibility(baseline.results, current.results);
       if (diffs.length > 0) {
-        saveDiff(mint, diffs);
+        await saveDiff(mint, diffs);
         await dispatchAlerts(mint, diffs);
         console.log(`[sentinel] ${mint}: ${diffs.length} diff(s) detected`);
       }
     }
 
-    saveSnapshot(mint, current);
-    updateLastChecked(mint, now);
+    await saveSnapshot(mint, current);
+    await updateLastChecked(mint, now);
     failureCounts.set(mint, 0);
   } catch (err) {
     failureCounts.set(mint, (failureCounts.get(mint) ?? 0) + 1);
@@ -52,7 +52,7 @@ async function recheckMint(mint: string): Promise<void> {
 }
 
 export async function tick(): Promise<void> {
-  const mints = listMints();
+  const mints = await listMints();
   if (mints.length === 0) {
     console.log("[sentinel] No mints to recheck");
     return;

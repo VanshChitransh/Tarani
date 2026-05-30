@@ -3,8 +3,8 @@ import { removeWebhook } from "@tarani/monitor-store";
 import { ensureDb } from "../../../../src/lib/db";
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  ensureDb();
+  await ensureDb();
   const { id } = await params;
-  removeWebhook(id);
+  await removeWebhook(id);
   return NextResponse.json({ ok: true, data: { removed: id } });
 }

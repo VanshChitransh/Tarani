@@ -2,7 +2,7 @@ import type { CompatibilityDiff } from "@tarani/shared";
 import { listWebhooks } from "@tarani/monitor-store";
 
 export async function dispatchAlerts(mint: string, diffs: CompatibilityDiff[]): Promise<void> {
-  const webhooks = listWebhooks();
+  const webhooks = await listWebhooks();
   if (webhooks.length === 0) return;
 
   const payload = { mint, diffs, detectedAt: new Date().toISOString() };

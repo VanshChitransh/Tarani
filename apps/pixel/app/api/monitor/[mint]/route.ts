@@ -17,15 +17,15 @@ function errorResponse(error: ApiError) {
 }
 
 export async function GET(_req: Request, { params }: { params: Promise<{ mint: string }> }) {
-  ensureDb();
+  await ensureDb();
   const { mint } = await params;
-  const record = getMint(mint);
+  const record = await getMint(mint);
   if (!record) {
     return errorResponse({ code: "NOT_FOUND", message: "Mint not monitored" });
   }
 
-  const latestSnapshot = getLatestSnapshot(mint);
-  const latestDiff = getLatestDiff(mint);
+  const latestSnapshot = await getLatestSnapshot(mint);
+  const latestDiff = await getLatestDiff(mint);
 
   const body = monitorDetailResponseSchema.parse({
     ok: true,
@@ -35,13 +35,13 @@ export async function GET(_req: Request, { params }: { params: Promise<{ mint: s
 }
 
 export async function DELETE(_req: Request, { params }: { params: Promise<{ mint: string }> }) {
-  ensureDb();
+  await ensureDb();
   const { mint } = await params;
-  const record = getMint(mint);
+  const record = await getMint(mint);
   if (!record) {
     return errorResponse({ code: "NOT_FOUND", message: "Mint not monitored" });
   }
 
-  removeMint(mint);
+  await removeMint(mint);
   return NextResponse.json({ ok: true, data: { removed: mint } });
 }

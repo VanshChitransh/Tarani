@@ -1,16 +1,18 @@
-import Database from "better-sqlite3";
-import path from "path";
-import { initDb, configure } from "@tarani/monitor-store";
+import { createTursoDriver, initDb, configure } from "@tarani/monitor-store";
 
-const DB_PATH =
-  process.env.MONITOR_DB_PATH ?? path.join(process.env.TMPDIR ?? "/tmp", "tarani-monitor.db");
+let initPromise: Promise<void> | null = null;
 
-let initialized = false;
+export function ensureDb(): Promise<void> {
+  if (initPromise) return initPromise;
 
-export function ensureDb(): void {
-  if (initialized) return;
-  const sqliteDb = new Database(DB_PATH);
-  const db = initDb(sqliteDb as unknown as import("@tarani/monitor-store").DbDriver);
-  configure(db);
-  initialized = true;
+  initPromise = (async () => {
+    const url = process.env.TURSO_DATABASE_URL;
+    const authToken = process.env.TURSO_AUTH_TOKEN ?? "";
+    if (!url) throw new Error("TURSO_DATABASE_URL is not set");
+    const driver = createTursoDriver(url, authToken);
+    const db = await initDb(driver);
+    configure(db);
+  })();
+
+  return initPromise;
 }

@@ -9,7 +9,7 @@ import { ensureDb } from "../../../src/lib/db";
 import { checkRateLimit, getClientIp } from "../../../src/lib/rateLimiter";
 
 export async function POST(req: Request) {
-  ensureDb();
+  await ensureDb();
 
   const cl = req.headers.get("content-length");
   if (cl && parseInt(cl, 10) > 10_240) {
@@ -36,14 +36,14 @@ export async function POST(req: Request) {
     );
   }
 
-  const record = addWebhook(parsed.data.url);
+  const record = await addWebhook(parsed.data.url);
   const body = registerWebhookResponseSchema.parse({ ok: true, data: record });
   return NextResponse.json(body);
 }
 
 export async function GET() {
-  ensureDb();
-  const hooks = listWebhooks();
+  await ensureDb();
+  const hooks = await listWebhooks();
   const body = webhookListResponseSchema.parse({ ok: true, data: hooks });
   return NextResponse.json(body);
 }

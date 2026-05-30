@@ -36,63 +36,67 @@ function rowToRecord(row: MintRow): MonitorRecord {
   };
 }
 
-export function addMint(mint: string, subscriptionId?: string): MonitorRecord {
+export async function addMint(mint: string, subscriptionId?: string): Promise<MonitorRecord> {
   const d = db();
 
-  const existing = getMint(mint);
+  const existing = await getMint(mint);
   if (existing) return existing;
 
-  const count = (d.prepare("SELECT COUNT(*) as n FROM monitored_mints").get() as { n: number }).n;
-  if (count >= MAX_MINTS) throw new Error("MAX_MONITORED_MINTS_EXCEEDED");
+  const countRow = (await d.prepare("SELECT COUNT(*) as n FROM monitored_mints").get()) as {
+    n: number;
+  };
+  if (countRow.n >= MAX_MINTS) throw new Error("MAX_MONITORED_MINTS_EXCEEDED");
 
   const id = subscriptionId ?? randomUUID();
   const addedAt = new Date().toISOString();
 
-  d.prepare(
-    "INSERT INTO monitored_mints (subscription_id, mint, added_at, last_checked_at) VALUES (?, ?, ?, NULL)",
-  ).run(id, mint, addedAt);
+  await d
+    .prepare(
+      "INSERT INTO monitored_mints (subscription_id, mint, added_at, last_checked_at) VALUES (?, ?, ?, NULL)",
+    )
+    .run(id, mint, addedAt);
 
   return { subscriptionId: id, mint, addedAt, lastCheckedAt: null };
 }
 
-export function removeMint(mint: string): void {
-  db().prepare("DELETE FROM monitored_mints WHERE mint = ?").run(mint);
+export async function removeMint(mint: string): Promise<void> {
+  await db().prepare("DELETE FROM monitored_mints WHERE mint = ?").run(mint);
 }
 
-export function getMint(mint: string): MonitorRecord | null {
-  const row = db().prepare("SELECT * FROM monitored_mints WHERE mint = ?").get(mint) as
+export async function getMint(mint: string): Promise<MonitorRecord | null> {
+  const row = (await db().prepare("SELECT * FROM monitored_mints WHERE mint = ?").get(mint)) as
     | MintRow
     | undefined;
   return row ? rowToRecord(row) : null;
 }
 
-export function listMints(): MonitorRecord[] {
-  const rows = db()
+export async function listMints(): Promise<MonitorRecord[]> {
+  const rows = (await db()
     .prepare("SELECT * FROM monitored_mints ORDER BY added_at ASC")
-    .all() as MintRow[];
+    .all()) as MintRow[];
   return rows.map(rowToRecord);
 }
 
-export function updateLastChecked(mint: string, checkedAt: string): void {
-  db()
+export async function updateLastChecked(mint: string, checkedAt: string): Promise<void> {
+  await db()
     .prepare("UPDATE monitored_mints SET last_checked_at = ? WHERE mint = ?")
     .run(checkedAt, mint);
 }
 
-export function saveSnapshot(mint: string, snapshot: CompatibilitySnapshot): void {
-  db()
+export async function saveSnapshot(mint: string, snapshot: CompatibilitySnapshot): Promise<void> {
+  await db()
     .prepare(
       "INSERT INTO compatibility_snapshots (mint, captured_at, results_json) VALUES (?, ?, ?)",
     )
     .run(mint, snapshot.capturedAt, JSON.stringify(snapshot.results));
 }
 
-export function getLatestSnapshot(mint: string): CompatibilitySnapshot | null {
-  const row = db()
+export async function getLatestSnapshot(mint: string): Promise<CompatibilitySnapshot | null> {
+  const row = (await db()
     .prepare(
       "SELECT * FROM compatibility_snapshots WHERE mint = ? ORDER BY captured_at DESC LIMIT 1",
     )
-    .get(mint) as { mint: string; captured_at: string; results_json: string } | undefined;
+    .get(mint)) as { mint: string; captured_at: string; results_json: string } | undefined;
 
   if (!row) return null;
   return {
@@ -102,17 +106,17 @@ export function getLatestSnapshot(mint: string): CompatibilitySnapshot | null {
   };
 }
 
-export function saveDiff(mint: string, diffs: CompatibilityDiff[]): void {
+export async function saveDiff(mint: string, diffs: CompatibilityDiff[]): Promise<void> {
   const detectedAt = diffs[0]?.detectedAt ?? new Date().toISOString();
-  db()
+  await db()
     .prepare("INSERT INTO compatibility_diffs (mint, detected_at, diffs_json) VALUES (?, ?, ?)")
     .run(mint, detectedAt, JSON.stringify(diffs));
 }
 
-export function getLatestDiff(mint: string): CompatibilityDiff[] | null {
-  const row = db()
+export async function getLatestDiff(mint: string): Promise<CompatibilityDiff[] | null> {
+  const row = (await db()
     .prepare("SELECT * FROM compatibility_diffs WHERE mint = ? ORDER BY detected_at DESC LIMIT 1")
-    .get(mint) as { diffs_json: string } | undefined;
+    .get(mint)) as { diffs_json: string } | undefined;
 
   if (!row) return null;
   return JSON.parse(row.diffs_json);
@@ -129,22 +133,22 @@ function rowToWebhook(row: WebhookRow): AlertWebhook {
   };
 }
 
-export function addWebhook(url: string): AlertWebhook {
+export async function addWebhook(url: string): Promise<AlertWebhook> {
   const id = randomUUID();
   const addedAt = new Date().toISOString();
-  db()
+  await db()
     .prepare("INSERT INTO alert_webhooks (id, url, added_at, active) VALUES (?, ?, ?, 1)")
     .run(id, url, addedAt);
   return { id, url, addedAt, active: true };
 }
 
-export function listWebhooks(): AlertWebhook[] {
-  const rows = db()
+export async function listWebhooks(): Promise<AlertWebhook[]> {
+  const rows = (await db()
     .prepare("SELECT * FROM alert_webhooks WHERE active = 1 ORDER BY added_at ASC")
-    .all() as WebhookRow[];
+    .all()) as WebhookRow[];
   return rows.map(rowToWebhook);
 }
 
-export function removeWebhook(id: string): void {
-  db().prepare("DELETE FROM alert_webhooks WHERE id = ?").run(id);
+export async function removeWebhook(id: string): Promise<void> {
+  await db().prepare("DELETE FROM alert_webhooks WHERE id = ?").run(id);
 }
