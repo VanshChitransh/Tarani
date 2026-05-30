@@ -7,11 +7,11 @@ import {
 } from "@tarani/gilfoyle";
 import {
   listMints,
-  listWebhooks,
   getLatestSnapshot,
   saveSnapshot,
   saveDiff,
   updateLastChecked,
+  dispatchToWebhooks,
 } from "@tarani/monitor-store";
 import { ensureDb } from "../../../../src/lib/db";
 
@@ -19,19 +19,7 @@ async function dispatchAlerts(
   mint: string,
   diffs: Awaited<ReturnType<typeof diffCompatibility>>,
 ): Promise<void> {
-  const webhooks = await listWebhooks();
-  if (webhooks.length === 0) return;
-  const body = JSON.stringify({ mint, diffs, detectedAt: new Date().toISOString() });
-  await Promise.allSettled(
-    webhooks.map((wh) =>
-      fetch(wh.url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body,
-        signal: AbortSignal.timeout(5_000),
-      }).catch(() => {}),
-    ),
-  );
+  await dispatchToWebhooks(JSON.stringify({ mint, diffs, detectedAt: new Date().toISOString() }));
 }
 
 async function recheckMint(mint: string): Promise<void> {

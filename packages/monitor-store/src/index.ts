@@ -22,3 +22,5 @@ export {
   checkRateLimit,
 } from "./store";
 export type { ReportHistoryEntry } from "./store";
+export { postToWebhooks, dispatchToWebhooks } from "./dispatch";
+export type { WebhookDeliveryResult } from "./dispatch";
