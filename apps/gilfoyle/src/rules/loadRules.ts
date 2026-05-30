@@ -1,17 +1,23 @@
-import { readFileSync, readdirSync } from "node:fs";
-import { join, dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
-import Ajv, { type ValidateFunction } from "ajv";
-import addFormats from "ajv-formats";
-import { VENUE_IDS, type VenueId } from "@tarani/shared";
+import type { VenueId } from "@tarani/shared";
 import type { VenueRule } from "./types";
 
-const HERE = dirname(fileURLToPath(import.meta.url));
-const RULES_DIR = resolve(HERE, "../../rules");
-const SCHEMA_PATH = join(RULES_DIR, "schema/venueRule.schema.json");
-const VENUES_DIR = join(RULES_DIR, "venues");
+import jupiterRule from "../../rules/venues/jupiter.json";
+import raydiumRule from "../../rules/venues/raydium.json";
+import orcaRule from "../../rules/venues/orca.json";
+import phantomRule from "../../rules/venues/phantom.json";
+import solflareRule from "../../rules/venues/solflare.json";
+import solscanRule from "../../rules/venues/solscan.json";
+import solanaExplorerRule from "../../rules/venues/solana-explorer.json";
 
-let cachedValidator: ValidateFunction<VenueRule> | null = null;
+const RULES: Record<string, VenueRule> = {
+  jupiter: jupiterRule as unknown as VenueRule,
+  raydium: raydiumRule as unknown as VenueRule,
+  orca: orcaRule as unknown as VenueRule,
+  phantom: phantomRule as unknown as VenueRule,
+  solflare: solflareRule as unknown as VenueRule,
+  solscan: solscanRule as unknown as VenueRule,
+  "solana-explorer": solanaExplorerRule as unknown as VenueRule,
+};
 
 export class RuleValidationError extends Error {
   readonly path: string;
@@ -24,35 +30,16 @@ export class RuleValidationError extends Error {
   }
 }
 
-function getValidator(): ValidateFunction<VenueRule> {
-  if (cachedValidator) return cachedValidator;
-  const schema = JSON.parse(readFileSync(SCHEMA_PATH, "utf8"));
-  const ajv = new Ajv({ allErrors: true, strict: false });
-  addFormats(ajv);
-  cachedValidator = ajv.compile<VenueRule>(schema);
-  return cachedValidator;
-}
-
 export function loadVenueRule(venue: VenueId): VenueRule {
-  const path = join(VENUES_DIR, `${venue}.json`);
-  const raw = JSON.parse(readFileSync(path, "utf8")) as unknown;
-  const validate = getValidator();
-  if (!validate(raw)) {
-    throw new RuleValidationError(path, validate.errors);
-  }
-  return raw as VenueRule;
+  const rule = RULES[venue];
+  if (!rule) throw new Error(`No rule found for venue: ${venue}`);
+  return rule;
 }
 
 export function loadAllVenueRules(): Record<VenueId, VenueRule> {
-  const out = {} as Record<VenueId, VenueRule>;
-  for (const venue of VENUE_IDS) {
-    out[venue] = loadVenueRule(venue);
-  }
-  return out;
+  return { ...RULES } as Record<VenueId, VenueRule>;
 }
 
 export function listVenueRuleFiles(): string[] {
-  return readdirSync(VENUES_DIR)
-    .filter((name) => name.endsWith(".json"))
-    .map((name) => join(VENUES_DIR, name));
+  return Object.keys(RULES).map((venue) => `${venue}.json`);
 }
