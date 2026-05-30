@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CompatibilityMatrix } from "../../components/CompatibilityMatrix";
 import { RiskSection } from "../../components/RiskSection";
 import { RecommendationList } from "../../components/RecommendationList";
@@ -46,6 +46,18 @@ export default function PrelaunchPage() {
   const [result, setResult] = useState<AnalyzeReport | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const reportRef = useRef<HTMLElement>(null);
+
+  // Scroll the report into view once it's generated — the report renders below
+  // the fold, so the user might not notice it appear after analyzing. Defer to the
+  // next frame so the report's children have laid out before we measure/scroll.
+  useEffect(() => {
+    if (!result) return;
+    const id = requestAnimationFrame(() => {
+      reportRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+    return () => cancelAnimationFrame(id);
+  }, [result]);
 
   function toggleExtension(kind: string, checked: boolean) {
     setConfig((prev) => ({
@@ -196,7 +208,7 @@ export default function PrelaunchPage() {
       )}
 
       {result && (
-        <section className="space-y-8">
+        <section ref={reportRef} className="space-y-8 scroll-mt-6">
           <div>
             <h2 className="text-sm font-semibold uppercase tracking-wide text-neutral-400 mb-3">
               Venue Compatibility
