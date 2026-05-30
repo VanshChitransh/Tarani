@@ -1,11 +1,19 @@
 import type { RiskFinding } from "@tarani/shared";
 
-const SEVERITY_STYLES: Record<RiskFinding["severity"], string> = {
-  critical: "bg-red-100 text-red-800 border border-red-200",
-  high: "bg-orange-100 text-orange-800 border border-orange-200",
-  medium: "bg-yellow-100 text-yellow-800 border border-yellow-200",
-  low: "bg-blue-100 text-blue-800 border border-blue-200",
-  info: "bg-neutral-100 text-neutral-500 border border-neutral-200",
+const SEVERITY_LEFT: Record<RiskFinding["severity"], string> = {
+  critical: "border-l-red-500",
+  high: "border-l-orange-400",
+  medium: "border-l-yellow-400",
+  low: "border-l-blue-400",
+  info: "border-l-neutral-300",
+};
+
+const SEVERITY_BADGE: Record<RiskFinding["severity"], string> = {
+  critical: "bg-red-100 text-red-700",
+  high: "bg-orange-100 text-orange-700",
+  medium: "bg-yellow-100 text-yellow-700",
+  low: "bg-blue-100 text-blue-700",
+  info: "bg-neutral-100 text-neutral-500",
 };
 
 const SEVERITY_LABEL: Record<RiskFinding["severity"], string> = {
@@ -16,6 +24,8 @@ const SEVERITY_LABEL: Record<RiskFinding["severity"], string> = {
   info: "Info",
 };
 
+const SEVERITY_ORDER: RiskFinding["severity"][] = ["critical", "high", "medium", "low", "info"];
+
 interface Props {
   risks: RiskFinding[];
 }
@@ -23,19 +33,27 @@ interface Props {
 export function RiskSection({ risks }: Props) {
   if (risks.length === 0) {
     return (
-      <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 border border-green-200 rounded px-4 py-3">
-        <span className="font-medium">No risk findings detected.</span>
+      <div className="flex items-center gap-3 text-sm text-green-700 bg-green-50 border border-green-200 rounded-lg px-4 py-3.5">
+        <span className="h-2 w-2 rounded-full bg-green-500 shrink-0" />
+        <span className="font-medium">No risk findings — this mint looks clean.</span>
       </div>
     );
   }
 
+  const sorted = [...risks].sort(
+    (a, b) => SEVERITY_ORDER.indexOf(a.severity) - SEVERITY_ORDER.indexOf(b.severity),
+  );
+
   return (
-    <div className="space-y-3">
-      {risks.map((risk) => (
-        <div key={risk.id} className="border border-neutral-200 rounded-md px-4 py-3 space-y-1">
-          <div className="flex items-center gap-2">
+    <div className="space-y-2.5">
+      {sorted.map((risk) => (
+        <div
+          key={risk.id}
+          className={`border border-neutral-200 border-l-4 ${SEVERITY_LEFT[risk.severity]} rounded-lg px-4 py-3 space-y-1.5`}
+        >
+          <div className="flex items-center gap-2 flex-wrap">
             <span
-              className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${SEVERITY_STYLES[risk.severity]}`}
+              className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold ${SEVERITY_BADGE[risk.severity]}`}
             >
               {SEVERITY_LABEL[risk.severity]}
             </span>
@@ -43,7 +61,7 @@ export function RiskSection({ risks }: Props) {
           </div>
           <p className="text-xs text-neutral-500 leading-relaxed">{risk.description}</p>
           {risk.affectedVenues && risk.affectedVenues.length > 0 && (
-            <div className="flex flex-wrap gap-1 pt-1">
+            <div className="flex flex-wrap gap-1 pt-0.5">
               {risk.affectedVenues.map((venue) => (
                 <span
                   key={venue}
