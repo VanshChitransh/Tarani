@@ -63,6 +63,16 @@ describe("postToWebhooks", () => {
     expect(results.find((r) => r.id === "bad")?.ok).toBe(false);
   });
 
+  it("refuses a non-HTTPS webhook without calling fetch", async () => {
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    const results = await postToWebhooks([wh("http", "http://insecure.example/hook")], "{}");
+    expect(results[0]).toMatchObject({ id: "http", ok: false });
+    expect(results[0].error).toContain("non-HTTPS");
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(console.error).toHaveBeenCalledOnce();
+  });
+
   it("returns an empty array for no webhooks (no fetch calls)", async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal("fetch", fetchMock);

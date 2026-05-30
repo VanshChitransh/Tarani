@@ -9,7 +9,8 @@
       "Bash(git check-ignore *)",
       "Bash(python3 -c ' *)",
       "Bash(echo \"lint exit: $?\")",
-      "Bash(python3 -c \"import json;print\\([r['id'] for r in json.load\\(open\\('apps/gilfoyle/rules/recommendations.json'\\)\\)['rules']]\\)\")"
+      "Bash(python3 -c \"import json;print\\([r['id'] for r in json.load\\(open\\('apps/gilfoyle/rules/recommendations.json'\\)\\)['rules']]\\)\")",
+      "Bash(echo \"coverage gate exit: $?\")"
     ]
   }
 }

@@ -24,3 +24,16 @@ export const allMintFixtures = {
 } as const;
 
 export type MintFixtureName = keyof typeof allMintFixtures;
+
+/**
+ * Look up a bundled mint fixture by its on-chain address (the Helius asset `id`).
+ * Returns the raw Helius-asset-shaped JSON, or null if no fixture matches.
+ * Used by the DEMO_MODE fallback so the app can serve a believable report when
+ * the live RPC is unavailable during a demo.
+ */
+export function findMintFixtureByAddress(address: string): unknown | null {
+  for (const fixture of Object.values(allMintFixtures)) {
+    if ((fixture as { id?: string }).id === address) return fixture;
+  }
+  return null;
+}

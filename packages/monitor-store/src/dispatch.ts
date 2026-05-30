@@ -30,6 +30,14 @@ export async function postToWebhooks(
   // The per-webhook handler catches everything, so none of these reject.
   return Promise.all(
     webhooks.map(async (webhook): Promise<WebhookDeliveryResult> => {
+      // Alert payloads carry mint + compatibility data; refuse to leak them over
+      // plaintext HTTP even if a non-HTTPS URL slipped past registration.
+      if (!webhook.url.toLowerCase().startsWith("https://")) {
+        console.error(
+          `[webhooks] Refusing to deliver to non-HTTPS webhook ${webhook.url} (${webhook.id})`,
+        );
+        return { id: webhook.id, url: webhook.url, ok: false, error: "insecure-url (non-HTTPS)" };
+      }
       try {
         const res = await fetch(webhook.url, {
           method: "POST",

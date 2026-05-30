@@ -18,6 +18,7 @@ import {
 import { checkRateLimit, getClientIp } from "../../../src/lib/rateLimiter";
 import { ensureDb } from "../../../src/lib/db";
 import { getLatestReport, saveReport } from "@tarani/monitor-store";
+import { findMintFixtureByAddress } from "@tarani/test-fixtures";
 import type { AnalyzeReport } from "@tarani/shared";
 
 const MAX_BODY_BYTES = 10_240;
@@ -116,8 +117,32 @@ export async function POST(req: Request) {
   }
 
   const client = new HeliusClient();
+
+  // Fetch live mint data. When DEMO_MODE is on and the live RPC is unavailable,
+  // fall back to a bundled fixture for the same address so a demo never dies on
+  // a flaky network. DEMO_MODE is off by default, so production never silently
+  // serves stand-in data.
+  let asset: Awaited<ReturnType<HeliusClient["fetchMintAsset"]>>;
   try {
-    const asset = await client.fetchMintAsset(mint);
+    asset = await client.fetchMintAsset(mint);
+  } catch (err) {
+    const fixture = process.env.DEMO_MODE === "true" ? findMintFixtureByAddress(mint) : null;
+    if (!fixture) {
+      if (err instanceof HeliusClientError) {
+        return errorResponse({ code: err.code, message: err.message, details: err.details });
+      }
+      return errorResponse({
+        code: "INTERNAL",
+        message: err instanceof Error ? err.message : "Unknown error",
+      });
+    }
+    console.warn(
+      `[analyze] DEMO_MODE fallback: live fetch failed for ${mint}, serving bundled fixture`,
+    );
+    asset = fixture as Awaited<ReturnType<HeliusClient["fetchMintAsset"]>>;
+  }
+
+  try {
     const profile = parseMintProfile(asset);
     const compatibility = await runCompatibilityEngine(profile);
     const risks = scoreRisk(profile, compatibility);
@@ -147,9 +172,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json(body);
   } catch (err) {
-    if (err instanceof HeliusClientError) {
-      return errorResponse({ code: err.code, message: err.message, details: err.details });
-    }
     return errorResponse({
       code: "INTERNAL",
       message: err instanceof Error ? err.message : "Unknown error",

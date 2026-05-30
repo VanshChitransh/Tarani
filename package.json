@@ -18,9 +18,10 @@
     "format": "bunx prettier --write .",
     "typecheck": "bunx tsc --noEmit",
     "test": "bunx vitest run",
+    "test:coverage": "bunx vitest run --coverage",
     "check": "bun run lint && bun run typecheck && bun run test",
     "check:freshness": "bun run --filter @tarani/gilfoyle check:freshness",
-    "check:ci": "bun run check && bun run build",
+    "check:ci": "bun run lint && bun run typecheck && bun run test:coverage && bun run build",
     "prepare": "husky"
   },
   "dependencies": {
@@ -36,6 +37,7 @@
     "@types/react-dom": "^19.1.9",
     "@typescript-eslint/eslint-plugin": "^8.44.1",
     "@typescript-eslint/parser": "^8.44.1",
+    "@vitest/coverage-v8": "3.2.4",
     "eslint": "^9.36.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.1",

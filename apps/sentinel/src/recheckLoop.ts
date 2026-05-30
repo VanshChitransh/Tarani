@@ -53,6 +53,15 @@ async function recheckMint(mint: string): Promise<void> {
 
 export async function tick(): Promise<void> {
   const mints = await listMints();
+
+  // Evict failure counters for mints that are no longer tracked. Without this
+  // the map grows without bound over the process lifetime as mints are added
+  // and removed (the entry for a removed mint would otherwise live forever).
+  const active = new Set(mints.map((r) => r.mint));
+  for (const key of failureCounts.keys()) {
+    if (!active.has(key)) failureCounts.delete(key);
+  }
+
   if (mints.length === 0) {
     console.log("[sentinel] No mints to recheck");
     return;

@@ -4,7 +4,13 @@ import { evaluateRule } from "./evaluator";
 import { PRELAUNCH_MINT_SENTINEL } from "../prelaunch";
 
 const ORCA_WHIRLPOOL_LIST_API = "https://api.mainnet.orca.so/v1/whirlpool/list";
-const ORCA_CACHE_TTL_MS = 5 * 60 * 1000;
+
+// Staleness bound for the process-wide whirlpool cache. A pool result may be up
+// to this many ms out of date — acceptable by design, since pool existence
+// changes slowly and re-downloading the ~18MB list per evaluation is far worse.
+// Operators can shorten the window (e.g. during a launch) via env.
+const ORCA_CACHE_TTL_MS =
+  parseInt(process.env.ORCA_WHIRLPOOL_CACHE_TTL_MS ?? "", 10) || 5 * 60 * 1000;
 
 interface OrcaWhirlpool {
   tokenA?: { mint?: string };

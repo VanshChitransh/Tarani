@@ -1,4 +1,8 @@
-import type { VenueCompatibilityResult, VenueFeatureStatus } from "@tarani/shared";
+import type {
+  CompatibilityEvidence,
+  VenueCompatibilityResult,
+  VenueFeatureStatus,
+} from "@tarani/shared";
 
 const STATUS_STYLES: Record<VenueCompatibilityResult["status"], string> = {
   supported: "bg-green-100 text-green-700",
@@ -45,6 +49,42 @@ const SCOPE_LABEL: Record<string, string> = {
   limitOrders: "Limit Orders",
   dca: "DCA",
 };
+
+const EVIDENCE_KIND_LABEL: Record<string, string> = {
+  probe: "probe",
+  doc: "doc",
+  heuristic: "heuristic",
+  override: "override",
+};
+
+/**
+ * Renders the full "how we know this" trail for a venue result: every note, plus
+ * each evidence record (snippet + the reference it came from). Previously only
+ * the first note was shown, hiding the source of every verdict.
+ */
+function EvidenceCell({ notes, evidence }: { notes: string[]; evidence: CompatibilityEvidence[] }) {
+  if (notes.length === 0 && evidence.length === 0) {
+    return <span className="text-neutral-400">—</span>;
+  }
+  return (
+    <div className="flex flex-col gap-1.5">
+      {notes.map((note, i) => (
+        <p key={`note-${i}`} className="text-neutral-600">
+          {note}
+        </p>
+      ))}
+      {evidence.map((e, i) => (
+        <div key={`ev-${i}`} className="flex flex-col gap-0.5 border-l-2 border-neutral-200 pl-2">
+          <span className="text-neutral-600">{e.snippet ?? e.reference}</span>
+          <span className="text-[10px] uppercase tracking-wide text-neutral-400">
+            {EVIDENCE_KIND_LABEL[e.kind] ?? e.kind}
+            {e.snippet ? ` · ${e.reference}` : ""}
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function StatusBadge({ status }: { status: VenueFeatureStatus["status"] }) {
   return (
@@ -112,7 +152,7 @@ export function CompatibilityMatrix({ results }: Props) {
                 Source
               </th>
               <th className="text-left py-2.5 px-4 font-medium text-neutral-500 text-xs uppercase tracking-wide hidden md:table-cell">
-                Notes
+                Notes &amp; Evidence
               </th>
             </tr>
           </thead>
@@ -147,8 +187,8 @@ export function CompatibilityMatrix({ results }: Props) {
                 <td className="py-3 px-4 text-neutral-400 text-xs capitalize hidden sm:table-cell">
                   {r.source}
                 </td>
-                <td className="py-3 px-4 text-neutral-500 text-xs hidden md:table-cell">
-                  {r.notes.length > 0 ? r.notes[0] : "—"}
+                <td className="py-3 px-4 text-neutral-500 text-xs hidden md:table-cell max-w-md">
+                  <EvidenceCell notes={r.notes} evidence={r.evidence} />
                 </td>
               </tr>
             ))}
