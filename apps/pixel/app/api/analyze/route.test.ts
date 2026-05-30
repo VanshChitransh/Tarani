@@ -18,10 +18,12 @@ function makeRequest(body: unknown): Request {
 
 beforeEach(() => {
   vi.stubEnv("SOLANA_RPC_URL", "http://helius.invalid");
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 400 })));
 });
 
 afterEach(() => {
   vi.unstubAllEnvs();
+  vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
 

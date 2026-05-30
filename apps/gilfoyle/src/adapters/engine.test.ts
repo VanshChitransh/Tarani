@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { VENUE_IDS, venueCompatibilityResultSchema } from "@tarani/shared";
 import type { MintProfile } from "@tarani/shared";
 import { runCompatibilityEngine } from "./engine";
@@ -31,6 +31,14 @@ const fixtureProfile: MintProfile = {
   warnings: [],
   fetchedAt: new Date().toISOString(),
 };
+
+beforeEach(() => {
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 400 })));
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe("runCompatibilityEngine", () => {
   it("returns exactly 7 results", async () => {

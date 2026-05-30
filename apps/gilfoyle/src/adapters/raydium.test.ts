@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { venueCompatibilityResultSchema } from "@tarani/shared";
 import type { MintProfile } from "@tarani/shared";
 import type { VenueRule } from "../rules";
@@ -47,6 +47,14 @@ const baseRule: VenueRule = {
   ],
   notes: [],
 };
+
+beforeEach(() => {
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 400 })));
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 
 describe("raydiumAdapter", () => {
   it("has venue id 'raydium'", () => {
