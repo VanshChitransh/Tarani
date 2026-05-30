@@ -20,7 +20,7 @@ export async function POST(req: Request) {
   }
 
   const ip = getClientIp(req);
-  if (!checkRateLimit(`webhooks:${ip}`, 10, 60_000)) {
+  if (!(await checkRateLimit(`webhooks:${ip}`, 10, 60_000))) {
     return NextResponse.json(
       { ok: false, error: { code: "RATE_LIMITED", message: "Too many requests" } },
       { status: 429 },

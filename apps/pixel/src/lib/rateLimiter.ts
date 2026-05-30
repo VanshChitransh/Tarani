@@ -1,15 +1,13 @@
-const windows = new Map<string, number[]>();
+import { checkRateLimit as storeCheckRateLimit } from "@tarani/monitor-store";
+import { ensureDb } from "./db";
 
-export function checkRateLimit(key: string, maxRequests: number, windowMs: number): boolean {
-  const now = Date.now();
-  const timestamps = (windows.get(key) ?? []).filter((t) => now - t < windowMs);
-  if (timestamps.length >= maxRequests) {
-    windows.set(key, timestamps);
-    return false;
-  }
-  timestamps.push(now);
-  windows.set(key, timestamps);
-  return true;
+export async function checkRateLimit(
+  key: string,
+  maxRequests: number,
+  windowMs: number,
+): Promise<boolean> {
+  await ensureDb();
+  return storeCheckRateLimit(key, maxRequests, windowMs);
 }
 
 export function getClientIp(req: Request): string {

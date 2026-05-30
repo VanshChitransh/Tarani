@@ -16,8 +16,40 @@ import {
   buildPrelaunchProfile,
 } from "@tarani/gilfoyle";
 import { checkRateLimit, getClientIp } from "../../../src/lib/rateLimiter";
+import { ensureDb } from "../../../src/lib/db";
+import { getLatestReport, saveReport } from "@tarani/monitor-store";
+import type { AnalyzeReport } from "@tarani/shared";
 
 const MAX_BODY_BYTES = 10_240;
+
+/**
+ * Stable signature of the parts of a report we treat as "meaningful change":
+ * per-venue verdicts and the set of risk findings. Profile churn (e.g. supply
+ * changing) does not trigger a new history row.
+ */
+function reportSignature(report: AnalyzeReport): string {
+  const venues = [...report.compatibility].map((c) => `${c.venue}:${c.status}`).sort();
+  const risks = [...report.risks].map((r) => r.id).sort();
+  return JSON.stringify({ venues, risks });
+}
+
+/**
+ * Persist an ad-hoc report into history, but only if its verdict differs from
+ * the most recent stored snapshot. Fully isolated: any failure (no DB
+ * configured, write error) is swallowed so analysis always succeeds.
+ */
+async function persistReportHistory(mint: string, report: AnalyzeReport): Promise<void> {
+  try {
+    await ensureDb();
+    const latest = await getLatestReport(mint);
+    if (latest && reportSignature(latest.report) === reportSignature(report)) {
+      return;
+    }
+    await saveReport(mint, report, report.generatedAt);
+  } catch (err) {
+    console.error("[analyze] Failed to persist report history", err);
+  }
+}
 
 const ERROR_HTTP_STATUS: Record<ApiErrorCode, number> = {
   BAD_REQUEST: 400,
@@ -40,7 +72,7 @@ export async function POST(req: Request) {
   }
 
   const ip = getClientIp(req);
-  if (!checkRateLimit(`analyze:${ip}`, 10, 60_000)) {
+  if (!(await checkRateLimit(`analyze:${ip}`, 10, 60_000))) {
     return errorResponse({ code: "RATE_LIMITED", message: "Too many requests" });
   }
 
@@ -107,6 +139,11 @@ export async function POST(req: Request) {
         console.error("[analyze] Response shape drift detected", check.error.issues);
       }
     }
+
+    // Persist into ad-hoc report history (write-if-changed). Awaited so the
+    // write completes before the serverless function freezes on return, but
+    // isolated so a DB failure never breaks the analysis response.
+    await persistReportHistory(mint, body.data);
 
     return NextResponse.json(body);
   } catch (err) {

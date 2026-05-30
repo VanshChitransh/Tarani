@@ -34,7 +34,7 @@ export async function POST(req: Request) {
   }
 
   const ip = getClientIp(req);
-  if (!checkRateLimit(`monitor:${ip}`, 20, 60_000)) {
+  if (!(await checkRateLimit(`monitor:${ip}`, 20, 60_000))) {
     return errorResponse({ code: "RATE_LIMITED", message: "Too many requests" });
   }
 

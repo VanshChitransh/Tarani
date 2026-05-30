@@ -1,5 +1,6 @@
 import type {
   AlertWebhook,
+  AnalyzeReport,
   CompatibilityDiff,
   CompatibilitySnapshot,
   MonitorRecord,
@@ -122,6 +123,46 @@ export async function getLatestDiff(mint: string): Promise<CompatibilityDiff[] |
   return JSON.parse(row.diffs_json);
 }
 
+export type ReportHistoryEntry = {
+  report: AnalyzeReport;
+  createdAt: string;
+};
+
+type ReportRow = { mint: string; report_json: string; created_at: string };
+
+function rowToReportEntry(row: ReportRow): ReportHistoryEntry {
+  return {
+    report: JSON.parse(row.report_json),
+    createdAt: row.created_at,
+  };
+}
+
+export async function saveReport(
+  mint: string,
+  report: AnalyzeReport,
+  createdAt: string,
+): Promise<void> {
+  await db()
+    .prepare("INSERT INTO report_history (mint, report_json, created_at) VALUES (?, ?, ?)")
+    .run(mint, JSON.stringify(report), createdAt);
+}
+
+export async function getLatestReport(mint: string): Promise<ReportHistoryEntry | null> {
+  const row = (await db()
+    .prepare("SELECT * FROM report_history WHERE mint = ? ORDER BY created_at DESC LIMIT 1")
+    .get(mint)) as ReportRow | undefined;
+
+  return row ? rowToReportEntry(row) : null;
+}
+
+export async function getReportHistory(mint: string, limit = 10): Promise<ReportHistoryEntry[]> {
+  const rows = (await db()
+    .prepare("SELECT * FROM report_history WHERE mint = ? ORDER BY created_at DESC LIMIT ?")
+    .all(mint, limit)) as ReportRow[];
+
+  return rows.map(rowToReportEntry);
+}
+
 type WebhookRow = { id: string; url: string; added_at: string; active: number };
 
 function rowToWebhook(row: WebhookRow): AlertWebhook {
@@ -151,4 +192,33 @@ export async function listWebhooks(): Promise<AlertWebhook[]> {
 
 export async function removeWebhook(id: string): Promise<void> {
   await db().prepare("DELETE FROM alert_webhooks WHERE id = ?").run(id);
+}
+
+/**
+ * Sliding-window rate limit backed by the shared DB, so the count survives
+ * across serverless instances (every Vercel cold start shares the same Turso row set).
+ * Returns true if the request is allowed, false if the limit is exceeded.
+ */
+export async function checkRateLimit(
+  bucketKey: string,
+  maxRequests: number,
+  windowMs: number,
+): Promise<boolean> {
+  const d = db();
+  const now = Date.now();
+  const cutoff = now - windowMs;
+
+  // Drop hits that have aged out of this key's window.
+  await d
+    .prepare("DELETE FROM rate_limit_hits WHERE bucket_key = ? AND ts < ?")
+    .run(bucketKey, cutoff);
+
+  const countRow = (await d
+    .prepare("SELECT COUNT(*) as n FROM rate_limit_hits WHERE bucket_key = ? AND ts >= ?")
+    .get(bucketKey, cutoff)) as { n: number };
+
+  if (countRow.n >= maxRequests) return false;
+
+  await d.prepare("INSERT INTO rate_limit_hits (bucket_key, ts) VALUES (?, ?)").run(bucketKey, now);
+  return true;
 }

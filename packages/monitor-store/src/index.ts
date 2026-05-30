@@ -13,7 +13,12 @@ export {
   getLatestSnapshot,
   saveDiff,
   getLatestDiff,
+  saveReport,
+  getLatestReport,
+  getReportHistory,
   addWebhook,
   listWebhooks,
   removeWebhook,
+  checkRateLimit,
 } from "./store";
+export type { ReportHistoryEntry } from "./store";
