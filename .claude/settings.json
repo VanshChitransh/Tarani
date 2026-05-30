@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -E \"\\\\.ts$\")",
+      "Bash(xargs -I {} bash -c 'echo \"=== {} ===\"; head -1 {}')",
+      "Bash(git -C /Users/vansh/Coding/Tarani log --all --oneline --grep=\"sentinel\\\\|architecture\\\\|mismatch\")",
+      "Bash(git -C /Users/vansh/Coding/Tarani log --all --format=\"%h %s\")",
+      "Bash(git -C /Users/vansh/Coding/Tarani show HEAD:README.md)",
+      "Bash(git check-ignore *)",
+      "Bash(python3 -c ' *)",
+      "Bash(echo \"lint exit: $?\")"
+    ]
+  }
+}

@@ -57,7 +57,7 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
   };
 }
 
-async function live({ connection, mint, payer }: LiveContext): Promise<ScenarioResult> {
+async function live({ profile, connection, mint, payer }: LiveContext): Promise<ScenarioResult> {
   const start = Date.now();
   const recipient = Keypair.generate();
   const AMOUNT = 1_000_000n;
@@ -107,7 +107,7 @@ async function live({ connection, mint, payer }: LiveContext): Promise<ScenarioR
           recipientAta.address,
           payer.publicKey,
           AMOUNT,
-          9,
+          profile.decimals,
           [],
           TOKEN_2022_PROGRAM_ID,
         ),
@@ -126,7 +126,7 @@ async function live({ connection, mint, payer }: LiveContext): Promise<ScenarioR
         recipientAta.address,
         payer.publicKey,
         AMOUNT,
-        9,
+        profile.decimals,
         [],
         TOKEN_2022_PROGRAM_ID,
       ),

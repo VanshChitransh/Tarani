@@ -56,7 +56,16 @@ async function recheckMint(mint: string): Promise<void> {
   await updateLastChecked(mint, now);
 }
 
-export async function GET() {
+export async function GET(request: Request) {
+  // Vercel attaches `Authorization: Bearer <CRON_SECRET>` to scheduled invocations
+  // when CRON_SECRET is set. Reject anything else so this expensive endpoint
+  // (Helius fetch + DB write per tracked mint) can't be triggered by the public.
+  // When CRON_SECRET is unset (local/dev), the endpoint stays open for manual triggers.
+  const cronSecret = process.env.CRON_SECRET;
+  if (cronSecret && request.headers.get("authorization") !== `Bearer ${cronSecret}`) {
+    return NextResponse.json({ ok: false, error: { message: "Unauthorized" } }, { status: 401 });
+  }
+
   try {
     await ensureDb();
 

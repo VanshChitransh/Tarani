@@ -49,7 +49,7 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
   };
 }
 
-async function live({ connection, mint, payer }: LiveContext): Promise<ScenarioResult> {
+async function live({ profile, connection, mint, payer }: LiveContext): Promise<ScenarioResult> {
   const start = Date.now();
   const recipient = Keypair.generate();
   const TRANSFER_AMOUNT = 1_000_000n;
@@ -98,7 +98,7 @@ async function live({ connection, mint, payer }: LiveContext): Promise<ScenarioR
       recipientAta.address,
       payer,
       TRANSFER_AMOUNT,
-      9, // decimals placeholder; real decimals used at runtime via profile
+      profile.decimals, // must match the mint's actual decimals or transferChecked rejects
       [],
       undefined,
       TOKEN_2022_PROGRAM_ID,
