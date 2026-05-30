@@ -8,6 +8,8 @@ import addFormats from "ajv-formats";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const RULES_DIR = resolve(HERE, "../rules/venues");
 const SCHEMA_PATH = resolve(HERE, "../rules/schema/venueRule.schema.json");
+const RECS_PATH = resolve(HERE, "../rules/recommendations.json");
+const RECS_SCHEMA_PATH = resolve(HERE, "../rules/schema/recommendations.schema.json");
 
 const schema = JSON.parse(readFileSync(SCHEMA_PATH, "utf8"));
 const ajv = new Ajv({ allErrors: true, strict: false });
@@ -40,4 +42,20 @@ for (const file of files) {
 }
 
 console.log(`\n${files.length - failures}/${files.length} venue rule files valid.`);
-process.exit(failures === 0 ? 0 : 1);
+
+// Validate the recommendations rule file against its schema.
+const recsSchema = JSON.parse(readFileSync(RECS_SCHEMA_PATH, "utf8"));
+const validateRecs = ajv.compile(recsSchema);
+const recsData = JSON.parse(readFileSync(RECS_PATH, "utf8"));
+let recsFailed = false;
+if (validateRecs(recsData)) {
+  console.log("ok    recommendations.json");
+} else {
+  recsFailed = true;
+  console.error("fail  recommendations.json");
+  for (const issue of validateRecs.errors ?? []) {
+    console.error(`      ${issue.instancePath || "/"} ${issue.message}`);
+  }
+}
+
+process.exit(failures === 0 && !recsFailed ? 0 : 1);
