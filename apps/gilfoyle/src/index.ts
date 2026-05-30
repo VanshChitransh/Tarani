@@ -8,3 +8,4 @@ export { diffCompatibility } from "./diff";
 export { buildPrelaunchProfile, PRELAUNCH_MINT_SENTINEL } from "./prelaunch";
 export { probeJupiterRoute } from "./adapters/jupiter";
 export { probeRaydiumPool } from "./adapters/raydium";
+export { probeOrcaPool } from "./adapters/orca";

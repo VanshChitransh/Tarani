@@ -2,7 +2,7 @@ import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { venueCompatibilityResultSchema } from "@tarani/shared";
 import type { MintProfile } from "@tarani/shared";
 import type { VenueRule } from "../rules";
-import { raydiumAdapter } from "./raydium";
+import { raydiumAdapter, probeRaydiumPool } from "./raydium";
 
 const TOKEN_2022 = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
 
@@ -77,5 +77,40 @@ describe("raydiumAdapter", () => {
     const profile = { ...baseProfile, extensions: [] };
     const result = await raydiumAdapter.evaluate({ profile, rule: baseRule });
     expect(result.status).toBe("supported");
+  });
+});
+
+describe("probeRaydiumPool", () => {
+  const MINT = "HoNeYy4S3p5N1RfRy7Sw1FZuYxnDpQpqxXJEUmwwHZGv";
+
+  it("returns pool_exists when the v3 query reports a matching pool", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(Response.json({ success: true, data: { count: 1, data: [{}] } })),
+    );
+    expect(await probeRaydiumPool(MINT)).toBe("pool_exists");
+  });
+
+  it("returns no_pool when the v3 query reports zero pools", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(Response.json({ success: true, data: { count: 0, data: [] } })),
+    );
+    expect(await probeRaydiumPool(MINT)).toBe("no_pool");
+  });
+
+  it("returns unknown when the API reports failure", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({ success: false })));
+    expect(await probeRaydiumPool(MINT)).toBe("unknown");
+  });
+
+  it("returns unknown on a non-ok response", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 500 })));
+    expect(await probeRaydiumPool(MINT)).toBe("unknown");
+  });
+
+  it("returns unknown on a network error", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("boom")));
+    expect(await probeRaydiumPool(MINT)).toBe("unknown");
   });
 });

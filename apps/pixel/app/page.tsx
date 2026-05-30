@@ -47,13 +47,12 @@ export default function HomePage() {
             type="text"
             value={mint}
             onChange={(e) => setMint(e.target.value)}
-            disabled={isPending}
             placeholder="Paste a mint address…"
-            className="flex-1 border border-neutral-200 rounded-lg px-3 py-2.5 text-sm font-mono placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-400 transition-colors disabled:opacity-60"
+            className="flex-1 border border-neutral-200 rounded-lg px-3 py-2.5 text-sm font-mono placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-neutral-900/10 focus:border-neutral-400 transition-colors"
           />
           <button
             type="submit"
-            disabled={mint.trim().length < 32 || isPending}
+            disabled={mint.trim().length < 32}
             className="px-5 py-2.5 text-sm font-medium rounded-lg bg-neutral-900 text-white hover:bg-neutral-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors inline-flex items-center gap-2"
           >
             {isPending && (
@@ -70,8 +69,7 @@ export default function HomePage() {
               key={address}
               type="button"
               onClick={() => tryMint(address)}
-              disabled={isPending}
-              className="text-xs text-neutral-500 hover:text-neutral-900 border border-neutral-200 hover:border-neutral-400 rounded px-2 py-0.5 transition-colors font-mono disabled:opacity-40 disabled:cursor-not-allowed"
+              className="text-xs text-neutral-500 hover:text-neutral-900 border border-neutral-200 hover:border-neutral-400 rounded px-2 py-0.5 transition-colors font-mono"
             >
               {label}
             </button>

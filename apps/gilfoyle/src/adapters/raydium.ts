@@ -3,17 +3,26 @@ import type { VenueAdapter, AdapterInput } from "./types";
 import { evaluateRule } from "./evaluator";
 import { PRELAUNCH_MINT_SENTINEL } from "../prelaunch";
 
-const RAYDIUM_PAIRS_API = "https://api.raydium.io/v2/main/pairs";
+// Mint-scoped v3 endpoint: returns only pools containing this mint (~few KB, sub-second).
+// The legacy /v2/main/pairs firehose is ~238MB and times out — never use it for a probe.
+const RAYDIUM_MINT_POOLS_API = "https://api-v3.raydium.io/pools/info/mint";
 
 export async function probeRaydiumPool(
   mint: string,
 ): Promise<"pool_exists" | "no_pool" | "unknown"> {
   try {
-    const res = await fetch(RAYDIUM_PAIRS_API, { signal: AbortSignal.timeout(5_000) });
+    const url =
+      `${RAYDIUM_MINT_POOLS_API}?mint1=${mint}` +
+      `&poolType=all&poolSortField=default&sortType=desc&pageSize=1&page=1`;
+    const res = await fetch(url, { signal: AbortSignal.timeout(5_000) });
     if (!res.ok) return "unknown";
-    const pairs = (await res.json()) as { baseMint: string; quoteMint: string }[];
-    const found = pairs.some((p) => p.baseMint === mint || p.quoteMint === mint);
-    return found ? "pool_exists" : "no_pool";
+    const body = (await res.json()) as {
+      success?: boolean;
+      data?: { count?: number; data?: unknown[] };
+    };
+    if (!body.success || !body.data) return "unknown";
+    const count = body.data.count ?? body.data.data?.length ?? 0;
+    return count > 0 ? "pool_exists" : "no_pool";
   } catch {
     return "unknown";
   }

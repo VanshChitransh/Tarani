@@ -4,7 +4,8 @@ import { evaluateRule } from "./evaluator";
 import { PRELAUNCH_MINT_SENTINEL } from "../prelaunch";
 
 const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
-const JUPITER_QUOTE_API = "https://quote-api.jup.ag/v6/quote";
+// quote-api.jup.ag/v6 was deprecated; lite-api is the current free-tier host.
+const JUPITER_QUOTE_API = "https://lite-api.jup.ag/swap/v1/quote";
 
 export async function probeJupiterRoute(
   mint: string,
