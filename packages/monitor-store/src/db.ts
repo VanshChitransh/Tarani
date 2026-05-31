@@ -45,16 +45,6 @@ const CREATE_TABLES_SQL = `
     active INTEGER NOT NULL DEFAULT 1
   );
 
-  CREATE TABLE IF NOT EXISTS report_history (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    mint TEXT NOT NULL,
-    report_json TEXT NOT NULL,
-    created_at TEXT NOT NULL
-  );
-
-  CREATE INDEX IF NOT EXISTS idx_report_history_mint
-    ON report_history (mint, created_at DESC);
-
   CREATE TABLE IF NOT EXISTS rate_limit_hits (
     bucket_key TEXT NOT NULL,
     ts INTEGER NOT NULL

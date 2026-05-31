@@ -1,6 +1,5 @@
 import type {
   AlertWebhook,
-  AnalyzeReport,
   CompatibilityDiff,
   CompatibilitySnapshot,
   MonitorRecord,
@@ -137,46 +136,6 @@ export async function getLatestDiff(mint: string): Promise<CompatibilityDiff[] |
 
   if (!row) return null;
   return JSON.parse(row.diffs_json);
-}
-
-export type ReportHistoryEntry = {
-  report: AnalyzeReport;
-  createdAt: string;
-};
-
-type ReportRow = { mint: string; report_json: string; created_at: string };
-
-function rowToReportEntry(row: ReportRow): ReportHistoryEntry {
-  return {
-    report: JSON.parse(row.report_json),
-    createdAt: row.created_at,
-  };
-}
-
-export async function saveReport(
-  mint: string,
-  report: AnalyzeReport,
-  createdAt: string,
-): Promise<void> {
-  await db()
-    .prepare("INSERT INTO report_history (mint, report_json, created_at) VALUES (?, ?, ?)")
-    .run(mint, JSON.stringify(report), createdAt);
-}
-
-export async function getLatestReport(mint: string): Promise<ReportHistoryEntry | null> {
-  const row = (await db()
-    .prepare("SELECT * FROM report_history WHERE mint = ? ORDER BY created_at DESC LIMIT 1")
-    .get(mint)) as ReportRow | undefined;
-
-  return row ? rowToReportEntry(row) : null;
-}
-
-export async function getReportHistory(mint: string, limit = 10): Promise<ReportHistoryEntry[]> {
-  const rows = (await db()
-    .prepare("SELECT * FROM report_history WHERE mint = ? ORDER BY created_at DESC LIMIT ?")
-    .all(mint, limit)) as ReportRow[];
-
-  return rows.map(rowToReportEntry);
 }
 
 type WebhookRow = { id: string; url: string; added_at: string; active: number };

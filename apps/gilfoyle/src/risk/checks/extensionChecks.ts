@@ -148,15 +148,56 @@ function checkTransferHookUnconfigured(profile: MintProfile): RiskFinding | null
   };
 }
 
+// Reads the CURRENT (newer) transfer fee rate in basis points from the parsed
+// extension. Returns undefined when the rate cannot be determined (e.g. the
+// parameters object is empty) so callers can stay conservative. Handles both
+// Helius snake_case and camelCase shapes, matching hookProgramId's convention.
+function activeTransferFeeBps(profile: MintProfile): number | undefined {
+  const ext = profile.extensions.find((e) => e.kind === "transferFeeConfig");
+  if (!ext) return undefined;
+  const newer = (ext.parameters["newer_transfer_fee"] ?? ext.parameters["newerTransferFee"]) as
+    | Record<string, unknown>
+    | undefined;
+  if (!newer || typeof newer !== "object") return undefined;
+  const raw = newer["transfer_fee_basis_points"] ?? newer["transferFeeBasisPoints"];
+  if (typeof raw === "number" && Number.isFinite(raw)) return raw;
+  if (typeof raw === "string" && /^\d+$/.test(raw)) return parseInt(raw, 10);
+  return undefined;
+}
+
+// A transfer-fee extension only hurts trade efficiency when a fee is ACTUALLY
+// charged. Many regulated stablecoins (PYUSD, USDG, AUSD, USYC…) carry the
+// extension with a 0 bps rate — no fee is withheld, so the old unconditional
+// "reduces trade efficiency" MEDIUM was a false positive. Fire MEDIUM only when
+// the active rate is non-zero (or unknown); when it is provably 0, emit an INFO
+// note about the dormant fee authority instead.
 function checkTransferFeePresence(profile: MintProfile): RiskFinding | null {
   if (!hasExt(profile, "transferFeeConfig")) return null;
+  const bps = activeTransferFeeBps(profile);
+
+  if (bps === 0) {
+    return {
+      id: "transfer-fee-inactive",
+      category: "extension",
+      severity: "info",
+      title: "Transfer-fee extension present but currently 0%",
+      description:
+        "This mint carries the TransferFeeConfig extension, but the current transfer fee is 0 basis points, so no " +
+        "amount is withheld on transfers today and trade efficiency is unaffected. However, the fee-config authority " +
+        "can raise the rate at any time (up to the configured maximum). Disclose the fee authority and that a fee " +
+        "could be enabled, so integrators and holders are not surprised by a future change.",
+    };
+  }
+
+  const rate =
+    bps !== undefined ? `a ${(bps / 100).toString()}% (${bps} bps) transfer fee` : "a transfer fee";
   return {
     id: "transfer-fee-presence",
     category: "extension",
     severity: "medium",
     title: "Transfer fee reduces trade efficiency",
     description:
-      "The transfer fee extension withholds a percentage of each transfer. DEX aggregators may route " +
+      `The transfer fee extension withholds ${rate} on every transfer. DEX aggregators may route ` +
       "around this token or present users with unexpected slippage. Ensure the fee rate is visible " +
       "in your token metadata and documentation.",
   };

@@ -68,4 +68,46 @@ describe("generateRecommendations", () => {
     const recs = generateRecommendations(risks, []);
     expect(recs).toHaveLength(2);
   });
+
+  it("builds a venue-aware recommendation for conditional-venues (DEX affected → Orca link + per-venue text)", () => {
+    const risks: RiskFinding[] = [
+      {
+        id: "conditional-venues",
+        category: "compatibility",
+        severity: "medium",
+        title: "x",
+        description: "y",
+        affectedVenues: ["orca", "phantom"],
+      },
+    ];
+    const recs = generateRecommendations(risks, []);
+    expect(recs).toHaveLength(1);
+    expect(recs[0].riskIds).toEqual(["conditional-venues"]);
+    expect(recs[0].links).toContain(
+      "https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/",
+    );
+    expect(recs[0].description).toMatch(/Orca/);
+    expect(recs[0].description).toMatch(/Phantom/);
+  });
+
+  it("conditional-venues for WALLET-ONLY conditionals omits the Orca TokenBadge link/text", () => {
+    const risks: RiskFinding[] = [
+      {
+        id: "conditional-venues",
+        category: "compatibility",
+        severity: "low",
+        title: "x",
+        description: "y",
+        affectedVenues: ["phantom", "solflare"],
+      },
+    ];
+    const recs = generateRecommendations(risks, []);
+    expect(recs).toHaveLength(1);
+    expect(recs[0].links).not.toContain(
+      "https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/",
+    );
+    expect(recs[0].description).not.toMatch(/TokenBadge/);
+    expect(recs[0].description).toMatch(/Phantom/);
+    expect(recs[0].description).toMatch(/Solflare/);
+  });
 });

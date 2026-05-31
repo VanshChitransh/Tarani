@@ -99,12 +99,6 @@
       ]
     },
     {
-      "id": "conditional-orca",
-      "title": "Apply for Orca TokenBadge",
-      "description": "Orca requires a TokenBadge for tokens with TransferHook or TransferFeeConfig extensions. Apply via Orca's developer documentation. Typical review time is 1-2 weeks. You must provide your transfer hook program address and a description of its behavior.",
-      "links": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"]
-    },
-    {
       "id": "metadata-missing",
       "title": "Add token metadata before launch",
       "description": "Upload a JSON metadata file to a permanent storage provider (Arweave or IPFS), then set the metadata URI on your mint. Include at minimum: name, symbol, description, and image. Without metadata, wallets will show your token as 'Unknown'.",

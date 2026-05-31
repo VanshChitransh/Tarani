@@ -83,6 +83,26 @@ exports[`parseMintProfile snapshots > matches snapshot for pyusd 1`] = `
   "decimals": 6,
   "extensions": [
     {
+      "kind": "tokenMetadata",
+      "parameters": {
+        "additional_metadata": [],
+        "authority": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
+        "mint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+        "name": "PayPal USD",
+        "symbol": "PYUSD",
+        "uri": "https://token-metadata.paxos.com/pyusd_metadata/prod/solana/pyusd_metadata.json",
+      },
+      "raw": {
+        "additional_metadata": [],
+        "authority": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
+        "mint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
+        "name": "PayPal USD",
+        "symbol": "PYUSD",
+        "uri": "https://token-metadata.paxos.com/pyusd_metadata/prod/solana/pyusd_metadata.json",
+      },
+      "rawKind": "metadata",
+    },
+    {
       "kind": "metadataPointer",
       "parameters": {
         "authority": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
@@ -113,26 +133,6 @@ exports[`parseMintProfile snapshots > matches snapshot for pyusd 1`] = `
         "delegate": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
       },
       "rawKind": "permanent_delegate",
-    },
-    {
-      "kind": "tokenMetadata",
-      "parameters": {
-        "additional_metadata": [],
-        "authority": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
-        "mint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
-        "name": "PayPal USD",
-        "symbol": "PYUSD",
-        "uri": "https://token-metadata.paxos.com/pyusd_metadata/prod/solana/pyusd_metadata.json",
-      },
-      "raw": {
-        "additional_metadata": [],
-        "authority": "22mKJkKjGEQ3rampp5YKaSsaYZ52BUkcnUN6evXGHXjT",
-        "mint": "2b1kV6DkPAnxd5ixfnxCpjxmKwqjjaYmCZfHsFu24GXo",
-        "name": "PayPal USD",
-        "symbol": "PYUSD",
-        "uri": "https://token-metadata.paxos.com/pyusd_metadata/prod/solana/pyusd_metadata.json",
-      },
-      "rawKind": "token_metadata",
     },
     {
       "kind": "transferFeeConfig",
@@ -213,24 +213,6 @@ exports[`parseMintProfile snapshots > matches snapshot for transferHookToken 1`]
   "decimals": 9,
   "extensions": [
     {
-      "kind": "metadataPointer",
-      "parameters": {
-        "authority": null,
-        "metadata_address": "HoNeYy4S3p5N1RfRy7Sw1FZuYxnDpQpqxXJEUmwwHZGv",
-      },
-      "raw": {
-        "authority": null,
-        "metadata_address": "HoNeYy4S3p5N1RfRy7Sw1FZuYxnDpQpqxXJEUmwwHZGv",
-      },
-      "rawKind": "metadata_pointer",
-    },
-    {
-      "kind": "nonTransferable",
-      "parameters": {},
-      "raw": {},
-      "rawKind": "non_transferable",
-    },
-    {
       "kind": "tokenMetadata",
       "parameters": {
         "additional_metadata": [],
@@ -248,7 +230,25 @@ exports[`parseMintProfile snapshots > matches snapshot for transferHookToken 1`]
         "symbol": "HONEY",
         "uri": "https://example.com/metadata/honey.json",
       },
-      "rawKind": "token_metadata",
+      "rawKind": "metadata",
+    },
+    {
+      "kind": "metadataPointer",
+      "parameters": {
+        "authority": null,
+        "metadata_address": "HoNeYy4S3p5N1RfRy7Sw1FZuYxnDpQpqxXJEUmwwHZGv",
+      },
+      "raw": {
+        "authority": null,
+        "metadata_address": "HoNeYy4S3p5N1RfRy7Sw1FZuYxnDpQpqxXJEUmwwHZGv",
+      },
+      "rawKind": "metadata_pointer",
+    },
+    {
+      "kind": "nonTransferable",
+      "parameters": {},
+      "raw": {},
+      "rawKind": "non_transferable",
     },
     {
       "kind": "transferHook",

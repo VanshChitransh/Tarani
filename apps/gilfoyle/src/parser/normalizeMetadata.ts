@@ -72,13 +72,21 @@ export function normalizeMetadata(asset: HeliusAsset): NormalizeMetadataOutput {
 }
 
 function readTokenMetadataExtension(asset: HeliusAsset) {
-  const ext = asset.mint_extensions?.["token_metadata"];
+  // Helius DAS emits the on-chain TokenMetadata extension under the key
+  // `metadata` (see normalizeExtensions' SNAKE_TO_CAMEL). Older/raw shapes use
+  // `token_metadata`. Read both so on-chain name/symbol are detected regardless
+  // of which key the upstream provider used — the previous `token_metadata`-only
+  // read missed every real mint and forced hasOnChainName/Symbol to false.
+  const ext = asset.mint_extensions?.["metadata"] ?? asset.mint_extensions?.["token_metadata"];
   if (!ext || typeof ext !== "object") return undefined;
   const obj = ext as Record<string, unknown>;
+  // Treat empty strings as absent so a blank on-chain field still falls back to
+  // off-chain metadata, and hasOnChain* stays false when the field is empty.
+  const str = (v: unknown) => (typeof v === "string" && v.length > 0 ? v : undefined);
   return {
-    name: typeof obj.name === "string" ? obj.name : undefined,
-    symbol: typeof obj.symbol === "string" ? obj.symbol : undefined,
-    uri: typeof obj.uri === "string" ? obj.uri : undefined,
+    name: str(obj.name),
+    symbol: str(obj.symbol),
+    uri: str(obj.uri),
   };
 }
 

@@ -260,6 +260,37 @@ describe("checkConfidentialFeeRequiresFeeConfig", () => {
   });
 });
 
+describe("checkTransferFeePresence (rate-aware — S2)", () => {
+  it("fires MEDIUM 'reduces trade efficiency' when the active fee is non-zero", () => {
+    const profile = withExtensions(["transferFeeConfig"], {
+      transferFeeConfig: { newer_transfer_fee: { transfer_fee_basis_points: 269 } },
+    });
+    const findings = scoreRisk(profile, NO_COMPAT);
+    const f = findings.find((x) => x.id === "transfer-fee-presence");
+    expect(f).toBeDefined();
+    expect(f?.severity).toBe("medium");
+    expect(f?.description).toContain("2.69%");
+    expect(findings.some((x) => x.id === "transfer-fee-inactive")).toBe(false);
+  });
+
+  it("fires INFO 'transfer-fee-inactive' (not the MEDIUM false positive) when the fee is 0 bps", () => {
+    const profile = withExtensions(["transferFeeConfig"], {
+      transferFeeConfig: { newer_transfer_fee: { transfer_fee_basis_points: 0 } },
+    });
+    const findings = scoreRisk(profile, NO_COMPAT);
+    expect(findings.some((x) => x.id === "transfer-fee-presence")).toBe(false);
+    const f = findings.find((x) => x.id === "transfer-fee-inactive");
+    expect(f).toBeDefined();
+    expect(f?.severity).toBe("info");
+  });
+
+  it("stays conservative (MEDIUM) when the fee rate cannot be read", () => {
+    const profile = withExtensions(["transferFeeConfig"]); // empty params -> unknown rate
+    const findings = scoreRisk(profile, NO_COMPAT);
+    expect(findings.some((x) => x.id === "transfer-fee-presence")).toBe(true);
+  });
+});
+
 // --- Compatibility checks ---
 
 describe("checkBlockedOnAllDexes", () => {
@@ -286,6 +317,46 @@ describe("checkBlockedOnMajorDex", () => {
     const compat = compatResults([{ venue: "jupiter", status: "blocked" }]);
     const findings = scoreRisk(BASE_PROFILE, compat);
     expect(findings.some((f) => f.id === "blocked-on-major-dex")).toBe(true);
+  });
+});
+
+describe("checkConditionalVenues (venue-aware — S3)", () => {
+  it("emits 'conditional-venues' (never the old 'conditional-orca' id)", () => {
+    const compat = compatResults([{ venue: "phantom", status: "conditional" }]);
+    const findings = scoreRisk(BASE_PROFILE, compat);
+    expect(findings.some((f) => f.id === "conditional-venues")).toBe(true);
+    expect(findings.some((f) => f.id === "conditional-orca")).toBe(false);
+  });
+
+  it("is LOW severity and wallet-worded when only wallets are conditional", () => {
+    const compat = compatResults([
+      { venue: "phantom", status: "conditional" },
+      { venue: "solflare", status: "conditional" },
+    ]);
+    const f = scoreRisk(BASE_PROFILE, compat).find((x) => x.id === "conditional-venues");
+    expect(f).toBeDefined();
+    expect(f?.severity).toBe("low");
+    expect(f?.affectedVenues).toEqual(["phantom", "solflare"]);
+    expect(f?.description).not.toMatch(/TokenBadge/);
+    expect(f?.description).toMatch(/warning/i);
+  });
+
+  it("is MEDIUM and mentions DEX listing steps when a DEX is conditional", () => {
+    const compat = compatResults([
+      { venue: "orca", status: "conditional" },
+      { venue: "phantom", status: "conditional" },
+    ]);
+    const f = scoreRisk(BASE_PROFILE, compat).find((x) => x.id === "conditional-venues");
+    expect(f).toBeDefined();
+    expect(f?.severity).toBe("medium");
+    expect(f?.affectedVenues).toContain("orca");
+    expect(f?.affectedVenues).toContain("phantom");
+    expect(f?.description).toMatch(/TokenBadge/);
+  });
+
+  it("does NOT fire when no venue is conditional", () => {
+    const findings = scoreRisk(BASE_PROFILE, compatResults([]));
+    expect(findings.some((f) => f.id === "conditional-venues")).toBe(false);
   });
 });
 

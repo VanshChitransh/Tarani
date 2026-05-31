@@ -1,7 +1,5 @@
-import type { AnalyzeReport, VenueCompatibilityResult } from "@tarani/shared";
+import type { AnalyzeReport } from "@tarani/shared";
 import Link from "next/link";
-import { getReportHistory } from "@tarani/monitor-store";
-import { ensureDb } from "../../../src/lib/db";
 import { CompatibilityMatrix } from "../../../components/CompatibilityMatrix";
 import { RiskSection } from "../../../components/RiskSection";
 import { RecommendationList } from "../../../components/RecommendationList";
@@ -10,7 +8,6 @@ import { MonitorButton } from "../../../components/MonitorButton";
 import { BadgeSection } from "../../../components/BadgeSection";
 import { CopyButton } from "../../../components/CopyButton";
 import { NoExtensionsToast } from "../../../components/NoExtensionsToast";
-import { ReportHistory, type VenueChange } from "../../../components/ReportHistory";
 
 interface Props {
   params: Promise<{ mint: string }>;
@@ -31,59 +28,6 @@ async function fetchReport(mint: string): Promise<AnalyzeReport | FetchError> {
     | { ok: false; error: { message: string } };
   if (!json.ok) return { error: json.error.message, status: res.status };
   return json.data;
-}
-
-/** Order-independent signature of venue verdicts, used to find the last differing snapshot. */
-function venueSignature(results: VenueCompatibilityResult[]): string {
-  return [...results]
-    .map((r) => `${r.venue}:${r.status}`)
-    .sort()
-    .join("|");
-}
-
-/** Per-venue status changes from a previous snapshot to the current one. */
-function diffVenues(
-  prev: VenueCompatibilityResult[],
-  curr: VenueCompatibilityResult[],
-): VenueChange[] {
-  const prevStatus = new Map(prev.map((r) => [r.venue, r.status]));
-  return curr
-    .filter((c) => prevStatus.has(c.venue) && prevStatus.get(c.venue) !== c.status)
-    .map((c) => ({ venue: c.venue, from: prevStatus.get(c.venue)!, to: c.status }));
-}
-
-interface HistoryView {
-  changes: VenueChange[];
-  comparedAt: string | null;
-  timeline: string[];
-}
-
-/**
- * Load persisted report history and compute the diff vs the most recent
- * snapshot whose verdict differs from the current one. Isolated: if the DB is
- * unavailable the page still renders, just without a history section.
- */
-async function loadHistory(
-  mint: string,
-  current: VenueCompatibilityResult[],
-): Promise<HistoryView> {
-  try {
-    await ensureDb();
-    const history = await getReportHistory(mint, 10);
-    if (history.length === 0) return { changes: [], comparedAt: null, timeline: [] };
-
-    const currentSig = venueSignature(current);
-    const prior =
-      history.find((h) => venueSignature(h.report.compatibility) !== currentSig) ?? null;
-
-    return {
-      changes: prior ? diffVenues(prior.report.compatibility, current) : [],
-      comparedAt: prior?.createdAt ?? null,
-      timeline: history.map((h) => h.createdAt),
-    };
-  } catch {
-    return { changes: [], comparedAt: null, timeline: [] };
-  }
 }
 
 function SectionHeader({ children }: { children: React.ReactNode }) {
@@ -133,7 +77,6 @@ export default async function ReportPage({ params }: Props) {
   }
 
   const { name, symbol } = result.profile.metadata;
-  const history = await loadHistory(mint, result.compatibility);
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-10 space-y-10">
@@ -181,18 +124,6 @@ export default async function ReportPage({ params }: Props) {
         <SectionHeader>Venue Compatibility</SectionHeader>
         <CompatibilityMatrix results={result.compatibility} />
       </section>
-
-      {/* History — only renders when persisted snapshots exist */}
-      {history.timeline.length > 0 && (
-        <section>
-          <SectionHeader>History</SectionHeader>
-          <ReportHistory
-            changes={history.changes}
-            comparedAt={history.comparedAt}
-            timeline={history.timeline}
-          />
-        </section>
-      )}
 
       {/* Risk Findings */}
       <section>

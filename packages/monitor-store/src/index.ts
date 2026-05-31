@@ -14,9 +14,6 @@ export {
   getLatestSnapshot,
   saveDiff,
   getLatestDiff,
-  saveReport,
-  getLatestReport,
-  getReportHistory,
   addWebhook,
   listWebhooks,
   removeWebhook,
@@ -24,6 +21,5 @@ export {
   saveNonce,
   consumeNonce,
 } from "./store";
-export type { ReportHistoryEntry } from "./store";
 export { postToWebhooks, dispatchToWebhooks } from "./dispatch";
 export type { WebhookDeliveryResult } from "./dispatch";

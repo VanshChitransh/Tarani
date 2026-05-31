@@ -109,13 +109,52 @@ describe("probeJupiterRoute", () => {
     expect(await probeJupiterRoute(MINT)).toBe("no_route");
   });
 
-  it("returns no_route on a non-ok response", async () => {
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 400 })));
+  it("returns no_route only on a definitive TOKEN_NOT_TRADABLE error (HTTP 400)", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(
+          Response.json(
+            { error: "The token X is not tradable", errorCode: "TOKEN_NOT_TRADABLE" },
+            { status: 400 },
+          ),
+        ),
+    );
     expect(await probeJupiterRoute(MINT)).toBe("no_route");
+  });
+
+  it("returns unknown on a transient non-ok response (rate-limit / 5xx)", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 429 })));
+    expect(await probeJupiterRoute(MINT)).toBe("unknown");
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 503 })));
+    expect(await probeJupiterRoute(MINT)).toBe("unknown");
   });
 
   it("returns unknown on a network error", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("boom")));
     expect(await probeJupiterRoute(MINT)).toBe("unknown");
+  });
+
+  it("quotes USDC against wSOL (never USDC->USDC) so USDC itself reads as routable", async () => {
+    const USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+    const WSOL = "So11111111111111111111111111111111111111112";
+    const fetchMock = vi.fn().mockResolvedValue(Response.json({ outAmount: "999" }));
+    vi.stubGlobal("fetch", fetchMock);
+    expect(await probeJupiterRoute(USDC)).toBe("route_available");
+    const calledUrl = fetchMock.mock.calls[0][0] as string;
+    expect(calledUrl).toContain(`inputMint=${USDC}`);
+    expect(calledUrl).toContain(`outputMint=${WSOL}`);
+    expect(calledUrl).not.toContain(`outputMint=${USDC}`);
+  });
+
+  it("still quotes a normal mint against USDC", async () => {
+    const USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+    const fetchMock = vi.fn().mockResolvedValue(Response.json({ outAmount: "5" }));
+    vi.stubGlobal("fetch", fetchMock);
+    await probeJupiterRoute(MINT);
+    const calledUrl = fetchMock.mock.calls[0][0] as string;
+    expect(calledUrl).toContain(`inputMint=${MINT}`);
+    expect(calledUrl).toContain(`outputMint=${USDC}`);
   });
 });

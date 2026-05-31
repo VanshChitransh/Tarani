@@ -1,7 +1,6 @@
 import type { MintProfile, VenueCompatibilityResult, RiskFinding } from "@tarani/shared";
 import type { RiskCheck } from "../types";
-
-const DEX_VENUES = ["jupiter", "raydium", "orca"] as const;
+import { DEX_VENUES, isDexVenue, isWalletVenue } from "../venueGuidance";
 
 function checkBlockedOnAllDexes(
   _profile: MintProfile,
@@ -48,22 +47,54 @@ function checkBlockedOnMajorDex(
   };
 }
 
+// A venue verdict of `conditional` means different things at different venues:
+// a DEX (Orca/Raydium/Jupiter) needs a TokenBadge / allowlisted pool / order-type
+// caveat, whereas a wallet (Phantom/Solflare) merely shows a warning before an
+// otherwise-successful send. The previous check lumped all of them under one
+// Orca-specific "apply for a TokenBadge" message — wrong for wallet conditionals
+// and even for tokens where Orca is fully supported. This builds an accurate,
+// venue-aware finding from each conditional venue's own guidance; the matching
+// recommendation (see recommendationEngine) is likewise built per-venue.
 function checkConditionalVenues(
   _profile: MintProfile,
   compatibility: VenueCompatibilityResult[],
 ): RiskFinding | null {
   const conditional = compatibility.filter((r) => r.status === "conditional");
   if (conditional.length === 0) return null;
+
+  const venues = conditional.map((r) => r.venue);
+  const dexVenues = venues.filter((v) => isDexVenue(v));
+  const walletVenues = venues.filter((v) => isWalletVenue(v));
+  const otherVenues = venues.filter((v) => !isDexVenue(v) && !isWalletVenue(v));
+
+  const clauses: string[] = [];
+  if (dexVenues.length > 0) {
+    clauses.push(
+      `${dexVenues.join(", ")} require venue-specific listing steps before this token trades there ` +
+        "(e.g. an Orca TokenBadge, a Raydium-allowlisted CPMM/CLMM pool, or Jupiter order-type limits)",
+    );
+  }
+  if (walletVenues.length > 0) {
+    clauses.push(
+      `${walletVenues.join(", ")} will display a warning to users (e.g. for a permanent delegate or freeze) ` +
+        "but still allow sends — disclose this behavior to holders",
+    );
+  }
+  if (otherVenues.length > 0) {
+    clauses.push(`${otherVenues.join(", ")} render the token only partially`);
+  }
+
+  // A DEX listing requirement is a real market-access blocker (medium); a
+  // wallet-only warning is informational-but-actionable (low).
+  const severity: RiskFinding["severity"] = dexVenues.length > 0 ? "medium" : "low";
+
   return {
-    id: "conditional-orca",
+    id: "conditional-venues",
     category: "compatibility",
-    severity: "medium",
-    title: `${conditional.length} venue${conditional.length > 1 ? "s require" : " requires"} extra steps`,
-    description:
-      `${conditional.map((r) => r.venue).join(", ")} will only support this token after additional setup steps, ` +
-      "such as applying for a TokenBadge or using a permissioned pool. " +
-      "Complete these steps before directing users to these venues.",
-    affectedVenues: conditional.map((r) => r.venue),
+    severity,
+    title: `${venues.length} venue${venues.length > 1 ? "s need" : " needs"} extra steps or show a warning`,
+    description: `${clauses.join(". ")}. Address each venue's requirement before directing users there.`,
+    affectedVenues: venues,
   };
 }
 
