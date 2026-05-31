@@ -255,33 +255,21 @@ interface VenueAdapter {
 
 The status space forms a **severity lattice** ranked by `STATUS_RANK` ([`evaluator.ts`](apps/gilfoyle/src/adapters/evaluator.ts)):
 
-$$
-\mathrm{rank}(s) : \{\textsf{blocked} \mapsto 5,\ \textsf{conditional} \mapsto 4,\ \textsf{partial} \mapsto 3,\ \textsf{unknown} \mapsto 2,\ \textsf{supported} \mapsto 1\}
-$$
+$$\textsf{blocked}\ (5) \succ \textsf{conditional}\ (4) \succ \textsf{partial}\ (3) \succ \textsf{unknown}\ (2) \succ \textsf{supported}\ (1)$$
 
-For a mint with extension set $E$ and a venue rule with feature set $F$, the engine builds the set of **applicable unscoped verdicts**
+For a mint with extension set $E$ and a venue rule with feature set $F$, the engine builds the set of **applicable unscoped verdicts** $V$ — the rule features $f \in F$ whose extension $\mathrm{id}(f) \in E$ and whose $\mathrm{scope}(f) = \varnothing$.
 
-$$
-V = \{\, f \in F \mid \mathrm{id}(f) \in E \ \wedge\ \mathrm{scope}(f) = \varnothing \,\}
-$$
+The **overall venue status** $s^{*}$ is the worst (highest-ranked) applicable verdict — a _fail-pessimistic_ aggregation:
 
-The **overall venue status** is the worst (highest-ranked) applicable verdict — a _fail-pessimistic_ aggregation:
+$$\mathrm{rank}(s^{*}) \ =\ \max_{f \in V}\ \mathrm{rank}(\mathrm{status}(f))$$
 
-$$
-s^{*} \;=\; \operatorname*{arg\,max}_{f \in V} \ \mathrm{rank}\big(\mathrm{status}(f)\big),
-\qquad s^{*} = \textsf{supported} \ \text{if}\ E = \varnothing,
-\qquad s^{*} = \textsf{unknown} \ \text{if}\ V = \varnothing
-$$
+with $s^{*} = \textsf{supported}$ when $E = \varnothing$ (an extension-free SPL token is universally supported by construction), and $s^{*} = \textsf{unknown}$ when $V = \varnothing$.
 
-(An extension-free SPL token is universally supported by construction.)
+**Confidence** $c^{*}$ is the _minimum_ confidence among the verdicts that actually drove $s^{*}$, with ranks $\textsf{high}\ (3) \succ \textsf{medium}\ (2) \succ \textsf{low}\ (1)$:
 
-**Confidence** is the _minimum_ confidence among the verdicts that actually drove $s^{*}$, with $\mathrm{crank}: \{\textsf{high}\mapsto 3, \textsf{medium}\mapsto 2, \textsf{low}\mapsto 1\}$:
+$$\mathrm{crank}(c^{*}) \ =\ \min_{f \in V,\ \mathrm{status}(f)\ =\ s^{*}}\ \mathrm{crank}(\mathrm{confidence}(f))$$
 
-$$
-c^{*} \;=\; \operatorname*{arg\,min}_{\substack{f \in V \\ \mathrm{status}(f) = s^{*}}} \ \mathrm{crank}\big(\mathrm{confidence}(f)\big)
-$$
-
-This prevents a high-confidence `blocked` verdict from inflating the confidence of a `supported` result. **Scoped** verdicts (e.g. Jupiter `swap` vs `limitOrders`) do not enter $V$; they populate a per-feature map `features[scope]`, each computed by the same $(s^{*}, c^{*})$ procedure over its own scope.
+This prevents a high-confidence `blocked` verdict from inflating the confidence of a `supported` result. **Scoped** verdicts (e.g. Jupiter `swap` vs `limitOrders`) do not enter $V$; they populate a per-feature map `features[scope]`, each computed by the same procedure over its own scope.
 
 ### 3.4 Live probes & verdict refinement
 
@@ -317,15 +305,12 @@ $$
 
 **Derived report grade.** The embeddable badge ([`badgeRenderer.ts`](apps/pixel/src/lib/badgeRenderer.ts)) collapses the venue vector to a single grade over $n$ venues, with $b$ blocked and $k$ supported:
 
-$$
-G \;=\;
-\begin{cases}
-\textsf{F}, & b > 0 \\[2pt]
-\textsf{A}, & b = 0 \ \wedge\ k/n \ge 0.8 \\[2pt]
-\textsf{B}, & b = 0 \ \wedge\ 0.5 \le k/n < 0.8 \\[2pt]
-\textsf{C}, & \text{otherwise}
-\end{cases}
-$$
+| Grade | Condition                       |
+| ----- | ------------------------------- |
+| **F** | $b > 0$ (any venue blocked)     |
+| **A** | $b = 0$ and $k/n \ge 0.8$       |
+| **B** | $b = 0$ and $0.5 \le k/n < 0.8$ |
+| **C** | otherwise                       |
 
 ### 3.6 Prelaunch & diff
 
