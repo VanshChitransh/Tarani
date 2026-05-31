@@ -27,69 +27,38 @@ The thesis: SPL **Token-2022** ships ~20 mint extensions (transfer fees, transfe
 
 Tarani is a **Bun workspace monorepo** of four applications and three packages. A single contract package (`@tarani/shared`) defines every Zod schema and type; every other module is a typed consumer of it. The system converges on one canonical payload — the **`AnalyzeReport`**.
 
-```
-                          +------------------------------------------------+
-   Browser / README       |  apps/pixel  (Next.js 15, App Router)          |
-   badge / webhook  ---->  |  - pages: /, /report/[mint], /prelaunch,       |
-                           |           /dashboard                           |
-                           |  - /api/*: analyze, simulate, badge, auth,     |
-                           |            monitor, webhooks, sentinel/tick     |
-                           +--------+-----------------------------+---------+
-              in-process import     |                             |  HTTP (server-side proxy)
-                                    v                             v
-                  +------------------------------+    +------------------------------+
-                  |  apps/gilfoyle               |    |  apps/kotler                 |
-                  |  COMPATIBILITY ENGINE        |    |  LIVE SIMULATION WORKER      |
-                  |  helius -> parse -> adapters |    |  solana-test-validator +     |
-                  |  -> risk -> recommendations  |    |  9 behavioral scenarios      |
-                  |  -> diff -> freshness        |    |  (live / heuristic)          |
-                  +--------------+---------------+    +------------------------------+
-                                 |
-                                 v
-                  +------------------------------+    +------------------------------+
-                  |  packages/monitor-store      | <--|  apps/sentinel               |
-                  |  SQLite / Turso (libSQL)     |    |  recheck loop + freshness    |
-                  |  mints, snapshots, diffs,    |    |  loop + webhook dispatch     |
-                  |  webhooks, rate-limits, auth |    |  (or Vercel cron)            |
-                  +--------------+---------------+    +------------------------------+
-                                 ^
-                                 |
-                  +------------------------------+
-                  |  packages/shared             |   Zod schemas / TS types / constants
-                  |  THE CONTRACT LAYER          |   (single source of truth)
-                  +------------------------------+
+```mermaid
+flowchart TD
+    Client["Browser / README<br/>badge / webhook"]
+    Pixel["apps/pixel (Next.js 15, App Router)<br/>pages + /api/* + wallet auth"]
+    Gilfoyle["apps/gilfoyle<br/>COMPATIBILITY ENGINE<br/>helius -> parse -> adapters -> risk -> recs -> diff"]
+    Kotler["apps/kotler<br/>LIVE SIMULATION WORKER<br/>solana-test-validator + 9 scenarios"]
+    Store[("packages/monitor-store<br/>SQLite / Turso (libSQL)")]
+    Sentinel["apps/sentinel<br/>recheck + freshness loops<br/>webhook dispatch / Vercel cron"]
+    Shared["packages/shared<br/>THE CONTRACT LAYER<br/>Zod schemas + TS types + constants"]
+    Client --> Pixel
+    Pixel -->|in-process import| Gilfoyle
+    Pixel -->|HTTP proxy| Kotler
+    Gilfoyle --> Store
+    Sentinel --> Store
+    Store --> Shared
 ```
 
 **End-to-end data flow:**
 
-```
- on-chain mint
-      |
-      |  Helius DAS  getAsset (JSON-RPC)
-      v
- +--------------+   parseMintProfile()      +--------------+
- |  raw asset   | ------------------------> |  MintProfile |   normalized, validated
- +--------------+   extensions/auth/meta    +------+-------+
-                                                   |  runCompatibilityEngine()
-                                                   v
-                            +--------------------------------------+
-                            |  7 venue adapters                    |
-                            |  rule eval -> live probe -> override |
-                            +------------------+-------------------+
-                                               v  VenueCompatibilityResult[]
-                        +----------------------+----------------------+
-                        v                                             v
-                scoreRisk() (18 checks)               (optional) POST /simulate
-                        |                                       |  -> Kotler
-                RiskFinding[]                                   v
-                        |                           boot validator -> clone hook
-            generateRecommendations()               -> structure-equiv mint
-                        |                           -> execute tx -> log post-mortem
-                Recommendation[]                            |
-                        |                                   v
-                        +-------------> AnalyzeReport <-- SimulationReport
-                                             |
-                                 persist (history) + render report + badge
+```mermaid
+flowchart TD
+    Mint["on-chain mint"] -->|Helius DAS getAsset| Raw["raw asset"]
+    Raw -->|parseMintProfile| Profile["MintProfile (normalized, validated)"]
+    Profile -->|runCompatibilityEngine| Adapters["7 venue adapters<br/>rule eval -> live probe -> override"]
+    Adapters --> Results["VenueCompatibilityResult[]"]
+    Results --> Risk["scoreRisk (18 checks)"]
+    Results -->|optional| Sim["POST /simulate -> Kotler<br/>boot validator -> clone hook<br/>-> structure-equiv mint -> execute tx -> log post-mortem"]
+    Risk --> Recs["generateRecommendations"]
+    Recs --> Report["AnalyzeReport"]
+    Sim --> SimReport["SimulationReport"]
+    SimReport --> Report
+    Report --> Out["persist history + render report + badge"]
 ```
 
 ---
@@ -331,19 +300,18 @@ Rules and probes tell you what _should_ happen. **Kotler proves what _does_ happ
 
 ### 4.1 Request lifecycle
 
-```
-POST /run  { mint, scenarios? }   (Authorization: Bearer <KOTLER_SECRET>)
-   |
-   +- validate body (simulationRequestSchema) + bearer secret
-   v
-runSimulation(request)
-   +- HeliusClient.fetchMintAsset -> parseMintProfile     (reuse Gilfoyle)
-   +- selectScenarios(profile)    -> baseline + extension-specific (deduped)
-   +- binary present? & !KOTLER_FORCE_HEURISTIC ?
-   |        +- YES -> runLive()                           (real validator)
-   |        +- NO  -> runHeuristic()                      (pure analysis)
-   v
-SimulationReport { mint, results: ScenarioResult[], validatorMode, generatedAt }
+```mermaid
+flowchart TD
+    Req["POST /run { mint, scenarios? }<br/>Authorization: Bearer KOTLER_SECRET"]
+    Req --> Validate["validate body + bearer secret"]
+    Validate --> Run["runSimulation(request)"]
+    Run --> Fetch["HeliusClient.fetchMintAsset -> parseMintProfile"]
+    Fetch --> Select["selectScenarios(profile)<br/>baseline + extension-specific"]
+    Select --> Decide{"validator binary present?<br/>and not KOTLER_FORCE_HEURISTIC"}
+    Decide -->|yes| Live["runLive() - real validator"]
+    Decide -->|no| Heur["runHeuristic() - pure analysis"]
+    Live --> Out["SimulationReport<br/>results, validatorMode, generatedAt"]
+    Heur --> Out
 ```
 
 ### 4.2 The validator lifecycle (`runLive`)
