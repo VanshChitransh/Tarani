@@ -2,6 +2,9 @@ import { simulationRequestSchema } from "@tarani/shared";
 import { runSimulation } from "./worker/runSimulation";
 
 const PORT = Number(process.env.KOTLER_PORT ?? 3001);
+// When set, POST /run requires `Authorization: Bearer <KOTLER_SECRET>`. Booting a
+// validator is expensive, so a public deployment should not let anyone trigger it.
+const KOTLER_SECRET = process.env.KOTLER_SECRET;
 
 export function startServer(): void {
   Bun.serve({
@@ -14,6 +17,10 @@ export function startServer(): void {
       }
 
       if (url.pathname === "/run" && req.method === "POST") {
+        if (KOTLER_SECRET && req.headers.get("authorization") !== `Bearer ${KOTLER_SECRET}`) {
+          return Response.json({ ok: false, error: "Unauthorized" }, { status: 401 });
+        }
+
         let raw: unknown;
         try {
           raw = await req.json();

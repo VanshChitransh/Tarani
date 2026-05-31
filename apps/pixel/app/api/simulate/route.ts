@@ -48,11 +48,16 @@ export async function POST(req: Request) {
 
   const kotlerUrl = process.env.KOTLER_URL ?? "http://localhost:3001";
 
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (process.env.KOTLER_SECRET) {
+    headers["Authorization"] = `Bearer ${process.env.KOTLER_SECRET}`;
+  }
+
   let kotlerRes: Response;
   try {
     kotlerRes = await fetch(`${kotlerUrl}/run`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(parsed.data),
       signal: AbortSignal.timeout(60_000),
     });

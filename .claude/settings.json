@@ -15,7 +15,8 @@
       "Bash(python3 -c 'import json;d=json.load\\(open\\('\\\\''packages/test-fixtures/mints/real/__TRACKED_VAR__.json'\\\\''\\)\\);print\\(d.get\\('\\\\''id'\\\\''\\), '\\\\''|'\\\\'', \\(d.get\\('\\\\''content'\\\\'',{}\\).get\\('\\\\''metadata'\\\\'',{}\\) or {}\\).get\\('\\\\''symbol'\\\\'','\\\\'''\\\\''\\)\\)')",
       "Bash(curl -s \"https://lite-api.jup.ag/tokens/v1/tagged/token2022\")",
       "Bash(curl -s -H \"User-Agent: Mozilla/5.0\" \"https://lite-api.jup.ag/tokens/v2/tag?query=token-2022\")",
-      "Bash(curl -s -H \"User-Agent: Mozilla/5.0\" \"https://lite-api.jup.ag/tokens/v2/search?query=PYUSD\")"
+      "Bash(curl -s -H \"User-Agent: Mozilla/5.0\" \"https://lite-api.jup.ag/tokens/v2/search?query=PYUSD\")",
+      "Bash(python3 -c \"import json;d=json.load\\(open\\('apps/gilfoyle/package.json'\\)\\);print\\('main:',d.get\\('main'\\)\\);print\\('scripts:',d.get\\('scripts'\\)\\)\")"
     ]
   }
 }
