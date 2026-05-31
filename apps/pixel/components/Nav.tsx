@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AuthButton } from "./AuthButton";
+import { ThemeToggle } from "./ThemeToggle";
 
 const links = [
   { href: "/", label: "Home" },
@@ -40,6 +41,7 @@ export default function Nav() {
 
       <div className="ml-auto flex items-center gap-2">
         <AuthButton />
+        <ThemeToggle />
         <a
           href="https://github.com/VanshChitransh/Tarani"
           target="_blank"

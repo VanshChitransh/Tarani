@@ -1,3 +1,165 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+ * Theme tokens. Colors are remapped (tailwind.config.ts) to these channel
+ * triplets, so the whole UI flips by toggling `.dark` on <html>.
+ *
+ *  - :root  → light theme = stock Tailwind palette.
+ *  - .dark  → dark theme  = Vercel's Geist design system, token for token
+ *             (vercel.com/geist/colors). Comments map each step to its Geist
+ *             source so the intent stays auditable.
+ *
+ * Semantics carry over from the light scale: low neutral steps are surfaces,
+ * high steps are text — so `bg-white text-neutral-900` and the
+ * `bg-neutral-900 text-white` primary button both invert coherently (the
+ * primary button becomes Geist's white-on-black-text style automatically).
+ * For accents, light tint backgrounds (-50/-100) map to Geist's dark -100
+ * tints and dark text (-700/-800) maps to Geist's bright -900 text, giving
+ * Vercel's dark badge look (e.g. error = bg #2a1314 + text #ff6166).
+ */
+:root {
+  color-scheme: light;
+
+  --c-white: 255 255 255;
+  --c-neutral-50: 250 250 250;
+  --c-neutral-100: 245 245 245;
+  --c-neutral-200: 229 229 229;
+  --c-neutral-300: 212 212 212;
+  --c-neutral-400: 163 163 163;
+  --c-neutral-500: 115 115 115;
+  --c-neutral-600: 82 82 82;
+  --c-neutral-700: 64 64 64;
+  --c-neutral-800: 38 38 38;
+  --c-neutral-900: 23 23 23;
+
+  --c-red-50: 254 242 242;
+  --c-red-100: 254 226 226;
+  --c-red-200: 254 202 202;
+  --c-red-500: 239 68 68;
+  --c-red-600: 220 38 38;
+  --c-red-700: 185 28 28;
+  --c-red-800: 153 27 27;
+
+  --c-green-50: 240 253 244;
+  --c-green-100: 220 252 231;
+  --c-green-200: 187 247 208;
+  --c-green-500: 34 197 94;
+  --c-green-700: 21 128 61;
+  --c-green-800: 22 101 52;
+
+  --c-blue-100: 219 234 254;
+  --c-blue-200: 191 219 254;
+  --c-blue-300: 147 197 253;
+  --c-blue-600: 37 99 235;
+  --c-blue-700: 29 78 216;
+  --c-blue-800: 30 64 175;
+
+  --c-yellow-100: 254 249 195;
+  --c-yellow-200: 254 240 138;
+  --c-yellow-400: 250 204 21;
+  --c-yellow-700: 161 98 7;
+  --c-yellow-800: 133 77 14;
+
+  --c-amber-50: 255 251 235;
+  --c-amber-200: 253 230 138;
+  --c-amber-400: 251 191 36;
+  --c-amber-500: 245 158 11;
+  --c-amber-700: 180 83 9;
+  --c-amber-900: 120 53 15;
+
+  --c-orange-100: 255 237 213;
+  --c-orange-200: 254 215 170;
+  --c-orange-400: 251 146 60;
+  --c-orange-500: 249 115 22;
+  --c-orange-700: 194 65 12;
+  --c-orange-800: 154 52 18;
+
+  --c-violet-50: 245 243 255;
+  --c-violet-100: 237 233 254;
+  --c-violet-700: 109 40 217;
+}
+
+.dark {
+  color-scheme: dark;
+
+  /*
+   * Soft, low-strain dark theme — NOT pure black. The base is a comfortable
+   * dark gray (#1b1b1e) and text is off-white (#ededf1, not #fff) to avoid the
+   * halation/eye-strain of high-contrast black-and-white. Neutral steps stay
+   * monotonic: white=darkest base, n50/100 are slightly-raised surfaces, the
+   * top steps are text. So `bg-white text-neutral-900` and the
+   * `bg-neutral-900 text-white` primary button invert coherently.
+   */
+  --c-white: 27 27 30; /* #1b1b1e — base bg / nav / cards */
+  --c-neutral-50: 33 33 37; /* #212125 — subtle raised surface */
+  --c-neutral-100: 40 40 45; /* #28282d — raised / hover / active pill */
+  --c-neutral-200: 50 50 56; /* #323238 — border */
+  --c-neutral-300: 64 64 71; /* #404047 — stronger border / ring */
+  --c-neutral-400: 141 141 150; /* #8d8d96 — muted text / placeholder */
+  --c-neutral-500: 165 165 175; /* #a5a5af — secondary text */
+  --c-neutral-600: 196 196 205; /* #c4c4cd */
+  --c-neutral-700: 216 216 223; /* #d8d8df — light chip bg */
+  --c-neutral-800: 230 230 235; /* #e6e6eb */
+  --c-neutral-900: 237 237 241; /* #ededf1 — primary text / primary button */
+
+  /*
+   * Accent badges (bg-COLOR-100 + text-COLOR-700). Backgrounds are tinted
+   * surfaces sitting ABOVE the base (so they read as gentle chips, not holes),
+   * and text is soft pastel rather than neon — easy on the eye.
+   */
+
+  /* Red */
+  --c-red-50: 58 29 31; /* #3a1d1f — bg tint */
+  --c-red-100: 58 29 31;
+  --c-red-200: 86 42 45; /* #562a2d — border */
+  --c-red-500: 232 93 97; /* #e85d61 — solid */
+  --c-red-600: 232 93 97;
+  --c-red-700: 247 150 153; /* #f79699 — soft text */
+  --c-red-800: 247 150 153;
+
+  /* Green */
+  --c-green-50: 22 48 31; /* #16301f */
+  --c-green-100: 22 48 31;
+  --c-green-200: 32 66 43; /* #20422b */
+  --c-green-500: 74 175 96; /* #4aaf60 — solid */
+  --c-green-700: 122 209 142; /* #7ad18e — soft text */
+  --c-green-800: 122 209 142;
+
+  /* Blue */
+  --c-blue-100: 22 41 64; /* #162940 */
+  --c-blue-200: 30 58 92; /* #1e3a5c — border */
+  --c-blue-300: 38 74 117; /* #264a75 */
+  --c-blue-600: 56 146 255; /* #3892ff — solid */
+  --c-blue-700: 125 180 255; /* #7db4ff — soft text */
+  --c-blue-800: 125 180 255;
+
+  /* Yellow (warm amber family) */
+  --c-yellow-100: 51 40 19; /* #332813 */
+  --c-yellow-200: 71 56 24; /* #473818 — border */
+  --c-yellow-400: 240 191 90; /* #f0bf5a — solid */
+  --c-yellow-700: 240 191 90;
+  --c-yellow-800: 240 191 90;
+
+  /* Amber */
+  --c-amber-50: 51 40 19; /* #332813 */
+  --c-amber-200: 71 56 24; /* #473818 */
+  --c-amber-400: 240 191 90; /* #f0bf5a */
+  --c-amber-500: 235 165 70; /* #eba546 */
+  --c-amber-700: 240 191 90;
+  --c-amber-900: 245 220 165; /* #f5dca5 — light text */
+
+  /* Orange */
+  --c-orange-100: 56 38 22; /* #382616 */
+  --c-orange-200: 77 52 30; /* #4d341e */
+  --c-orange-400: 240 160 80; /* #f0a050 */
+  --c-orange-500: 240 175 90; /* #f0af5a */
+  --c-orange-700: 240 175 90;
+  --c-orange-800: 240 175 90;
+
+  /* Violet */
+  --c-violet-50: 44 33 60; /* #2c213c */
+  --c-violet-100: 44 33 60;
+  --c-violet-700: 197 160 240; /* #c5a0f0 — soft text */
+}
