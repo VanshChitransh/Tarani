@@ -116,6 +116,15 @@ export async function createStructureEquivalentMint(
 
   const extensionInits = await buildExtensionInits(profile, mint, payer);
 
+  // A mint with DefaultAccountState=Frozen (or any active freeze authority) must
+  // be created WITH a freeze authority, or InitializeMint fails with custom error
+  // 0x10 ("This token mint cannot freeze accounts"). Use the payer as the local
+  // stand-in so the structural clone is valid and freeze scenarios stay realistic.
+  const needsFreezeAuthority =
+    profile.authorities.freeze.address !== null ||
+    profile.extensions.some((e) => e.kind === "defaultAccountState");
+  const freezeAuthority = needsFreezeAuthority ? payer.publicKey : null;
+
   const tx = new Transaction().add(
     SystemProgram.createAccount({
       fromPubkey: payer.publicKey,
@@ -129,7 +138,7 @@ export async function createStructureEquivalentMint(
       mint.publicKey,
       profile.decimals,
       payer.publicKey,
-      null,
+      freezeAuthority,
       TOKEN_2022_PROGRAM_ID,
     ),
   );
