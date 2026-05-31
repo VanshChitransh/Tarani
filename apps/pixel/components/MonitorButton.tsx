@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useWallet } from "@solana/wallet-adapter-react";
+import { useWalletModal } from "@solana/wallet-adapter-react-ui";
+import { useAuth } from "../src/lib/authContext";
 
 type State =
   | { status: "idle" }
@@ -14,6 +17,9 @@ interface Props {
 
 export function MonitorButton({ mint }: Props) {
   const [state, setState] = useState<State>({ status: "idle" });
+  const { address, signIn, signingIn } = useAuth();
+  const { connected } = useWallet();
+  const { setVisible } = useWalletModal();
 
   async function track() {
     setState({ status: "loading" });
@@ -29,6 +35,29 @@ export function MonitorButton({ mint }: Props) {
     } catch (e) {
       setState({ status: "error", message: e instanceof Error ? e.message : "Failed to track" });
     }
+  }
+
+  // Tracking is per-wallet, so require sign-in before showing the Track action.
+  if (state.status === "idle" && !address) {
+    if (!connected) {
+      return (
+        <button
+          onClick={() => setVisible(true)}
+          className="px-4 py-2 text-sm font-medium rounded border border-neutral-300 text-neutral-700 hover:bg-neutral-50"
+        >
+          Connect wallet to track
+        </button>
+      );
+    }
+    return (
+      <button
+        onClick={signIn}
+        disabled={signingIn}
+        className="px-4 py-2 text-sm font-medium rounded border border-neutral-300 text-neutral-700 hover:bg-neutral-50 disabled:opacity-50"
+      >
+        {signingIn ? "Signing…" : "Sign in to track"}
+      </button>
+    );
   }
 
   if (state.status === "idle") {

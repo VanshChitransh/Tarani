@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import type { MonitorDetail } from "@tarani/shared";
+import { useAuth } from "../../src/lib/authContext";
+import { AuthButton } from "../../components/AuthButton";
 
 function truncateMint(mint: string): string {
   return `${mint.slice(0, 8)}…${mint.slice(-8)}`;
@@ -18,37 +20,47 @@ function formatDate(iso: string | null): string {
 }
 
 export default function DashboardPage() {
+  const { address, loading: authLoading } = useAuth();
   const [mints, setMints] = useState<MonitorDetail[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const [input, setInput] = useState("");
   const [adding, setAdding] = useState(false);
   const [addError, setAddError] = useState<string | null>(null);
 
+  // Load this wallet's watchlist; re-run when the signed-in address changes.
   useEffect(() => {
-    async function load() {
-      try {
-        const res = await fetch("/api/monitor");
-        const json = await res.json();
-        if (!json.ok) throw new Error(json.error.message);
-
-        const details: MonitorDetail[] = await Promise.all(
-          json.data.map(async (r: { mint: string }) => {
-            const dr = await fetch(`/api/monitor/${r.mint}`);
-            const dj = await dr.json();
-            return dj.ok ? dj.data : { ...r, latestSnapshot: null, latestDiff: null };
-          }),
-        );
-        setMints(details);
-      } catch (e) {
-        setError(e instanceof Error ? e.message : "Failed to load");
-      } finally {
-        setLoading(false);
-      }
+    if (!address) {
+      setMints([]);
+      return;
     }
-    load();
-  }, []);
+    let active = true;
+    setLoading(true);
+    setError(null);
+    (async () => {
+      const res = await fetch("/api/monitor");
+      const json = await res.json();
+      if (!json.ok) throw new Error(json.error.message);
+      const details: MonitorDetail[] = await Promise.all(
+        json.data.map(async (r: { mint: string }) => {
+          const dr = await fetch(`/api/monitor/${r.mint}`);
+          const dj = await dr.json();
+          return dj.ok ? dj.data : { ...r, latestSnapshot: null, latestDiff: null };
+        }),
+      );
+      if (active) setMints(details);
+    })()
+      .catch((e) => {
+        if (active) setError(e instanceof Error ? e.message : "Failed to load");
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [address]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -87,6 +99,27 @@ export default function DashboardPage() {
   async function handleRemove(mint: string) {
     await fetch(`/api/monitor/${mint}`, { method: "DELETE" });
     setMints((prev) => prev.filter((m) => m.mint !== mint));
+  }
+
+  if (!authLoading && !address) {
+    return (
+      <main className="max-w-4xl mx-auto px-4 py-12 space-y-6">
+        <div>
+          <h1 className="text-xl font-semibold text-neutral-900">Monitor Dashboard</h1>
+          <p className="text-sm text-neutral-500 mt-1">
+            Track token mints for compatibility changes.
+          </p>
+        </div>
+        <div className="rounded-lg border border-neutral-200 bg-neutral-50 px-6 py-10 text-center space-y-4">
+          <p className="text-sm text-neutral-600">
+            Connect your Solana wallet and sign in to view and manage your tracked mints.
+          </p>
+          <div className="flex justify-center">
+            <AuthButton />
+          </div>
+        </div>
+      </main>
+    );
   }
 
   return (
