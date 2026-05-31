@@ -259,15 +259,15 @@ $$\textsf{blocked}\ (5) \succ \textsf{conditional}\ (4) \succ \textsf{partial}\ 
 
 For a mint with extension set $E$ and a venue rule with feature set $F$, the engine builds the set of **applicable unscoped verdicts** $V$ — the rule features $f \in F$ whose extension $\mathrm{id}(f) \in E$ and whose $\mathrm{scope}(f) = \varnothing$.
 
-The **overall venue status** $s^{*}$ is the worst (highest-ranked) applicable verdict — a _fail-pessimistic_ aggregation:
+The **overall venue status** $s'$ is the worst (highest-ranked) applicable verdict — a _fail-pessimistic_ aggregation:
 
-$$\mathrm{rank}(s^{*}) \ =\ \max_{f \in V}\ \mathrm{rank}(\mathrm{status}(f))$$
+$$\mathrm{rank}(s') \ =\ \max_{f \in V}\ \mathrm{rank}(\mathrm{status}(f))$$
 
-with $s^{*} = \textsf{supported}$ when $E = \varnothing$ (an extension-free SPL token is universally supported by construction), and $s^{*} = \textsf{unknown}$ when $V = \varnothing$.
+with $s' = \textsf{supported}$ when $E = \varnothing$ (an extension-free SPL token is universally supported by construction), and $s' = \textsf{unknown}$ when $V = \varnothing$.
 
-**Confidence** $c^{*}$ is the _minimum_ confidence among the verdicts that actually drove $s^{*}$, with ranks $\textsf{high}\ (3) \succ \textsf{medium}\ (2) \succ \textsf{low}\ (1)$:
+**Confidence** $c'$ is the _minimum_ confidence among the verdicts that actually drove $s'$, with ranks $\textsf{high}\ (3) \succ \textsf{medium}\ (2) \succ \textsf{low}\ (1)$:
 
-$$\mathrm{crank}(c^{*}) \ =\ \min_{f \in V,\ \mathrm{status}(f)\ =\ s^{*}}\ \mathrm{crank}(\mathrm{confidence}(f))$$
+$$\mathrm{crank}(c') \ =\ \min_{f \in V,\ \mathrm{status}(f)\ =\ s'}\ \mathrm{crank}(\mathrm{confidence}(f))$$
 
 This prevents a high-confidence `blocked` verdict from inflating the confidence of a `supported` result. **Scoped** verdicts (e.g. Jupiter `swap` vs `limitOrders`) do not enter $V$; they populate a per-feature map `features[scope]`, each computed by the same procedure over its own scope.
 
