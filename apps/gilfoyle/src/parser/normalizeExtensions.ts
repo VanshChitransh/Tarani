@@ -15,6 +15,7 @@ const SNAKE_TO_CAMEL: Record<string, ExtensionKind> = {
   confidential_transfer_fee_config: "confidentialTransferFeeConfig",
   metadata_pointer: "metadataPointer",
   token_metadata: "tokenMetadata",
+  metadata: "tokenMetadata", // Helius emits the TokenMetadata extension as `metadata`
   group_pointer: "groupPointer",
   token_group: "tokenGroup",
   group_member_pointer: "groupMemberPointer",
@@ -22,6 +23,7 @@ const SNAKE_TO_CAMEL: Record<string, ExtensionKind> = {
   mint_close_authority: "mintCloseAuthority",
   scaled_ui_amount_config: "scaledUiAmountConfig",
   pausable: "pausable",
+  pausable_config: "pausable", // Helius emits the Pausable extension as `pausable_config`
 };
 
 const KNOWN_KINDS = new Set<string>(EXTENSION_KINDS);
