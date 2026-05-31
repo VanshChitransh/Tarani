@@ -8,6 +8,7 @@ import {
 import { Transaction, sendAndConfirmTransaction } from "@solana/web3.js";
 import type { ScenarioResult } from "@tarani/shared";
 import { extractLogs, extractErrorMessage, extractFailureCode } from "../worker/logParser";
+import { thawIfFrozen } from "../validator/accounts";
 import type { ScenarioEntry, HeuristicContext, LiveContext } from "./types";
 
 // SPL Memo program address
@@ -30,6 +31,7 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
       id: crypto.randomUUID(),
       kind: "memo_required",
       outcome: "blocked",
+      mode: "analysis",
       summary: "Token is non-transferable. Memo requirement is irrelevant.",
       durationMs: Date.now() - start,
       failureCode: "NON_TRANSFERABLE",
@@ -42,6 +44,7 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
       id: crypto.randomUUID(),
       kind: "memo_required",
       outcome: "warning",
+      mode: "analysis",
       summary:
         "MemoTransfer extension is present. Incoming transfers to accounts with this extension require an attached memo instruction, or they will be rejected.",
       durationMs: Date.now() - start,
@@ -52,6 +55,7 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
     id: crypto.randomUUID(),
     kind: "memo_required",
     outcome: "success",
+    mode: "analysis",
     summary: "No memo requirement detected. Transfers can be sent without a memo.",
     durationMs: Date.now() - start,
   };
@@ -84,6 +88,10 @@ async function live({ profile, connection, mint, payer }: LiveContext): Promise<
       undefined,
       TOKEN_2022_PROGRAM_ID,
     );
+
+    // Thaw if frozen-by-default so the memo-enforcement test can run.
+    await thawIfFrozen(connection, payer, senderAta, mint.publicKey);
+    await thawIfFrozen(connection, payer, recipientAta, mint.publicKey);
 
     await mintTo(
       connection,
@@ -138,6 +146,7 @@ async function live({ profile, connection, mint, payer }: LiveContext): Promise<
         id: crypto.randomUUID(),
         kind: "memo_required",
         outcome: "warning",
+        mode: "validator",
         summary:
           "Transfer without memo was rejected; transfer with memo succeeded. Memo is required for this token.",
         durationMs: Date.now() - start,
@@ -148,6 +157,7 @@ async function live({ profile, connection, mint, payer }: LiveContext): Promise<
       id: crypto.randomUUID(),
       kind: "memo_required",
       outcome: "success",
+      mode: "validator",
       summary: "Both memo and non-memo transfers succeeded. Memo is not enforced on this token.",
       durationMs: Date.now() - start,
     };
@@ -162,6 +172,7 @@ async function live({ profile, connection, mint, payer }: LiveContext): Promise<
       id: crypto.randomUUID(),
       kind: "memo_required",
       outcome: "error",
+      mode: "validator",
       summary: `Live memo test failed: ${message}`,
       durationMs: Date.now() - start,
       failureCode,

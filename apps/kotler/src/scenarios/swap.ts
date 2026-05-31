@@ -11,6 +11,7 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
       id: crypto.randomUUID(),
       kind: "swap",
       outcome: "blocked",
+      mode: "analysis",
       summary: "Token is non-transferable. Swaps require token transfers and will always fail.",
       durationMs: Date.now() - start,
       failureCode: "NON_TRANSFERABLE",
@@ -21,6 +22,7 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
       id: crypto.randomUUID(),
       kind: "swap",
       outcome: "warning",
+      mode: "analysis",
       summary:
         "Token has a transfer fee. DEX quotes may not account for fees withheld on each swap leg.",
       durationMs: Date.now() - start,
@@ -31,6 +33,7 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
       id: crypto.randomUUID(),
       kind: "swap",
       outcome: "warning",
+      mode: "analysis",
       summary:
         "Token has a transfer hook. The hook executes on every swap transaction and may reject it.",
       durationMs: Date.now() - start,
@@ -41,6 +44,7 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
       id: crypto.randomUUID(),
       kind: "swap",
       outcome: "warning",
+      mode: "analysis",
       summary: "Token has the pausable extension. Swaps can be blocked by the issuer at any time.",
       durationMs: Date.now() - start,
     };
@@ -50,11 +54,17 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
     id: crypto.randomUUID(),
     kind: "swap",
     outcome: "success",
+    mode: "analysis",
     summary: "No swap-blocking extensions detected.",
     durationMs: Date.now() - start,
   };
 }
 
+// This is NOT a validator transaction — Tarani does not stand up a DEX program +
+// pool on the throwaway validator. It queries the live Jupiter Quote API for a
+// real route, so the result is reported with mode "api" (the UI labels it as an
+// API probe, not a simulated swap). On an inconclusive probe it degrades to the
+// static heuristic (mode "analysis").
 async function live({ profile }: LiveContext): Promise<ScenarioResult> {
   const start = Date.now();
 
@@ -69,6 +79,7 @@ async function live({ profile }: LiveContext): Promise<ScenarioResult> {
       id: crypto.randomUUID(),
       kind: "swap",
       outcome: "success",
+      mode: "api",
       summary: "Jupiter Quote API confirmed a live swap route exists for this mint.",
       durationMs: Date.now() - start,
     };
@@ -78,6 +89,7 @@ async function live({ profile }: LiveContext): Promise<ScenarioResult> {
       id: crypto.randomUUID(),
       kind: "swap",
       outcome: "blocked",
+      mode: "api",
       summary: "Jupiter Quote API returned no route for this mint.",
       durationMs: Date.now() - start,
       failureCode: "NO_SWAP_ROUTE",

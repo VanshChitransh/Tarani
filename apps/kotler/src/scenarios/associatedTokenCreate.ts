@@ -16,6 +16,7 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
       id: crypto.randomUUID(),
       kind: "associated_token_create",
       outcome: "warning",
+      mode: "analysis",
       summary:
         "An associated token account can be created, but the DefaultAccountState extension may create it frozen, requiring the freeze authority to thaw it before use.",
       durationMs: Date.now() - start,
@@ -26,6 +27,7 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
     id: crypto.randomUUID(),
     kind: "associated_token_create",
     outcome: "success",
+    mode: "analysis",
     summary: "A standard associated token account can be created for this mint.",
     durationMs: Date.now() - start,
   };
@@ -51,6 +53,7 @@ async function live({ connection, mint, payer }: LiveContext): Promise<ScenarioR
         id: crypto.randomUUID(),
         kind: "associated_token_create",
         outcome: "warning",
+        mode: "validator",
         summary:
           "Associated token account created, but it is frozen on creation (DefaultAccountState=Frozen). Holders must be thawed before transacting.",
         durationMs: Date.now() - start,
@@ -61,6 +64,7 @@ async function live({ connection, mint, payer }: LiveContext): Promise<ScenarioR
       id: crypto.randomUUID(),
       kind: "associated_token_create",
       outcome: "success",
+      mode: "validator",
       summary: "Associated token account created successfully on the test validator.",
       durationMs: Date.now() - start,
     };
@@ -75,6 +79,7 @@ async function live({ connection, mint, payer }: LiveContext): Promise<ScenarioR
       id: crypto.randomUUID(),
       kind: "associated_token_create",
       outcome: "error",
+      mode: "validator",
       summary: `Live ATA creation failed: ${message}`,
       durationMs: Date.now() - start,
       failureCode,

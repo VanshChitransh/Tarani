@@ -7,7 +7,9 @@ import {
   TOKEN_2022_PROGRAM_ID,
 } from "@solana/spl-token";
 import type { ScenarioResult } from "@tarani/shared";
+import { readTransferFeeConfig } from "@tarani/gilfoyle";
 import { extractLogs, extractErrorMessage, extractFailureCode } from "../worker/logParser";
+import { thawIfFrozen } from "../validator/accounts";
 import type { ScenarioEntry, HeuristicContext, LiveContext } from "./types";
 
 function heuristic({ profile }: HeuristicContext): ScenarioResult {
@@ -19,6 +21,7 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
       id: crypto.randomUUID(),
       kind: "transfer_fee",
       outcome: "blocked",
+      mode: "analysis",
       summary: "Token is non-transferable. Fee configuration is irrelevant.",
       durationMs: Date.now() - start,
       failureCode: "NON_TRANSFERABLE",
@@ -31,19 +34,37 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
       id: crypto.randomUUID(),
       kind: "transfer_fee",
       outcome: "success",
+      mode: "analysis",
       summary: "No transfer fee configured. Recipients receive the full transfer amount.",
       durationMs: Date.now() - start,
     };
   }
 
-  const bps = (feeExt.parameters["transferFeeBasisPoints"] as number | undefined) ?? 0;
-  const maxFee = (feeExt.parameters["maximumFee"] as string | undefined) ?? "0";
+  // Read the ACTUAL current rate via the shared reader (Helius nests it under
+  // newer_transfer_fee; the old code read the wrong key and always saw 0).
+  const { basisPoints, maximumFee } = readTransferFeeConfig(feeExt);
+  const bps = basisPoints ?? 0;
+  const maxFee = maximumFee ?? 0n;
   const pct = (bps / 100).toFixed(2);
+
+  // A 0 bps fee withholds nothing today — call it out instead of warning about a
+  // fee that is not actually charged (the authority can still raise it later).
+  if (bps === 0) {
+    return {
+      id: crypto.randomUUID(),
+      kind: "transfer_fee",
+      outcome: "success",
+      mode: "analysis",
+      summary: `Transfer-fee extension present but the current rate is 0% (0 bps), so no fee is withheld. The fee authority can raise it later (max fee: ${maxFee} base units).`,
+      durationMs: Date.now() - start,
+    };
+  }
 
   return {
     id: crypto.randomUUID(),
     kind: "transfer_fee",
     outcome: "warning",
+    mode: "analysis",
     summary: `Transfer fee: ${pct}% (${bps} bps), max fee: ${maxFee} base units. Fee is withheld in the recipient account and must be harvested.`,
     durationMs: Date.now() - start,
   };
@@ -76,6 +97,10 @@ async function live({ profile, connection, mint, payer }: LiveContext): Promise<
       undefined,
       TOKEN_2022_PROGRAM_ID,
     );
+
+    // Thaw if frozen-by-default so the fee can actually be measured.
+    await thawIfFrozen(connection, payer, senderAta, mint.publicKey);
+    await thawIfFrozen(connection, payer, recipientAta, mint.publicKey);
 
     await mintTo(
       connection,
@@ -118,7 +143,8 @@ async function live({ profile, connection, mint, payer }: LiveContext): Promise<
       id: crypto.randomUUID(),
       kind: "transfer_fee",
       outcome: "success",
-      summary: `Transferred ${TRANSFER_AMOUNT} units. Recipient received ${received}, fee withheld: ${withheld}.`,
+      mode: "validator",
+      summary: `Live transfer of ${TRANSFER_AMOUNT} units on the test validator: recipient received ${received}, fee withheld: ${withheld}.`,
       durationMs: Date.now() - start,
     };
   } catch (err) {
@@ -132,6 +158,7 @@ async function live({ profile, connection, mint, payer }: LiveContext): Promise<
       id: crypto.randomUUID(),
       kind: "transfer_fee",
       outcome: "error",
+      mode: "validator",
       summary: `Live transfer fee test failed: ${message}`,
       durationMs: Date.now() - start,
       failureCode,

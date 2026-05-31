@@ -29,11 +29,35 @@ const KIND_LABEL: Record<string, string> = {
   transfer_fee: "Transfer Fee",
   memo_required: "Memo Required",
   metadata_check: "Metadata",
+  swap: "Swap Route",
+  wrap_sol: "Liquidity Pool",
+  associated_token_create: "Token Account",
+  freeze_check: "Freeze",
 };
 
 const MODE_STYLES: Record<SimulationReport["validatorMode"], string> = {
   live: "bg-blue-100 text-blue-700 border border-blue-200",
   heuristic: "bg-neutral-100 text-neutral-600 border border-neutral-200",
+};
+
+// Per-scenario execution mode, so a row never implies a live validator tx when it
+// was actually an external API probe or static analysis.
+const SCENARIO_MODE_LABEL: Record<string, string> = {
+  validator: "live tx",
+  api: "API probe",
+  analysis: "static",
+};
+
+const SCENARIO_MODE_STYLES: Record<string, string> = {
+  validator: "bg-blue-50 text-blue-700 border border-blue-200",
+  api: "bg-violet-50 text-violet-700 border border-violet-200",
+  analysis: "bg-neutral-100 text-neutral-500 border border-neutral-200",
+};
+
+const SCENARIO_MODE_TITLE: Record<string, string> = {
+  validator: "Executed as a real transaction on the local test validator",
+  api: "Verdict from a live external API probe (Jupiter/Raydium) — not a validator transaction",
+  analysis: "Static analysis of the mint's configuration — no transaction was executed",
 };
 
 interface Props {
@@ -54,6 +78,13 @@ export function SimulationTimeline({ report }: Props) {
         </span>
       </div>
 
+      {report.validatorMode === "heuristic" && (
+        <p className="text-xs text-neutral-500 bg-neutral-50 border border-neutral-200 rounded-md px-3 py-2">
+          The local validator was unavailable, so these results are static analysis of the
+          mint&apos;s configuration — not live transactions.
+        </p>
+      )}
+
       <div className="relative">
         <div className="absolute left-2 top-0 bottom-0 w-px bg-neutral-200" aria-hidden />
         <div className="space-y-3 pl-8">
@@ -73,7 +104,17 @@ export function SimulationTimeline({ report }: Props) {
                   >
                     {OUTCOME_LABEL[result.outcome]}
                   </span>
-                  <span className="ml-auto text-xs text-neutral-400">{result.durationMs}ms</span>
+                  <span
+                    title={SCENARIO_MODE_TITLE[result.mode]}
+                    className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${SCENARIO_MODE_STYLES[result.mode] ?? ""}`}
+                  >
+                    {SCENARIO_MODE_LABEL[result.mode] ?? result.mode}
+                  </span>
+                  {/* Only a real validator tx has a meaningful wall-clock; for API/static
+                      rows a "0ms"/probe latency reads as broken, so hide it. */}
+                  {result.mode === "validator" && (
+                    <span className="ml-auto text-xs text-neutral-400">{result.durationMs}ms</span>
+                  )}
                 </div>
                 <p className="text-xs text-neutral-500 leading-relaxed">{result.summary}</p>
                 {result.failureCode && (

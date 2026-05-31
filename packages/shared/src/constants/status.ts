@@ -14,6 +14,13 @@ export const METADATA_QUALITY_VALUES = ["complete", "partial", "missing"] as con
 
 export const SCENARIO_OUTCOME_VALUES = ["success", "blocked", "warning", "error"] as const;
 
+// How a scenario reached its result, so the UI never implies an API/static check
+// was a live validator transaction:
+//  - "validator": executed a real transaction on the local test validator
+//  - "api":       verdict derived from a live external API probe (Jupiter/Raydium)
+//  - "analysis":  static analysis of the mint profile (no execution)
+export const SCENARIO_MODE_VALUES = ["validator", "api", "analysis"] as const;
+
 export const API_ERROR_CODE_VALUES = [
   "BAD_REQUEST",
   "NOT_FOUND",

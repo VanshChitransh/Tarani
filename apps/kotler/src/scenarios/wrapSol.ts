@@ -11,6 +11,7 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
       id: crypto.randomUUID(),
       kind: "wrap_sol",
       outcome: "blocked",
+      mode: "analysis",
       summary: "Token is non-transferable. It cannot be deposited into any liquidity pool.",
       durationMs: Date.now() - start,
       failureCode: "NON_TRANSFERABLE",
@@ -21,6 +22,7 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
       id: crypto.randomUUID(),
       kind: "wrap_sol",
       outcome: "warning",
+      mode: "analysis",
       summary:
         "Token has a transfer hook. The hook executes on pool deposits and withdrawals and may reject them.",
       durationMs: Date.now() - start,
@@ -31,11 +33,16 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
     id: crypto.randomUUID(),
     kind: "wrap_sol",
     outcome: "success",
+    mode: "analysis",
     summary: "No pool-blocking extensions detected.",
     durationMs: Date.now() - start,
   };
 }
 
+// NOT a validator transaction — Tarani does not deploy an AMM + pool on the
+// throwaway validator. It checks the live Raydium Pools API for a real
+// SOL-paired pool, so the result is reported with mode "api". On an inconclusive
+// probe it degrades to the static heuristic (mode "analysis").
 async function live({ profile }: LiveContext): Promise<ScenarioResult> {
   const start = Date.now();
 
@@ -50,6 +57,7 @@ async function live({ profile }: LiveContext): Promise<ScenarioResult> {
       id: crypto.randomUUID(),
       kind: "wrap_sol",
       outcome: "success",
+      mode: "api",
       summary: "A Raydium SOL-paired pool exists for this mint.",
       durationMs: Date.now() - start,
     };
@@ -59,6 +67,7 @@ async function live({ profile }: LiveContext): Promise<ScenarioResult> {
       id: crypto.randomUUID(),
       kind: "wrap_sol",
       outcome: "warning",
+      mode: "api",
       summary: "No Raydium pool found for this mint yet. Pool creation is not blocked.",
       durationMs: Date.now() - start,
     };

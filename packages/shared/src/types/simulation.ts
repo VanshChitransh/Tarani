@@ -5,12 +5,14 @@ import type {
   monitorEventSchema,
   scenarioKindSchema,
   scenarioOutcomeSchema,
+  scenarioModeSchema,
   scenarioResultSchema,
   simulationReportSchema,
 } from "../schemas/simulation.schema";
 
 export type ScenarioKind = z.infer<typeof scenarioKindSchema>;
 export type ScenarioOutcome = z.infer<typeof scenarioOutcomeSchema>;
+export type ScenarioMode = z.infer<typeof scenarioModeSchema>;
 export type ScenarioResult = z.infer<typeof scenarioResultSchema>;
 export type SimulationReport = z.infer<typeof simulationReportSchema>;
 export type SimulationBadgeData = z.infer<typeof simulationBadgeDataSchema>;

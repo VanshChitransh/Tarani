@@ -32,6 +32,7 @@ export function unimplementedScenario(kind: ScenarioKind): ScenarioResult {
     id: crypto.randomUUID(),
     kind,
     outcome: "error",
+    mode: "analysis",
     summary: `Scenario "${kind}" is not implemented.`,
     durationMs: 0,
     failureCode: "NOT_IMPLEMENTED",

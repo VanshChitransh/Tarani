@@ -16,6 +16,7 @@ import {
   TOKEN_2022_PROGRAM_ID,
   AccountState,
 } from "@solana/spl-token";
+import { readTransferFeeConfig } from "@tarani/gilfoyle";
 import type { MintProfile } from "@tarani/shared";
 
 export interface TestMintSetup {
@@ -46,16 +47,18 @@ export async function buildExtensionInits(
   for (const ext of profile.extensions) {
     switch (ext.kind) {
       case "transferFeeConfig": {
-        const feeBasisPoints =
-          (ext.parameters["transferFeeBasisPoints"] as number | undefined) ?? 0;
-        const maxFee = BigInt((ext.parameters["maximumFee"] as string | undefined) ?? "0");
+        // Read the REAL rate via the shared reader. Helius nests it under
+        // newer_transfer_fee.{transfer_fee_basis_points,maximum_fee}; the old code
+        // read the wrong (flat camelCase) keys and always built a 0-fee mint, so
+        // the live transfer-fee scenario never measured a real withheld fee.
+        const { basisPoints, maximumFee } = readTransferFeeConfig(ext);
         ixs.push(
           createInitializeTransferFeeConfigInstruction(
             mint.publicKey,
             payer.publicKey,
             payer.publicKey,
-            feeBasisPoints,
-            maxFee,
+            basisPoints ?? 0,
+            maximumFee ?? 0n,
             TOKEN_2022_PROGRAM_ID,
           ),
         );

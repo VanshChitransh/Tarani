@@ -29,10 +29,20 @@ describe("freezeCheck heuristic", () => {
     expect(r.failureCode).toBe("DEFAULT_FROZEN");
   });
 
-  it("live delegates to the heuristic (no faithful validator replication)", async () => {
+  // When the mint has no freeze power, the live path reaches a structural
+  // conclusion without a validator tx (mode "analysis") — and therefore does not
+  // touch ctx.connection, so a minimal ctx is sufficient here. The freeze-power
+  // path (mode "validator") requires a real validator and is exercised by the
+  // live simulation run, not this unit test.
+  it("live reports structural success (mode analysis) when there is no freeze power", async () => {
     const r = await freezeCheckScenario.live({
       profile: BASE_PROFILE,
     } as unknown as Parameters<typeof freezeCheckScenario.live>[0]);
     expect(r.outcome).toBe("success");
+    expect(r.mode).toBe("analysis");
+  });
+
+  it("heuristic results are tagged mode analysis", () => {
+    expect(freezeCheckScenario.heuristic({ profile: BASE_PROFILE }).mode).toBe("analysis");
   });
 });

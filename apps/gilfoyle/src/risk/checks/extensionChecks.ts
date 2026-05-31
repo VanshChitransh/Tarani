@@ -1,4 +1,5 @@
 import type { MintProfile, RiskFinding } from "@tarani/shared";
+import { readTransferFeeConfig } from "../../parser";
 import type { RiskCheck } from "../types";
 
 function hasExt(profile: MintProfile, kind: string): boolean {
@@ -149,20 +150,12 @@ function checkTransferHookUnconfigured(profile: MintProfile): RiskFinding | null
 }
 
 // Reads the CURRENT (newer) transfer fee rate in basis points from the parsed
-// extension. Returns undefined when the rate cannot be determined (e.g. the
-// parameters object is empty) so callers can stay conservative. Handles both
-// Helius snake_case and camelCase shapes, matching hookProgramId's convention.
+// extension via the shared reader (single source of truth, also used by the
+// kotler simulator). Returns undefined when the rate cannot be determined so
+// callers can stay conservative.
 function activeTransferFeeBps(profile: MintProfile): number | undefined {
   const ext = profile.extensions.find((e) => e.kind === "transferFeeConfig");
-  if (!ext) return undefined;
-  const newer = (ext.parameters["newer_transfer_fee"] ?? ext.parameters["newerTransferFee"]) as
-    | Record<string, unknown>
-    | undefined;
-  if (!newer || typeof newer !== "object") return undefined;
-  const raw = newer["transfer_fee_basis_points"] ?? newer["transferFeeBasisPoints"];
-  if (typeof raw === "number" && Number.isFinite(raw)) return raw;
-  if (typeof raw === "string" && /^\d+$/.test(raw)) return parseInt(raw, 10);
-  return undefined;
+  return readTransferFeeConfig(ext).basisPoints;
 }
 
 // A transfer-fee extension only hurts trade efficiency when a fee is ACTUALLY

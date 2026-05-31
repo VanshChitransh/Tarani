@@ -143,7 +143,9 @@ export default async function ReportPage({ params }: Props) {
       <section>
         <SectionHeader>Simulation</SectionHeader>
         <p className="text-xs text-neutral-400 mb-3">
-          Run test transactions against a validator seeded with this mint&apos;s state.
+          Runs live transactions on a throwaway validator built with this mint&apos;s extensions,
+          alongside external route/pool checks and static analysis. Each row is tagged with how it
+          was verified.
         </p>
         <SimulationSection mint={mint} />
       </section>

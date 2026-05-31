@@ -22,14 +22,27 @@ describe("transferFee heuristic", () => {
     expect(result.summary).toContain("1000000");
   });
 
-  it("shows 0% fee when basis points are 0", () => {
+  it("reports a dormant 0 bps fee as success (no fee withheld today)", () => {
     const result = run(
       withExtensions(["transferFeeConfig"], {
         transferFeeConfig: { transferFeeBasisPoints: 0, maximumFee: "0" },
       }),
     );
-    expect(result.outcome).toBe("warning");
+    expect(result.outcome).toBe("success");
     expect(result.summary).toContain("0 bps");
+  });
+
+  it("reads the rate from the nested newer_transfer_fee shape (real Helius DAS)", () => {
+    const result = run(
+      withExtensions(["transferFeeConfig"], {
+        transferFeeConfig: {
+          newer_transfer_fee: { transfer_fee_basis_points: 269, maximum_fee: "5000" },
+        },
+      }),
+    );
+    expect(result.outcome).toBe("warning");
+    expect(result.summary).toContain("269 bps");
+    expect(result.summary).toContain("2.69%");
   });
 
   it("returns blocked for nonTransferable token", () => {

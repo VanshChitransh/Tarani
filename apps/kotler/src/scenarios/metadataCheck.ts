@@ -10,6 +10,7 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
       id: crypto.randomUUID(),
       kind: "metadata_check",
       outcome: "blocked",
+      mode: "analysis",
       summary:
         "Token has no metadata. Name, symbol, and URI are all missing. Wallets and explorers will display this token as unknown.",
       durationMs: Date.now() - start,
@@ -27,6 +28,7 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
       id: crypto.randomUUID(),
       kind: "metadata_check",
       outcome: "warning",
+      mode: "analysis",
       summary: `Metadata is incomplete. Missing fields: ${missing.join(", ")}. Some venues may display this token incorrectly or reject it.`,
       durationMs: Date.now() - start,
       failureCode: "INCOMPLETE_METADATA",
@@ -38,6 +40,7 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
       id: crypto.randomUUID(),
       kind: "metadata_check",
       outcome: "warning",
+      mode: "analysis",
       summary:
         "Metadata fields are present but quality is partial (e.g., placeholder values or non-resolving URI). Verify name, symbol, and URI resolve correctly.",
       durationMs: Date.now() - start,
@@ -48,12 +51,15 @@ function heuristic({ profile }: HeuristicContext): ScenarioResult {
     id: crypto.randomUUID(),
     kind: "metadata_check",
     outcome: "success",
+    mode: "analysis",
     summary: `Metadata is complete. Name: "${metadata.name}", Symbol: "${metadata.symbol}". Token should render correctly across wallets and explorers.`,
     durationMs: Date.now() - start,
   };
 }
 
-// Metadata check is pure analysis — no validator state needed.
+// Metadata is fully determined by the parsed profile — there is no validator
+// state to exercise, so the live path returns the same static analysis. It is
+// reported with mode "analysis" so the UI never implies a validator tx ran.
 async function live(ctx: LiveContext): Promise<ScenarioResult> {
   return heuristic({ profile: ctx.profile });
 }
