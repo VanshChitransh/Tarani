@@ -1,6 +1,7 @@
 import type { CompatibilityEvidence, VenueCompatibilityResult } from "@tarani/shared";
 import type { VenueAdapter, AdapterInput } from "./types";
 import { evaluateRule } from "./evaluator";
+import { reconcileProbe } from "./probeReconcile";
 import { PRELAUNCH_MINT_SENTINEL } from "../prelaunch";
 
 const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
@@ -43,7 +44,7 @@ export async function runJupiterCompatibility(
 
   const probeEvidence: CompatibilityEvidence = {
     kind: "probe",
-    reference: "Jupiter Quote API v6",
+    reference: "Jupiter Quote API (lite-api v1)",
     snippet:
       probeResult === "route_available"
         ? "Jupiter Quote API returned a valid swap route for this mint."
@@ -51,11 +52,6 @@ export async function runJupiterCompatibility(
     observedAt: new Date().toISOString(),
   };
 
-  const evidence = [...base.evidence, probeEvidence];
-
-  if (probeResult === "no_route" && base.status === "supported") {
-    return { ...base, source: "probe", status: "partial", evidence };
-  }
-
-  return { ...base, source: "probe", evidence };
+  const presence = probeResult === "route_available" ? "exists" : "absent";
+  return reconcileProbe(base, presence, probeEvidence);
 }

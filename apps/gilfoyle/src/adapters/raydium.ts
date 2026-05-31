@@ -1,6 +1,7 @@
 import type { CompatibilityEvidence, VenueCompatibilityResult } from "@tarani/shared";
 import type { VenueAdapter, AdapterInput } from "./types";
 import { evaluateRule } from "./evaluator";
+import { reconcileProbe } from "./probeReconcile";
 import { PRELAUNCH_MINT_SENTINEL } from "../prelaunch";
 
 // Mint-scoped v3 endpoint: returns only pools containing this mint (~few KB, sub-second).
@@ -50,13 +51,14 @@ export async function runRaydiumCompatibility(
 
   const probeEvidence: CompatibilityEvidence = {
     kind: "probe",
-    reference: "Raydium Pairs API v2",
+    reference: "Raydium Pools API v3",
     snippet:
       probeResult === "pool_exists"
-        ? "A Raydium liquidity pool exists for this mint."
+        ? "A live Raydium liquidity pool exists for this mint."
         : "No Raydium liquidity pool found for this mint.",
     observedAt: new Date().toISOString(),
   };
 
-  return { ...base, source: "probe", evidence: [...base.evidence, probeEvidence] };
+  const presence = probeResult === "pool_exists" ? "exists" : "absent";
+  return reconcileProbe(base, presence, probeEvidence);
 }

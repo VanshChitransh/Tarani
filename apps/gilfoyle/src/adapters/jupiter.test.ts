@@ -72,6 +72,15 @@ describe("jupiterAdapter", () => {
     expect(venueCompatibilityResultSchema.safeParse(result).success).toBe(true);
   });
 
+  // A live swap route is ground truth: it overrides the rule's "blocked" verdict (the C1 fix).
+  it("upgrades blocked -> supported when the probe finds a route", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({ outAmount: "123" })));
+    const result = await jupiterAdapter.evaluate({ profile: baseProfile, rule: baseRule });
+    expect(result.status).toBe("supported");
+    expect(result.source).toBe("probe");
+    expect(result.evidence.some((e) => e.kind === "probe")).toBe(true);
+  });
+
   it("returns supported when profile has no extensions and the probe is unavailable", async () => {
     const profile = { ...baseProfile, extensions: [] };
     const result = await jupiterAdapter.evaluate({ profile, rule: baseRule });

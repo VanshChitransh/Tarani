@@ -75,12 +75,34 @@ export function aggregateConfidence(
   }, "high");
 }
 
+// Multiple features in one venue rule often cite the same source URL or note, which
+// would otherwise repeat 4-8x in a single venue result. Dedupe so each unique source
+// (by kind + reference) and each unique note appears once.
 function collectEvidence(verdicts: FeatureVerdict[]): CompatibilityEvidence[] {
-  return verdicts.flatMap((v) => v.evidence);
+  const seen = new Set<string>();
+  const out: CompatibilityEvidence[] = [];
+  for (const v of verdicts) {
+    for (const e of v.evidence) {
+      const key = `${e.kind}::${e.reference}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push(e);
+    }
+  }
+  return out;
 }
 
 function collectNotes(verdicts: FeatureVerdict[]): string[] {
-  return verdicts.flatMap((v) => v.notes);
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const v of verdicts) {
+    for (const n of v.notes) {
+      if (seen.has(n)) continue;
+      seen.add(n);
+      out.push(n);
+    }
+  }
+  return out;
 }
 
 function buildFeatureStatus(verdicts: FeatureVerdict[]): VenueFeatureStatus {

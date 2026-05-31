@@ -174,28 +174,89 @@ describe("checkMetadataAuthorityLive", () => {
 
 // --- Extension checks ---
 
+const HOOK_PROGRAM = { transferHook: { program_id: "Hook11111111111111111111111111111111111111" } };
+
 describe("checkNonTransferableWithHook", () => {
-  it("fires when both nonTransferable and transferHook are present", () => {
-    const profile = withExtensions(["nonTransferable", "transferHook"]);
+  // The program does NOT reject this pair; with a real hook program the hook is just inert on a
+  // soulbound mint. LOW-severity "redundant config" finding, not a CRITICAL incompatibility.
+  it("fires as a low-severity inert-hook finding when a configured hook is present", () => {
+    const profile = withExtensions(["nonTransferable", "transferHook"], HOOK_PROGRAM);
     const findings = scoreRisk(profile, NO_COMPAT);
-    expect(findings.some((f) => f.id === "incompatible-non-transferable-hook")).toBe(true);
-    expect(findings.find((f) => f.id === "incompatible-non-transferable-hook")?.severity).toBe(
-      "critical",
-    );
+    expect(findings.some((f) => f.id === "non-transferable-hook-inert")).toBe(true);
+    expect(findings.find((f) => f.id === "non-transferable-hook-inert")?.severity).toBe("low");
   });
 
   it("does NOT fire when only one of the pair is present", () => {
     const profile = withExtensions(["nonTransferable"]);
     const findings = scoreRisk(profile, NO_COMPAT);
-    expect(findings.some((f) => f.id === "incompatible-non-transferable-hook")).toBe(false);
+    expect(findings.some((f) => f.id === "non-transferable-hook-inert")).toBe(false);
   });
 });
 
 describe("checkConfidentialTransferWithHook", () => {
-  it("fires when confidentialTransferMint and transferHook are both present", () => {
-    const profile = withExtensions(["confidentialTransferMint", "transferHook"]);
+  // Supported combination — the hook is invoked with u64::MAX. Informational, not critical.
+  it("fires as an info-severity amount-blind finding when a configured hook is present", () => {
+    const profile = withExtensions(["confidentialTransferMint", "transferHook"], HOOK_PROGRAM);
     const findings = scoreRisk(profile, NO_COMPAT);
-    expect(findings.some((f) => f.id === "incompatible-confidential-hook")).toBe(true);
+    const f = findings.find((x) => x.id === "confidential-hook-amount-blind");
+    expect(f).toBeDefined();
+    expect(f?.severity).toBe("info");
+  });
+});
+
+describe("checkTransferHookUnconfigured", () => {
+  // M4: a transferHook slot with programId null is a no-op, not an active hook risk.
+  it("fires INFO when transferHook is present but has no program set", () => {
+    const profile = withExtensions(["confidentialTransferMint", "transferHook"]); // no program_id
+    const findings = scoreRisk(profile, NO_COMPAT);
+    const f = findings.find((x) => x.id === "transfer-hook-unconfigured");
+    expect(f).toBeDefined();
+    expect(f?.severity).toBe("info");
+    // The configured-hook finding should NOT fire when the hook is unconfigured.
+    expect(findings.some((x) => x.id === "confidential-hook-amount-blind")).toBe(false);
+  });
+
+  it("does NOT fire when a real hook program is configured", () => {
+    const profile = withExtensions(["transferHook"], HOOK_PROGRAM);
+    const findings = scoreRisk(profile, NO_COMPAT);
+    expect(findings.some((f) => f.id === "transfer-hook-unconfigured")).toBe(false);
+  });
+});
+
+describe("checkScaledUiWithInterestBearing", () => {
+  // The ONE genuine mutual exclusion enforced by the program at mint init.
+  it("fires CRITICAL when both scaledUiAmountConfig and interestBearingConfig are present", () => {
+    const profile = withExtensions(["scaledUiAmountConfig", "interestBearingConfig"]);
+    const findings = scoreRisk(profile, NO_COMPAT);
+    const f = findings.find((x) => x.id === "incompatible-scaled-ui-interest-bearing");
+    expect(f).toBeDefined();
+    expect(f?.severity).toBe("critical");
+  });
+
+  it("does NOT fire when only one of the pair is present", () => {
+    const profile = withExtensions(["scaledUiAmountConfig"]);
+    const findings = scoreRisk(profile, NO_COMPAT);
+    expect(findings.some((f) => f.id === "incompatible-scaled-ui-interest-bearing")).toBe(false);
+  });
+});
+
+describe("checkConfidentialFeeRequiresFeeConfig", () => {
+  it("fires CRITICAL when confidential + fee lack the required ConfidentialTransferFeeConfig", () => {
+    const profile = withExtensions(["confidentialTransferMint", "transferFeeConfig"]);
+    const findings = scoreRisk(profile, NO_COMPAT);
+    const f = findings.find((x) => x.id === "confidential-fee-missing-fee-config");
+    expect(f).toBeDefined();
+    expect(f?.severity).toBe("critical");
+  });
+
+  it("does NOT fire when ConfidentialTransferFeeConfig is present (correctly configured)", () => {
+    const profile = withExtensions([
+      "confidentialTransferMint",
+      "transferFeeConfig",
+      "confidentialTransferFeeConfig",
+    ]);
+    const findings = scoreRisk(profile, NO_COMPAT);
+    expect(findings.some((f) => f.id === "confidential-fee-missing-fee-config")).toBe(false);
   });
 });
 

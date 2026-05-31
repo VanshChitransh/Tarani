@@ -1,6 +1,7 @@
 import type { CompatibilityEvidence, VenueCompatibilityResult } from "@tarani/shared";
 import type { VenueAdapter, AdapterInput } from "./types";
 import { evaluateRule } from "./evaluator";
+import { reconcileProbe } from "./probeReconcile";
 import { PRELAUNCH_MINT_SENTINEL } from "../prelaunch";
 
 const ORCA_WHIRLPOOL_LIST_API = "https://api.mainnet.orca.so/v1/whirlpool/list";
@@ -90,12 +91,6 @@ export async function runOrcaCompatibility(
     observedAt: new Date().toISOString(),
   };
 
-  const evidence = [...base.evidence, probeEvidence];
-
-  // A live pool proves the conditional setup has actually been done: upgrade to supported.
-  if (probeResult === "pool_exists" && base.status === "conditional") {
-    return { ...base, source: "probe", status: "supported", evidence };
-  }
-
-  return { ...base, source: "probe", evidence };
+  const presence = probeResult === "pool_exists" ? "exists" : "absent";
+  return reconcileProbe(base, presence, probeEvidence);
 }

@@ -78,6 +78,19 @@ describe("raydiumAdapter", () => {
     const result = await raydiumAdapter.evaluate({ profile, rule: baseRule });
     expect(result.status).toBe("supported");
   });
+
+  // A live pool is ground truth: it overrides the rule's "blocked" verdict (the C1 fix —
+  // e.g. xStocks/NVDAx trade on Raydium via permissioned pools despite the permissionless rule).
+  it("upgrades blocked -> supported when a live pool exists", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(Response.json({ success: true, data: { count: 1, data: [{}] } })),
+    );
+    const result = await raydiumAdapter.evaluate({ profile: baseProfile, rule: baseRule });
+    expect(result.status).toBe("supported");
+    expect(result.source).toBe("probe");
+    expect(result.evidence.some((e) => e.kind === "probe")).toBe(true);
+  });
 });
 
 describe("probeRaydiumPool", () => {

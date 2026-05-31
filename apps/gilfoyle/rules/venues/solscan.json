@@ -8,8 +8,8 @@
       "status": "supported",
       "confidence": "high",
       "evidence": [
-        "https://info.solscan.io/exploring-token-details-page/",
-        "https://github.com/solana-labs/solana/blob/master/account-decoder/src/parse_token_extension.rs"
+        "https://solana.com/docs/tokens/extensions",
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
       ],
       "notes": [
         "Token details page has a dedicated Extensions tab; transfer fee config is parsed by the jsonParsed RPC decoder Solscan consumes."
@@ -20,7 +20,7 @@
       "status": "supported",
       "confidence": "high",
       "evidence": [
-        "https://github.com/solana-labs/solana/blob/master/account-decoder/src/parse_token_extension.rs"
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
       ],
       "notes": ["Hook program address rendered in the extensions panel."]
     },
@@ -29,7 +29,7 @@
       "status": "supported",
       "confidence": "high",
       "evidence": [
-        "https://github.com/solana-labs/solana/blob/master/account-decoder/src/parse_token_extension.rs"
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
       ],
       "notes": ["DefaultAccountState parsed and shown."]
     },
@@ -39,7 +39,7 @@
       "confidence": "high",
       "evidence": [
         "https://chainstack.com/solana-token-2022-utility-extensions/",
-        "https://github.com/solana-labs/solana/blob/master/account-decoder/src/parse_token_extension.rs"
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
       ],
       "notes": ["Permanent delegate address visible in the extensions section."]
     },
@@ -48,7 +48,7 @@
       "status": "supported",
       "confidence": "high",
       "evidence": [
-        "https://github.com/solana-labs/solana/blob/master/account-decoder/src/parse_token_extension.rs"
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
       ],
       "notes": ["NonTransferable flag rendered."]
     },
@@ -57,8 +57,8 @@
       "status": "supported",
       "confidence": "high",
       "evidence": [
-        "https://github.com/solana-labs/solana/blob/master/account-decoder/src/parse_token_extension.rs",
-        "https://info.solscan.io/exploring-token-details-page/"
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs",
+        "https://solana.com/docs/tokens/extensions"
       ],
       "notes": ["Interest rate / config fields parsed and shown."]
     },
@@ -67,7 +67,7 @@
       "status": "supported",
       "confidence": "high",
       "evidence": [
-        "https://github.com/solana-labs/solana/blob/master/account-decoder/src/parse_token_extension.rs"
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
       ],
       "notes": ["Account-level CpiGuard parsed."]
     },
@@ -76,7 +76,7 @@
       "status": "supported",
       "confidence": "high",
       "evidence": [
-        "https://github.com/solana-labs/solana/blob/master/account-decoder/src/parse_token_extension.rs"
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
       ],
       "notes": ["Account-level MemoTransfer (require incoming memos) parsed."]
     },
@@ -85,7 +85,7 @@
       "status": "partial",
       "confidence": "high",
       "evidence": [
-        "https://github.com/solana-labs/solana/blob/master/account-decoder/src/parse_token_extension.rs",
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs",
         "https://solana.com/docs/tokens/extensions/confidential-transfer"
       ],
       "notes": [
@@ -97,7 +97,7 @@
       "status": "partial",
       "confidence": "high",
       "evidence": [
-        "https://github.com/solana-labs/solana/blob/master/account-decoder/src/parse_token_extension.rs",
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs",
         "https://solana.com/docs/tokens/extensions/confidential-transfer"
       ],
       "notes": [
@@ -109,7 +109,7 @@
       "status": "supported",
       "confidence": "high",
       "evidence": [
-        "https://github.com/solana-labs/solana/blob/master/account-decoder/src/parse_token_extension.rs"
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
       ],
       "notes": ["Metadata pointer authority and metadata address rendered."]
     },
@@ -118,8 +118,8 @@
       "status": "supported",
       "confidence": "high",
       "evidence": [
-        "https://github.com/solana-labs/solana/blob/master/account-decoder/src/parse_token_extension.rs",
-        "https://info.solscan.io/exploring-token-details-page/"
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs",
+        "https://solana.com/docs/tokens/extensions"
       ],
       "notes": ["On-chain name/symbol/URI/additional metadata parsed and used for token display."]
     },
@@ -128,7 +128,7 @@
       "status": "supported",
       "confidence": "high",
       "evidence": [
-        "https://github.com/solana-labs/solana/blob/master/account-decoder/src/parse_token_extension.rs"
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
       ],
       "notes": ["GroupPointer parsed by the upstream decoder."]
     },
@@ -137,7 +137,7 @@
       "status": "supported",
       "confidence": "medium",
       "evidence": [
-        "https://github.com/solana-labs/solana/blob/master/account-decoder/src/parse_token_extension.rs"
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
       ],
       "notes": [
         "TokenGroup parsed by the jsonParsed decoder; dedicated Solscan label not separately documented but raw fields available."
@@ -148,7 +148,7 @@
       "status": "supported",
       "confidence": "high",
       "evidence": [
-        "https://github.com/solana-labs/solana/blob/master/account-decoder/src/parse_token_extension.rs"
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
       ],
       "notes": ["GroupMemberPointer parsed."]
     },
@@ -157,7 +157,7 @@
       "status": "supported",
       "confidence": "medium",
       "evidence": [
-        "https://github.com/solana-labs/solana/blob/master/account-decoder/src/parse_token_extension.rs"
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
       ],
       "notes": ["TokenGroupMember parsed by the jsonParsed decoder."]
     },
@@ -166,7 +166,7 @@
       "status": "supported",
       "confidence": "high",
       "evidence": [
-        "https://github.com/solana-labs/solana/blob/master/account-decoder/src/parse_token_extension.rs"
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
       ],
       "notes": ["Close authority rendered."]
     },
@@ -184,7 +184,7 @@
       "status": "supported",
       "confidence": "medium",
       "evidence": [
-        "https://github.com/solana-program/token-2022/blob/main/program/src/extension/mod.rs"
+        "https://github.com/solana-program/token-2022/blob/main/interface/src/extension/mod.rs"
       ],
       "notes": [
         "PausableConfig is a recent extension shown as an extension/raw field; Solscan-specific dedicated rendering not separately documented."
@@ -195,7 +195,7 @@
       "status": "supported",
       "confidence": "medium",
       "evidence": [
-        "https://github.com/solana-labs/solana/blob/master/account-decoder/src/parse_token_extension.rs"
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
       ],
       "notes": [
         "The jsonParsed decoder returns UnparseableExtension for unrecognized types rather than failing, so Solscan can still list an unknown extension's presence."

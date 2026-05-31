@@ -18,9 +18,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ mint: s
   const profile = parseMintProfile(asset);
   const results = await runCompatibilityEngine(profile);
 
-  const supportedCount = results.filter(
-    (r) => r.status === "supported" || r.status === "partial",
-  ).length;
+  // "Supported" means fully supported only — do NOT count partial/conditional, which
+  // previously inflated the badge (e.g. explorers that merely *render* a token were
+  // counted as supporting venues). The "X/Y venues" figure now reflects real support.
+  const supportedCount = results.filter((r) => r.status === "supported").length;
   const blockedCount = results.filter((r) => r.status === "blocked").length;
   const totalCount = results.length;
 

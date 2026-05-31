@@ -94,7 +94,7 @@
       "id": "defaultAccountState",
       "status": "conditional",
       "confidence": "low",
-      "evidence": ["https://solana.com/docs/tokens/extensions/default-account-state"],
+      "evidence": ["https://solana.com/docs/tokens/extensions/default-state"],
       "notes": ["If accounts default to frozen, sends fail until thawed (mechanical inference)."]
     },
     {

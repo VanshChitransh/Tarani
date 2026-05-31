@@ -10,7 +10,7 @@
       "confidence": "high",
       "evidence": [
         "https://discuss.jup.ag/t/archived-jupiter-token-2022-support/21711",
-        "https://station.jup.ag/guides/jupiter-swap/swap"
+        "https://developers.jup.ag/docs/swap/build-swap-transaction"
       ],
       "notes": [
         "Jupiter swap routes transfer-fee tokens; the fee is deducted from the received amount and quotes account for it."
@@ -45,7 +45,7 @@
       "status": "partial",
       "confidence": "medium",
       "evidence": [
-        "https://station.jup.ag/guides/jupiter-swap/swap",
+        "https://developers.jup.ag/docs/swap/build-swap-transaction",
         "https://neodyme.io/en/blog/token-2022/"
       ],
       "notes": [
@@ -139,7 +139,9 @@
       "id": "metadataPointer",
       "status": "supported",
       "confidence": "high",
-      "evidence": ["https://developers.jup.ag/docs/guides/how-to-get-token-information"],
+      "evidence": [
+        "https://support.jup.ag/hc/en-us/articles/22634616157340-Are-all-kinds-of-tokens-supported-on-Instant-Limit-and-Recurring"
+      ],
       "notes": [
         "Display/metadata-only; does not affect transfers. Jupiter reads it for token info."
       ]
@@ -148,7 +150,9 @@
       "id": "tokenMetadata",
       "status": "supported",
       "confidence": "high",
-      "evidence": ["https://developers.jup.ag/docs/guides/how-to-get-token-information"],
+      "evidence": [
+        "https://support.jup.ag/hc/en-us/articles/22634616157340-Are-all-kinds-of-tokens-supported-on-Instant-Limit-and-Recurring"
+      ],
       "notes": ["On-chain metadata extension; display-only, no transfer impact."]
     },
     {
