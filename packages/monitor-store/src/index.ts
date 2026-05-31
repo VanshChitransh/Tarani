@@ -20,6 +20,8 @@ export {
   listWebhooks,
   removeWebhook,
   checkRateLimit,
+  saveNonce,
+  consumeNonce,
 } from "./store";
 export type { ReportHistoryEntry } from "./store";
 export { postToWebhooks, dispatchToWebhooks } from "./dispatch";

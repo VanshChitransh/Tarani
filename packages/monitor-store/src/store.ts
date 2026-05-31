@@ -229,3 +229,28 @@ export async function checkRateLimit(
 
   return inserted > 0;
 }
+
+// ── auth nonces (single-use, expiring) ──────────────────────────────────────────
+
+export async function saveNonce(nonce: string, issuedAt: number): Promise<void> {
+  await db()
+    .prepare("INSERT INTO auth_nonces (nonce, issued_at) VALUES (?, ?)")
+    .run(nonce, issuedAt);
+}
+
+/**
+ * Consume a sign-in nonce: returns true only if it existed AND is within
+ * maxAgeMs. The nonce is deleted regardless (single use), so a replayed or
+ * brute-forced nonce can never be reused. Also purges expired nonces.
+ */
+export async function consumeNonce(nonce: string, maxAgeMs: number): Promise<boolean> {
+  const d = db();
+  const now = Date.now();
+  const row = (await d.prepare("SELECT issued_at FROM auth_nonces WHERE nonce = ?").get(nonce)) as
+    | { issued_at: number }
+    | undefined;
+  await d.prepare("DELETE FROM auth_nonces WHERE nonce = ?").run(nonce);
+  await d.prepare("DELETE FROM auth_nonces WHERE issued_at < ?").run(now - maxAgeMs);
+  if (!row) return false;
+  return now - row.issued_at <= maxAgeMs;
+}

@@ -55,6 +55,11 @@ const CREATE_TABLES_SQL = `
 
   CREATE INDEX IF NOT EXISTS idx_rate_limit_hits_key
     ON rate_limit_hits (bucket_key, ts);
+
+  CREATE TABLE IF NOT EXISTS auth_nonces (
+    nonce TEXT PRIMARY KEY,
+    issued_at INTEGER NOT NULL
+  );
 `;
 
 export async function initDb(db: DbDriver): Promise<DbDriver> {
