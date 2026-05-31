@@ -3,9 +3,10 @@ import "./globals.css";
 import Nav from "../components/Nav";
 import { Providers } from "../components/Providers";
 
-// Runs before first paint to apply the saved (or system) theme, avoiding a
-// flash of the wrong theme. Kept as a raw string so it ships inline in <head>.
-const themeInit = `(function(){try{var t=localStorage.getItem("theme");var d=t?t==="dark":matchMedia("(prefers-color-scheme:dark)").matches;document.documentElement.classList.toggle("dark",d);}catch(e){}})();`;
+// Runs before first paint to apply the saved theme, avoiding a flash of the
+// wrong theme. Defaults to light when nothing is saved (ignores OS preference).
+// Kept as a raw string so it ships inline in <head>.
+const themeInit = `(function(){try{var t=localStorage.getItem("theme");var d=t==="dark";document.documentElement.classList.toggle("dark",d);}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
