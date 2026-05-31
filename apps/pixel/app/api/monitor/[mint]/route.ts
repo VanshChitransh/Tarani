@@ -2,6 +2,14 @@ import { NextResponse } from "next/server";
 import { monitorDetailResponseSchema, type ApiError, type ApiErrorCode } from "@tarani/shared";
 import { getMint, removeMint, getLatestSnapshot, getLatestDiff } from "@tarani/monitor-store";
 import { ensureDb } from "../../../../src/lib/db";
+import { getAuthedAddress } from "../../../../src/lib/auth";
+
+function unauthorized() {
+  return NextResponse.json(
+    { ok: false, error: { message: "Sign in with your wallet" } },
+    { status: 401 },
+  );
+}
 
 const ERROR_HTTP_STATUS: Record<ApiErrorCode, number> = {
   BAD_REQUEST: 400,
@@ -16,10 +24,12 @@ function errorResponse(error: ApiError) {
   return NextResponse.json({ ok: false, error }, { status: ERROR_HTTP_STATUS[error.code] });
 }
 
-export async function GET(_req: Request, { params }: { params: Promise<{ mint: string }> }) {
+export async function GET(req: Request, { params }: { params: Promise<{ mint: string }> }) {
   await ensureDb();
+  const address = getAuthedAddress(req);
+  if (!address) return unauthorized();
   const { mint } = await params;
-  const record = await getMint(mint);
+  const record = await getMint(address, mint);
   if (!record) {
     return errorResponse({ code: "NOT_FOUND", message: "Mint not monitored" });
   }
@@ -34,14 +44,16 @@ export async function GET(_req: Request, { params }: { params: Promise<{ mint: s
   return NextResponse.json(body);
 }
 
-export async function DELETE(_req: Request, { params }: { params: Promise<{ mint: string }> }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ mint: string }> }) {
   await ensureDb();
+  const address = getAuthedAddress(req);
+  if (!address) return unauthorized();
   const { mint } = await params;
-  const record = await getMint(mint);
+  const record = await getMint(address, mint);
   if (!record) {
     return errorResponse({ code: "NOT_FOUND", message: "Mint not monitored" });
   }
 
-  await removeMint(mint);
+  await removeMint(address, mint);
   return NextResponse.json({ ok: true, data: { removed: mint } });
 }

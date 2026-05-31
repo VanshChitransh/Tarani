@@ -9,6 +9,7 @@ import {
 import { addMint, listMints } from "@tarani/monitor-store";
 import { ensureDb } from "../../../src/lib/db";
 import { checkRateLimit, getClientIp } from "../../../src/lib/rateLimiter";
+import { getAuthedAddress } from "../../../src/lib/auth";
 
 const MAX_BODY_BYTES = 10_240;
 
@@ -33,6 +34,14 @@ export async function POST(req: Request) {
     return errorResponse({ code: "BAD_REQUEST", message: "Request body too large" });
   }
 
+  const address = getAuthedAddress(req);
+  if (!address) {
+    return NextResponse.json(
+      { ok: false, error: { message: "Sign in with your wallet to track mints" } },
+      { status: 401 },
+    );
+  }
+
   const ip = getClientIp(req);
   if (!(await checkRateLimit(`monitor:${ip}`, 20, 60_000))) {
     return errorResponse({ code: "RATE_LIMITED", message: "Too many requests" });
@@ -45,7 +54,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const record = await addMint(parsed.data.mint, parsed.data.subscriberId);
+    const record = await addMint(address, parsed.data.mint);
     const body = monitorResponseSchema.parse({
       ok: true,
       data: { subscriptionId: record.subscriptionId, mint: record.mint },
@@ -62,9 +71,16 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(req: Request) {
   await ensureDb();
-  const mints = await listMints();
+  const address = getAuthedAddress(req);
+  if (!address) {
+    return NextResponse.json(
+      { ok: false, error: { message: "Sign in with your wallet to view tracked mints" } },
+      { status: 401 },
+    );
+  }
+  const mints = await listMints(address);
   const body = monitorListResponseSchema.parse({ ok: true, data: mints });
   return NextResponse.json(body);
 }

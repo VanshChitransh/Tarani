@@ -6,7 +6,7 @@ import {
   diffCompatibility,
 } from "@tarani/gilfoyle";
 import {
-  listMints,
+  listDistinctMints,
   getLatestSnapshot,
   saveSnapshot,
   saveDiff,
@@ -57,12 +57,12 @@ export async function GET(request: Request) {
   try {
     await ensureDb();
 
-    const mints = await listMints();
+    const mints = await listDistinctMints();
     if (mints.length === 0) {
       return NextResponse.json({ ok: true, data: { rechecked: 0 } });
     }
 
-    const results = await Promise.allSettled(mints.map((r) => recheckMint(r.mint)));
+    const results = await Promise.allSettled(mints.map((mint) => recheckMint(mint)));
 
     const failed = results.filter((r) => r.status === "rejected").length;
     const rechecked = results.length - failed;

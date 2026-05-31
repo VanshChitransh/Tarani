@@ -8,6 +8,7 @@ import {
   getMint,
   removeMint,
   listMints,
+  listDistinctMints,
   saveSnapshot,
   getLatestSnapshot,
   saveDiff,
@@ -16,6 +17,8 @@ import {
   listWebhooks,
   removeWebhook,
 } from "./store";
+
+const SUB = "Wa11etAAA1111111111111111111111111111111111";
 
 beforeEach(async () => {
   const driver = createBetterSqlite3Driver(new Database(":memory:"));
@@ -29,19 +32,19 @@ describe("addMint / getMint", () => {
   const MINT = "So11111111111111111111111111111111111111112";
 
   it("addMint returns a MonitorRecord with correct mint and non-empty subscriptionId", async () => {
-    const record = await addMint(MINT);
+    const record = await addMint(SUB, MINT);
     expect(record.mint).toBe(MINT);
     expect(record.subscriptionId.length).toBeGreaterThan(0);
     expect(record.lastCheckedAt).toBeNull();
   });
 
   it("getMint returns null for an unknown mint address", async () => {
-    expect(await getMint("unknownmintaddressunknownmintaddressunknown")).toBeNull();
+    expect(await getMint(SUB, "unknownmintaddressunknownmintaddressunknown")).toBeNull();
   });
 
   it("addMint twice with same mint is idempotent — returns existing record", async () => {
-    const first = await addMint(MINT);
-    const second = await addMint(MINT);
+    const first = await addMint(SUB, MINT);
+    const second = await addMint(SUB, MINT);
     expect(second.subscriptionId).toBe(first.subscriptionId);
     expect(second.addedAt).toBe(first.addedAt);
   });
@@ -54,20 +57,55 @@ describe("removeMint / listMints", () => {
   const MINT_B = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 
   it("removeMint removes the record — subsequent getMint returns null", async () => {
-    await addMint(MINT_A);
-    await removeMint(MINT_A);
-    expect(await getMint(MINT_A)).toBeNull();
+    await addMint(SUB, MINT_A);
+    await removeMint(SUB, MINT_A);
+    expect(await getMint(SUB, MINT_A)).toBeNull();
   });
 
   it("listMints returns all added mints in insertion order", async () => {
-    await addMint(MINT_A);
-    await addMint(MINT_B);
-    const mints = await listMints();
+    await addMint(SUB, MINT_A);
+    await addMint(SUB, MINT_B);
+    const mints = await listMints(SUB);
     expect(mints.map((m) => m.mint)).toEqual([MINT_A, MINT_B]);
   });
 
   it("listMints returns empty array when no mints added", async () => {
-    expect(await listMints()).toEqual([]);
+    expect(await listMints(SUB)).toEqual([]);
+  });
+});
+
+// ── per-subscriber isolation ─────────────────────────────────────────────────
+
+describe("per-subscriber isolation", () => {
+  const ALICE = "A1iceeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee";
+  const BOB = "B0bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+  const MINT = "So11111111111111111111111111111111111111112";
+
+  it("each subscriber only sees their own mints", async () => {
+    await addMint(ALICE, MINT);
+    expect((await listMints(ALICE)).map((m) => m.mint)).toEqual([MINT]);
+    expect(await listMints(BOB)).toEqual([]);
+  });
+
+  it("two subscribers can track the same mint independently", async () => {
+    await addMint(ALICE, MINT);
+    await addMint(BOB, MINT);
+    expect(await getMint(ALICE, MINT)).not.toBeNull();
+    expect(await getMint(BOB, MINT)).not.toBeNull();
+  });
+
+  it("removing a mint for one subscriber leaves the other's intact", async () => {
+    await addMint(ALICE, MINT);
+    await addMint(BOB, MINT);
+    await removeMint(ALICE, MINT);
+    expect(await getMint(ALICE, MINT)).toBeNull();
+    expect(await getMint(BOB, MINT)).not.toBeNull();
+  });
+
+  it("listDistinctMints returns the deduped union across subscribers", async () => {
+    await addMint(ALICE, MINT);
+    await addMint(BOB, MINT);
+    expect(await listDistinctMints()).toEqual([MINT]);
   });
 });
 

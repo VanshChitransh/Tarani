@@ -23,6 +23,7 @@ function db(): DbDriver {
 
 type MintRow = {
   subscription_id: string;
+  subscriber_id: string;
   mint: string;
   added_at: string;
   last_checked_at: string | null;
@@ -37,45 +38,60 @@ function rowToRecord(row: MintRow): MonitorRecord {
   };
 }
 
-export async function addMint(mint: string, subscriptionId?: string): Promise<MonitorRecord> {
+export async function addMint(subscriberId: string, mint: string): Promise<MonitorRecord> {
   const d = db();
 
-  const existing = await getMint(mint);
+  const existing = await getMint(subscriberId, mint);
   if (existing) return existing;
 
-  const countRow = (await d.prepare("SELECT COUNT(*) as n FROM monitored_mints").get()) as {
-    n: number;
-  };
+  // MAX_MONITORED_MINTS is enforced per subscriber, not globally.
+  const countRow = (await d
+    .prepare("SELECT COUNT(*) as n FROM monitored_mints WHERE subscriber_id = ?")
+    .get(subscriberId)) as { n: number };
   if (countRow.n >= MAX_MINTS) throw new Error("MAX_MONITORED_MINTS_EXCEEDED");
 
-  const id = subscriptionId ?? randomUUID();
+  const id = randomUUID();
   const addedAt = new Date().toISOString();
 
   await d
     .prepare(
-      "INSERT INTO monitored_mints (subscription_id, mint, added_at, last_checked_at) VALUES (?, ?, ?, NULL)",
+      "INSERT INTO monitored_mints (subscription_id, subscriber_id, mint, added_at, last_checked_at) VALUES (?, ?, ?, ?, NULL)",
     )
-    .run(id, mint, addedAt);
+    .run(id, subscriberId, mint, addedAt);
 
   return { subscriptionId: id, mint, addedAt, lastCheckedAt: null };
 }
 
-export async function removeMint(mint: string): Promise<void> {
-  await db().prepare("DELETE FROM monitored_mints WHERE mint = ?").run(mint);
+export async function removeMint(subscriberId: string, mint: string): Promise<void> {
+  await db()
+    .prepare("DELETE FROM monitored_mints WHERE subscriber_id = ? AND mint = ?")
+    .run(subscriberId, mint);
 }
 
-export async function getMint(mint: string): Promise<MonitorRecord | null> {
-  const row = (await db().prepare("SELECT * FROM monitored_mints WHERE mint = ?").get(mint)) as
-    | MintRow
-    | undefined;
+export async function getMint(subscriberId: string, mint: string): Promise<MonitorRecord | null> {
+  const row = (await db()
+    .prepare("SELECT * FROM monitored_mints WHERE subscriber_id = ? AND mint = ?")
+    .get(subscriberId, mint)) as MintRow | undefined;
   return row ? rowToRecord(row) : null;
 }
 
-export async function listMints(): Promise<MonitorRecord[]> {
+export async function listMints(subscriberId: string): Promise<MonitorRecord[]> {
   const rows = (await db()
-    .prepare("SELECT * FROM monitored_mints ORDER BY added_at ASC")
-    .all()) as MintRow[];
+    .prepare("SELECT * FROM monitored_mints WHERE subscriber_id = ? ORDER BY added_at ASC")
+    .all(subscriberId)) as MintRow[];
   return rows.map(rowToRecord);
+}
+
+/**
+ * The distinct set of mints tracked by anyone — used by the recheck/cron
+ * machinery so a mint watched by N users is fetched and snapshotted once, not N
+ * times. Compatibility snapshots/diffs are per-mint (identical for everyone).
+ */
+export async function listDistinctMints(): Promise<string[]> {
+  const rows = (await db().prepare("SELECT DISTINCT mint FROM monitored_mints").all()) as {
+    mint: string;
+  }[];
+  return rows.map((r) => r.mint);
 }
 
 export async function updateLastChecked(mint: string, checkedAt: string): Promise<void> {

@@ -5,7 +5,7 @@ import {
   diffCompatibility,
 } from "@tarani/gilfoyle";
 import {
-  listMints,
+  listDistinctMints,
   getLatestSnapshot,
   saveSnapshot,
   saveDiff,
@@ -52,12 +52,12 @@ async function recheckMint(mint: string): Promise<void> {
 }
 
 export async function tick(): Promise<void> {
-  const mints = await listMints();
+  const mints = await listDistinctMints();
 
-  // Evict failure counters for mints that are no longer tracked. Without this
-  // the map grows without bound over the process lifetime as mints are added
-  // and removed (the entry for a removed mint would otherwise live forever).
-  const active = new Set(mints.map((r) => r.mint));
+  // Evict failure counters for mints that are no longer tracked by anyone.
+  // Without this the map grows without bound over the process lifetime as mints
+  // are added and removed (the entry for a removed mint would otherwise live forever).
+  const active = new Set(mints);
   for (const key of failureCounts.keys()) {
     if (!active.has(key)) failureCounts.delete(key);
   }
@@ -67,7 +67,7 @@ export async function tick(): Promise<void> {
     return;
   }
   console.log(`[sentinel] Rechecking ${mints.length} mint(s)...`);
-  await Promise.allSettled(mints.map((r) => recheckMint(r.mint)));
+  await Promise.allSettled(mints.map((mint) => recheckMint(mint)));
 }
 
 export async function runRecheckLoop(intervalMs: number): Promise<void> {

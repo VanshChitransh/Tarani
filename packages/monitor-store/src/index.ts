@@ -8,6 +8,7 @@ export {
   removeMint,
   getMint,
   listMints,
+  listDistinctMints,
   updateLastChecked,
   saveSnapshot,
   getLatestSnapshot,
