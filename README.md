@@ -28,66 +28,68 @@ The thesis: SPL **Token-2022** ships ~20 mint extensions (transfer fees, transfe
 Tarani is a **Bun workspace monorepo** of four applications and three packages. A single contract package (`@tarani/shared`) defines every Zod schema and type; every other module is a typed consumer of it. The system converges on one canonical payload — the **`AnalyzeReport`**.
 
 ```
-                         ┌──────────────────────────────────────────────┐
-   Browser / README      │  apps/pixel  (Next.js 15, App Router)         │
-   badge / webhook  ───▶ │  ─ pages: /, /report/[mint], /prelaunch,      │
-                         │           /dashboard                          │
-                         │  ─ /api/*: analyze, simulate, badge, auth,    │
-                         │           monitor, webhooks, sentinel/tick    │
-                         └───────┬───────────────────────────┬──────────┘
-                in-process import │                           │ HTTP (server-side proxy)
-                                  ▼                           ▼
-                  ┌──────────────────────────────┐   ┌────────────────────────────┐
-                  │  apps/gilfoyle               │   │  apps/kotler               │
-                  │  COMPATIBILITY ENGINE        │   │  LIVE SIMULATION WORKER    │
-                  │  helius → parse → adapters    │   │  solana-test-validator +   │
-                  │  → risk → recommendations     │   │  9 behavioral scenarios    │
-                  │  → diff → freshness           │   │  (live ↔ heuristic)        │
-                  └──────────────┬───────────────┘   └────────────────────────────┘
-                                 ▼
-                  ┌──────────────────────────────┐   ┌────────────────────────────┐
-                  │  packages/monitor-store      │◀──│  apps/sentinel             │
-                  │  SQLite / Turso (libSQL)     │   │  recheck loop + freshness  │
-                  │  mints, snapshots, diffs,    │   │  loop + webhook dispatch   │
-                  │  webhooks, rate-limits, auth │   │  (or Vercel cron)          │
-                  └──────────────┬───────────────┘   └────────────────────────────┘
-                                 ▲
-                  ┌──────────────────────────────┐
-                  │  packages/shared             │  Zod schemas · TS types · constants
-                  │  THE CONTRACT LAYER          │  (single source of truth)
-                  └──────────────────────────────┘
+                          +------------------------------------------------+
+   Browser / README       |  apps/pixel  (Next.js 15, App Router)          |
+   badge / webhook  ---->  |  - pages: /, /report/[mint], /prelaunch,       |
+                           |           /dashboard                           |
+                           |  - /api/*: analyze, simulate, badge, auth,     |
+                           |            monitor, webhooks, sentinel/tick     |
+                           +--------+-----------------------------+---------+
+              in-process import     |                             |  HTTP (server-side proxy)
+                                    v                             v
+                  +------------------------------+    +------------------------------+
+                  |  apps/gilfoyle               |    |  apps/kotler                 |
+                  |  COMPATIBILITY ENGINE        |    |  LIVE SIMULATION WORKER      |
+                  |  helius -> parse -> adapters |    |  solana-test-validator +     |
+                  |  -> risk -> recommendations  |    |  9 behavioral scenarios      |
+                  |  -> diff -> freshness        |    |  (live / heuristic)          |
+                  +--------------+---------------+    +------------------------------+
+                                 |
+                                 v
+                  +------------------------------+    +------------------------------+
+                  |  packages/monitor-store      | <--|  apps/sentinel               |
+                  |  SQLite / Turso (libSQL)     |    |  recheck loop + freshness    |
+                  |  mints, snapshots, diffs,    |    |  loop + webhook dispatch     |
+                  |  webhooks, rate-limits, auth |    |  (or Vercel cron)            |
+                  +--------------+---------------+    +------------------------------+
+                                 ^
+                                 |
+                  +------------------------------+
+                  |  packages/shared             |   Zod schemas / TS types / constants
+                  |  THE CONTRACT LAYER          |   (single source of truth)
+                  +------------------------------+
 ```
 
 **End-to-end data flow:**
 
 ```
  on-chain mint
-      │
-      │  Helius DAS  getAsset (JSON-RPC)
-      ▼
-┌──────────────┐   parseMintProfile()    ┌──────────────┐
-│  raw asset   │ ──────────────────────▶ │  MintProfile │   normalized, validated
-└──────────────┘  extensions/auth/meta   └──────┬───────┘
-                                                 │ runCompatibilityEngine()
-                                                 ▼
-                              ┌────────────────────────────────────┐
-                              │  7 venue adapters                  │
-                              │  rule eval → live probe → override │
-                              └──────────────┬─────────────────────┘
-                                             ▼  VenueCompatibilityResult[]
-                          ┌──────────────────┴──────────────────┐
-                          ▼                                      ▼
-                  scoreRisk() (18 checks)            (optional) POST /simulate
-                          │                                      │  → Kotler
-                  RiskFinding[]                                  ▼
-                          │                          boot validator → clone hook
-              generateRecommendations()              → structure-equiv mint
-                          │                          → execute tx → log post-mortem
-                  Recommendation[]                            │
-                          │                                   ▼
-                          └──────────▶  AnalyzeReport  ◀── SimulationReport
-                                              │
-                                  persist (history) + render report + badge
+      |
+      |  Helius DAS  getAsset (JSON-RPC)
+      v
+ +--------------+   parseMintProfile()      +--------------+
+ |  raw asset   | ------------------------> |  MintProfile |   normalized, validated
+ +--------------+   extensions/auth/meta    +------+-------+
+                                                   |  runCompatibilityEngine()
+                                                   v
+                            +--------------------------------------+
+                            |  7 venue adapters                    |
+                            |  rule eval -> live probe -> override |
+                            +------------------+-------------------+
+                                               v  VenueCompatibilityResult[]
+                        +----------------------+----------------------+
+                        v                                             v
+                scoreRisk() (18 checks)               (optional) POST /simulate
+                        |                                       |  -> Kotler
+                RiskFinding[]                                   v
+                        |                           boot validator -> clone hook
+            generateRecommendations()               -> structure-equiv mint
+                        |                           -> execute tx -> log post-mortem
+                Recommendation[]                            |
+                        |                                   v
+                        +-------------> AnalyzeReport <-- SimulationReport
+                                             |
+                                 persist (history) + render report + badge
 ```
 
 ---
@@ -104,7 +106,7 @@ Tarani instead sources state from the **Helius Digital Asset Standard (DAS) API*
 
 `HeliusClient` ([`client.ts`](apps/gilfoyle/src/helius/client.ts)) hardens that call:
 
-- **Base58 guard** — `^[1-9A-HJ-NP-Za-km-z]{32,44}$` before any network I/O.
+- **Base58 guard** — rejects anything that isn't a 32–44 character base58 string (the canonical Solana address shape) before any network I/O.
 - **Process-wide cache** — 5-minute TTL, shared across instances (memoizes hot mints).
 - **Bounded latency** — `AbortController` with a 5 s timeout per attempt.
 - **Typed error taxonomy** — HTTP/RPC outcomes map onto a closed `ApiErrorCode` union (`429 → RATE_LIMITED`, `≥500 → UPSTREAM_ERROR`, null result `→ NOT_FOUND`).
@@ -331,16 +333,16 @@ Rules and probes tell you what _should_ happen. **Kotler proves what _does_ happ
 
 ```
 POST /run  { mint, scenarios? }   (Authorization: Bearer <KOTLER_SECRET>)
-   │
-   ├─ validate body (simulationRequestSchema) + bearer secret
-   ▼
+   |
+   +- validate body (simulationRequestSchema) + bearer secret
+   v
 runSimulation(request)
-   ├─ HeliusClient.fetchMintAsset → parseMintProfile      (reuse Gilfoyle)
-   ├─ selectScenarios(profile)    → baseline ∪ extension-specific (deduped)
-   ├─ binary present? & !KOTLER_FORCE_HEURISTIC ?
-   │        ├─ YES → runLive()                            (real validator)
-   │        └─ NO  → runHeuristic()                       (pure analysis)
-   ▼
+   +- HeliusClient.fetchMintAsset -> parseMintProfile     (reuse Gilfoyle)
+   +- selectScenarios(profile)    -> baseline + extension-specific (deduped)
+   +- binary present? & !KOTLER_FORCE_HEURISTIC ?
+   |        +- YES -> runLive()                           (real validator)
+   |        +- NO  -> runHeuristic()                      (pure analysis)
+   v
 SimulationReport { mint, results: ScenarioResult[], validatorMode, generatedAt }
 ```
 
@@ -348,7 +350,7 @@ SimulationReport { mint, results: ScenarioResult[], validatorMode, generatedAt }
 
 [`validator/lifecycle.ts`](apps/kotler/src/validator/lifecycle.ts) + [`worker/liveRunner.ts`](apps/kotler/src/worker/liveRunner.ts):
 
-1. **Free-port scan** — probe `127.0.0.1:8899…8998` for an open RPC port.
+1. **Free-port scan** — probe `127.0.0.1:8899-8998` for an open RPC port.
 2. **Boot** — spawn the validator with the program clone list:
    ```
    solana-test-validator --rpc-port <port> --quiet [--clone <hookProgramId> ...]
@@ -410,7 +412,7 @@ A blocked transfer surfaces as `outcome: "blocked"` with the program's `custom p
 `monitor-store` is a driver-abstracted SQLite layer with two backends — **Turso/libSQL** (production) and **better-sqlite3** (local/test) — over a shared `DbDriver` interface. Notable invariants:
 
 - `monitored_mints` is unique on **(subscriber_id, mint)** — one mint watched by _N_ users yields _N_ subscriptions but **one shared snapshot**; `listDistinctMints()` dedups so rechecks fetch once.
-- **Atomic rate limiting** — a single `INSERT … SELECT WHERE COUNT(window) < max` exploits SQLite's serialized writer for race-free sliding windows.
+- **Atomic rate limiting** — a single `INSERT ... SELECT WHERE COUNT(window) < max` exploits SQLite's serialized writer for race-free sliding windows.
 - **Webhooks** — HTTPS-only (plaintext refused), 5 s timeout, per-hook error isolation (one failure never sinks the batch).
 
 The **sentinel** runs two overlap-guarded loops: a **recheck loop** (default 60 s) that re-analyzes each tracked mint, `diffCompatibility`s against the last snapshot, persists changes, and dispatches webhooks; and a **freshness loop** (default 24 h) that re-alerts only when the _set_ of stale venue rules changes. On Vercel the same logic runs as a daily cron hitting `/api/sentinel/tick` (guarded by `CRON_SECRET`).
@@ -421,54 +423,54 @@ The **sentinel** runs two overlap-guarded loops: a **recheck loop** (default 60 
 
 ```
 tarani/
-├── apps/
-│   ├── pixel/                         # Next.js 15 — UI + API + wallet auth
-│   │   ├── app/
-│   │   │   ├── page.tsx               #   / — mint input
-│   │   │   ├── report/[mint]/page.tsx #   server-rendered report
-│   │   │   ├── prelaunch/page.tsx     #   pre-launch config analyzer
-│   │   │   ├── dashboard/page.tsx     #   authenticated watchlist
-│   │   │   └── api/
-│   │   │       ├── analyze/route.ts   #   POST → compatibility engine
-│   │   │       ├── simulate/route.ts  #   POST → proxy to Kotler
-│   │   │       ├── badge/[mint]/      #   GET  → SVG status badge
-│   │   │       ├── auth/{nonce,verify,me,logout}/   # wallet sign-in
-│   │   │       ├── monitor/{,[mint]}/ #   watchlist CRUD (authed)
-│   │   │       ├── webhooks/{,[id]}/  #   webhook registration
-│   │   │       └── sentinel/tick/     #   cron entrypoint (CRON_SECRET)
-│   │   ├── components/                #   matrix, risk, recs, simulation UI
-│   │   └── src/lib/                   #   auth (HMAC), rateLimiter, db, badgeRenderer
-│   │
-│   ├── gilfoyle/                      # COMPATIBILITY ENGINE
-│   │   ├── src/helius/                #   DAS client + error taxonomy + types
-│   │   ├── src/parser/                #   parseMintProfile + 3 normalizers
-│   │   ├── src/adapters/              #   engine, evaluator, 7 venue adapters, overrides
-│   │   ├── src/risk/                  #   riskEngine + checks/{authority,extension,compatibility,metadata}
-│   │   ├── src/recommendations/       #   recommendationEngine + remediations
-│   │   ├── src/prelaunch/             #   synthetic profile builder
-│   │   ├── src/diff/                  #   compatibility diff engine
-│   │   ├── src/rules/                 #   loadRules + freshness logic
-│   │   ├── rules/venues/*.json        #   7 hand-maintained venue rules
-│   │   ├── rules/schema/*.json        #   JSON-Schema validators
-│   │   └── scripts/                   #   validate-rules, check-freshness, smoke-parse
-│   │
-│   ├── kotler/                        # LIVE SIMULATION WORKER
-│   │   ├── src/server.ts              #   Bun HTTP /run (+ bearer auth)
-│   │   ├── src/validator/             #   lifecycle (boot/clone/teardown) + mintSetup
-│   │   ├── src/worker/                #   runSimulation, liveRunner, heuristicRunner, logParser
-│   │   └── src/scenarios/             #   9 behavioral scenarios (live + heuristic)
-│   │
-│   └── sentinel/                      # MONITORING WORKER
-│       └── src/                       #   recheckLoop, freshnessLoop, alertDispatcher
-│
-├── packages/
-│   ├── shared/src/                    # CONTRACT LAYER: schemas + types + constants
-│   ├── monitor-store/src/             #   SQLite/Turso store, dispatch, rate-limit
-│   └── test-fixtures/                 #   USDC, PYUSD, transfer-hook, synthetic mints
-│
-├── vitest.config.ts                   # coverage gate (66% lines / 75% fn / 86% branch)
-├── eslint.config.mjs · tsconfig.json
-└── apps/pixel/vercel.json             # sentinel cron: "0 6 * * *"
+|-- apps/
+|   |-- pixel/                         # Next.js 15 - UI + API + wallet auth
+|   |   |-- app/
+|   |   |   |-- page.tsx               #   / - mint input
+|   |   |   |-- report/[mint]/page.tsx #   server-rendered report
+|   |   |   |-- prelaunch/page.tsx     #   pre-launch config analyzer
+|   |   |   |-- dashboard/page.tsx     #   authenticated watchlist
+|   |   |   \-- api/
+|   |   |       |-- analyze/route.ts   #   POST -> compatibility engine
+|   |   |       |-- simulate/route.ts  #   POST -> proxy to Kotler
+|   |   |       |-- badge/[mint]/      #   GET  -> SVG status badge
+|   |   |       |-- auth/{nonce,verify,me,logout}/   # wallet sign-in
+|   |   |       |-- monitor/{,[mint]}/ #   watchlist CRUD (authed)
+|   |   |       |-- webhooks/{,[id]}/  #   webhook registration
+|   |   |       \-- sentinel/tick/     #   cron entrypoint (CRON_SECRET)
+|   |   |-- components/                #   matrix, risk, recs, simulation UI
+|   |   \-- src/lib/                   #   auth (HMAC), rateLimiter, db, badgeRenderer
+|   |
+|   |-- gilfoyle/                      # COMPATIBILITY ENGINE
+|   |   |-- src/helius/                #   DAS client + error taxonomy + types
+|   |   |-- src/parser/                #   parseMintProfile + 3 normalizers
+|   |   |-- src/adapters/              #   engine, evaluator, 7 venue adapters, overrides
+|   |   |-- src/risk/                  #   riskEngine + checks/{authority,extension,compatibility,metadata}
+|   |   |-- src/recommendations/       #   recommendationEngine + remediations
+|   |   |-- src/prelaunch/             #   synthetic profile builder
+|   |   |-- src/diff/                  #   compatibility diff engine
+|   |   |-- src/rules/                 #   loadRules + freshness logic
+|   |   |-- rules/venues/*.json        #   7 hand-maintained venue rules
+|   |   |-- rules/schema/*.json        #   JSON-Schema validators
+|   |   \-- scripts/                   #   validate-rules, check-freshness, smoke-parse
+|   |
+|   |-- kotler/                        # LIVE SIMULATION WORKER
+|   |   |-- src/server.ts              #   Bun HTTP /run (+ bearer auth)
+|   |   |-- src/validator/             #   lifecycle (boot/clone/teardown) + mintSetup
+|   |   |-- src/worker/                #   runSimulation, liveRunner, heuristicRunner, logParser
+|   |   \-- src/scenarios/             #   9 behavioral scenarios (live + heuristic)
+|   |
+|   \-- sentinel/                      # MONITORING WORKER
+|       \-- src/                       #   recheckLoop, freshnessLoop, alertDispatcher
+|
+|-- packages/
+|   |-- shared/src/                    # CONTRACT LAYER: schemas + types + constants
+|   |-- monitor-store/src/             #   SQLite/Turso store, dispatch, rate-limit
+|   \-- test-fixtures/                 #   USDC, PYUSD, transfer-hook, synthetic mints
+|
+|-- vitest.config.ts                   # coverage gate (66% lines / 75% fn / 86% branch)
+|-- eslint.config.mjs, tsconfig.json
+\-- apps/pixel/vercel.json             # sentinel cron: "0 6 * * *"
 ```
 
 ---
@@ -504,25 +506,25 @@ cp .env.example apps/pixel/.env.local
 Populate `apps/pixel/.env.local`:
 
 ```dotenv
-# ─── Helius / Solana RPC (REQUIRED) ──────────────────────────────
+# --- Helius / Solana RPC (REQUIRED) ------------------------------
 HELIUS_API_KEY=your_key_here
 SOLANA_RPC_URL=https://mainnet.helius-rpc.com/?api-key=${HELIUS_API_KEY}
 
-# ─── Pixel (Next.js) ─────────────────────────────────────────────
+# --- Pixel (Next.js) ---------------------------------------------
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 NEXT_PUBLIC_RPC_URL=https://api.mainnet-beta.solana.com   # wallet adapter only
-AUTH_SECRET=$(openssl rand -hex 32)                       # ≥16 chars in prod
-DEMO_MODE=false                                           # true → fixture fallback
+AUTH_SECRET=$(openssl rand -hex 32)                       # >=16 chars in prod
+DEMO_MODE=false                                           # true -> fixture fallback
 
-# ─── Monitoring store (Turso / libSQL) ───────────────────────────
+# --- Monitoring store (Turso / libSQL) ---------------------------
 TURSO_DATABASE_URL=file:./monitor.db                      # local file; or libsql://...
 # TURSO_AUTH_TOKEN=...                                    # required for remote URLs
 
-# ─── Kotler (live simulation worker) ─────────────────────────────
+# --- Kotler (live simulation worker) -----------------------------
 KOTLER_URL=http://localhost:3001
 KOTLER_SECRET=$(openssl rand -hex 32)                     # shared bearer secret
 
-# ─── Sentinel / cron ─────────────────────────────────────────────
+# --- Sentinel / cron ---------------------------------------------
 SENTINEL_INTERVAL_MS=60000
 CRON_SECRET=$(openssl rand -hex 32)                       # protects /api/sentinel/tick
 ```
@@ -530,7 +532,7 @@ CRON_SECRET=$(openssl rand -hex 32)                       # protects /api/sentin
 ### 7.4 Run the web app
 
 ```bash
-bun run dev            # → http://localhost:3000
+bun run dev            # -> http://localhost:3000
 ```
 
 Paste a demo mint to see a full report:
@@ -549,7 +551,7 @@ Kotler runs as a separate service (it needs the Solana CLI on the host).
 ```bash
 # Terminal 1 — start the worker
 cd apps/kotler
-KOTLER_SECRET=<same-as-pixel> bun run dev        # → http://localhost:3001
+KOTLER_SECRET=<same-as-pixel> bun run dev        # -> http://localhost:3001
 
 # Terminal 2 — drive a simulation directly
 curl -X POST http://localhost:3001/run \
@@ -577,8 +579,8 @@ solana-test-validator --rpc-port <auto> --quiet --clone <transferHookProgramId>
 ```bash
 bun run test            # full Vitest suite
 bun run test:coverage   # with V8 coverage thresholds
-bun run check:ci        # full gate: lint → typecheck → test:coverage → build
-bun run check:freshness # fail if any venue rule is stale (≥60d) / critical (≥120d)
+bun run check:ci        # full gate: lint -> typecheck -> test:coverage -> build
+bun run check:freshness # fail if any venue rule is stale (>=60d) / critical (>=120d)
 ```
 
 Coverage floors (`vitest.config.ts`): **66%** lines/statements, **75%** functions, **86%** branches. The function gap is intentional — per-scenario `live` paths require a booted validator and are excluded from unit coverage.
