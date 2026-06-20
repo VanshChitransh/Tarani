@@ -10,6 +10,9 @@ export interface HeliusClientOptions {
 }
 
 export class HeliusClient {
+  private static cache = new Map<string, { data: HeliusAsset; expiresAt: number }>();
+  private static readonly TTL_MS = 5 * 60 * 1_000;
+
   private readonly rpcUrl: string;
   private readonly timeoutMs: number;
   private readonly maxRetries: number;
@@ -32,6 +35,9 @@ export class HeliusClient {
       throw new HeliusClientError("BAD_REQUEST", `Invalid mint address format: ${mint}`);
     }
 
+    const cached = HeliusClient.cache.get(mint);
+    if (cached && cached.expiresAt > Date.now()) return cached.data;
+
     const body = JSON.stringify({
       jsonrpc: "2.0",
       id: "tarani-gilfoyle",
@@ -42,7 +48,7 @@ export class HeliusClient {
     let lastError: HeliusClientError | null = null;
     for (let attempt = 0; attempt <= this.maxRetries; attempt++) {
       try {
-        return await this.attempt(body, mint);
+        return this.cacheResult(mint, await this.attempt(body, mint));
       } catch (err) {
         const clientErr =
           err instanceof HeliusClientError
@@ -56,6 +62,11 @@ export class HeliusClient {
       }
     }
     throw lastError ?? new HeliusClientError("INTERNAL", "fetchMintAsset exhausted retries");
+  }
+
+  private cacheResult(mint: string, data: HeliusAsset): HeliusAsset {
+    HeliusClient.cache.set(mint, { data, expiresAt: Date.now() + HeliusClient.TTL_MS });
+    return data;
   }
 
   private async attempt(body: string, mint: string): Promise<HeliusAsset> {

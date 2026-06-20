@@ -5,8 +5,11 @@ import { jupiterAdapter } from "./jupiter";
 import { orcaAdapter } from "./orca";
 import { phantomAdapter } from "./phantom";
 import { raydiumAdapter } from "./raydium";
+import { solanaExplorerAdapter } from "./solana-explorer";
 import { solflareAdapter } from "./solflare";
+import { solscanAdapter } from "./solscan";
 import type { VenueAdapter } from "./types";
+import { OVERRIDES, applyOverride } from "./overrides";
 
 const ADAPTERS: Record<(typeof VENUE_IDS)[number], VenueAdapter> = {
   jupiter: jupiterAdapter,
@@ -14,9 +17,18 @@ const ADAPTERS: Record<(typeof VENUE_IDS)[number], VenueAdapter> = {
   orca: orcaAdapter,
   phantom: phantomAdapter,
   solflare: solflareAdapter,
+  solscan: solscanAdapter,
+  "solana-explorer": solanaExplorerAdapter,
 };
 
-export function runCompatibilityEngine(profile: MintProfile): VenueCompatibilityResult[] {
+export async function runCompatibilityEngine(
+  profile: MintProfile,
+): Promise<VenueCompatibilityResult[]> {
   const rules = loadAllVenueRules();
-  return VENUE_IDS.map((venue) => ADAPTERS[venue].evaluate({ profile, rule: rules[venue] }));
+  return Promise.all(
+    VENUE_IDS.map(async (venue) => {
+      const base = await ADAPTERS[venue].evaluate({ profile, rule: rules[venue] });
+      return applyOverride(base, profile, OVERRIDES);
+    }),
+  );
 }

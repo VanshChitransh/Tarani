@@ -1,8 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { venueCompatibilityResultSchema } from "@tarani/shared";
 import type { MintProfile } from "@tarani/shared";
 import type { VenueRule } from "../rules";
-import { jupiterAdapter } from "./jupiter";
+import { jupiterAdapter, probeJupiterRoute } from "./jupiter";
 
 const TOKEN_2022 = "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb";
 
@@ -46,26 +46,115 @@ const baseRule: VenueRule = {
   notes: [],
 };
 
+beforeEach(() => {
+  // Default: probe unreachable -> "unknown" -> adapter falls back to the heuristic verdict.
+  vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network down")));
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
 describe("jupiterAdapter", () => {
   it("has venue id 'jupiter'", () => {
     expect(jupiterAdapter.venue).toBe("jupiter");
   });
 
-  it("returns a VenueCompatibilityResult for a matching profile", () => {
-    const result = jupiterAdapter.evaluate({ profile: baseProfile, rule: baseRule });
+  it("returns a VenueCompatibilityResult for a matching profile", async () => {
+    const result = await jupiterAdapter.evaluate({ profile: baseProfile, rule: baseRule });
     expect(result.venue).toBe("jupiter");
     expect(result.status).toBe("blocked");
-    expect(result.source).toBe("heuristic");
+    expect(["heuristic", "probe"]).toContain(result.source);
   });
 
-  it("output validates against venueCompatibilityResultSchema", () => {
-    const result = jupiterAdapter.evaluate({ profile: baseProfile, rule: baseRule });
+  it("output validates against venueCompatibilityResultSchema", async () => {
+    const result = await jupiterAdapter.evaluate({ profile: baseProfile, rule: baseRule });
     expect(venueCompatibilityResultSchema.safeParse(result).success).toBe(true);
   });
 
-  it("returns unknown when profile has no matching extensions", () => {
+  // A live swap route is ground truth: it overrides the rule's "blocked" verdict (the C1 fix).
+  it("upgrades blocked -> supported when the probe finds a route", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({ outAmount: "123" })));
+    const result = await jupiterAdapter.evaluate({ profile: baseProfile, rule: baseRule });
+    expect(result.status).toBe("supported");
+    expect(result.source).toBe("probe");
+    expect(result.evidence.some((e) => e.kind === "probe")).toBe(true);
+  });
+
+  it("returns supported when profile has no extensions and the probe is unavailable", async () => {
     const profile = { ...baseProfile, extensions: [] };
-    const result = jupiterAdapter.evaluate({ profile, rule: baseRule });
-    expect(result.status).toBe("unknown");
+    const result = await jupiterAdapter.evaluate({ profile, rule: baseRule });
+    expect(result.status).toBe("supported");
+  });
+
+  it("downgrades supported -> partial when the probe finds no route", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({})));
+    const profile = { ...baseProfile, extensions: [] };
+    const result = await jupiterAdapter.evaluate({ profile, rule: baseRule });
+    expect(result.status).toBe("partial");
+    expect(result.source).toBe("probe");
+  });
+});
+
+describe("probeJupiterRoute", () => {
+  const MINT = "HoNeYy4S3p5N1RfRy7Sw1FZuYxnDpQpqxXJEUmwwHZGv";
+
+  it("returns route_available when a quote has an outAmount", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({ outAmount: "123" })));
+    expect(await probeJupiterRoute(MINT)).toBe("route_available");
+  });
+
+  it("returns no_route when the quote has no outAmount", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({})));
+    expect(await probeJupiterRoute(MINT)).toBe("no_route");
+  });
+
+  it("returns no_route only on a definitive TOKEN_NOT_TRADABLE error (HTTP 400)", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValue(
+          Response.json(
+            { error: "The token X is not tradable", errorCode: "TOKEN_NOT_TRADABLE" },
+            { status: 400 },
+          ),
+        ),
+    );
+    expect(await probeJupiterRoute(MINT)).toBe("no_route");
+  });
+
+  it("returns unknown on a transient non-ok response (rate-limit / 5xx)", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 429 })));
+    expect(await probeJupiterRoute(MINT)).toBe("unknown");
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 503 })));
+    expect(await probeJupiterRoute(MINT)).toBe("unknown");
+  });
+
+  it("returns unknown on a network error", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("boom")));
+    expect(await probeJupiterRoute(MINT)).toBe("unknown");
+  });
+
+  it("quotes USDC against wSOL (never USDC->USDC) so USDC itself reads as routable", async () => {
+    const USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+    const WSOL = "So11111111111111111111111111111111111111112";
+    const fetchMock = vi.fn().mockResolvedValue(Response.json({ outAmount: "999" }));
+    vi.stubGlobal("fetch", fetchMock);
+    expect(await probeJupiterRoute(USDC)).toBe("route_available");
+    const calledUrl = fetchMock.mock.calls[0][0] as string;
+    expect(calledUrl).toContain(`inputMint=${USDC}`);
+    expect(calledUrl).toContain(`outputMint=${WSOL}`);
+    expect(calledUrl).not.toContain(`outputMint=${USDC}`);
+  });
+
+  it("still quotes a normal mint against USDC", async () => {
+    const USDC = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+    const fetchMock = vi.fn().mockResolvedValue(Response.json({ outAmount: "5" }));
+    vi.stubGlobal("fetch", fetchMock);
+    await probeJupiterRoute(MINT);
+    const calledUrl = fetchMock.mock.calls[0][0] as string;
+    expect(calledUrl).toContain(`inputMint=${MINT}`);
+    expect(calledUrl).toContain(`outputMint=${USDC}`);
   });
 });

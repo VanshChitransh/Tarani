@@ -1,0 +1,231 @@
+import type {
+  AlertWebhook,
+  CompatibilityDiff,
+  CompatibilitySnapshot,
+  MonitorRecord,
+} from "@tarani/shared";
+import { randomUUID } from "crypto";
+import type { DbDriver } from "./db";
+
+const MAX_MINTS = parseInt(process.env.MAX_MONITORED_MINTS ?? "100", 10);
+
+let _db: DbDriver | null = null;
+
+export function configure(db: DbDriver): void {
+  _db = db;
+}
+
+function db(): DbDriver {
+  if (!_db) throw new Error("monitor-store: call configure(db) before using store functions");
+  return _db;
+}
+
+type MintRow = {
+  subscription_id: string;
+  subscriber_id: string;
+  mint: string;
+  added_at: string;
+  last_checked_at: string | null;
+};
+
+function rowToRecord(row: MintRow): MonitorRecord {
+  return {
+    subscriptionId: row.subscription_id,
+    mint: row.mint,
+    addedAt: row.added_at,
+    lastCheckedAt: row.last_checked_at,
+  };
+}
+
+export async function addMint(subscriberId: string, mint: string): Promise<MonitorRecord> {
+  const d = db();
+
+  const existing = await getMint(subscriberId, mint);
+  if (existing) return existing;
+
+  // MAX_MONITORED_MINTS is enforced per subscriber, not globally.
+  const countRow = (await d
+    .prepare("SELECT COUNT(*) as n FROM monitored_mints WHERE subscriber_id = ?")
+    .get(subscriberId)) as { n: number };
+  if (countRow.n >= MAX_MINTS) throw new Error("MAX_MONITORED_MINTS_EXCEEDED");
+
+  const id = randomUUID();
+  const addedAt = new Date().toISOString();
+
+  await d
+    .prepare(
+      "INSERT INTO monitored_mints (subscription_id, subscriber_id, mint, added_at, last_checked_at) VALUES (?, ?, ?, ?, NULL)",
+    )
+    .run(id, subscriberId, mint, addedAt);
+
+  return { subscriptionId: id, mint, addedAt, lastCheckedAt: null };
+}
+
+export async function removeMint(subscriberId: string, mint: string): Promise<void> {
+  await db()
+    .prepare("DELETE FROM monitored_mints WHERE subscriber_id = ? AND mint = ?")
+    .run(subscriberId, mint);
+}
+
+export async function getMint(subscriberId: string, mint: string): Promise<MonitorRecord | null> {
+  const row = (await db()
+    .prepare("SELECT * FROM monitored_mints WHERE subscriber_id = ? AND mint = ?")
+    .get(subscriberId, mint)) as MintRow | undefined;
+  return row ? rowToRecord(row) : null;
+}
+
+export async function listMints(subscriberId: string): Promise<MonitorRecord[]> {
+  const rows = (await db()
+    .prepare("SELECT * FROM monitored_mints WHERE subscriber_id = ? ORDER BY added_at ASC")
+    .all(subscriberId)) as MintRow[];
+  return rows.map(rowToRecord);
+}
+
+/**
+ * The distinct set of mints tracked by anyone — used by the recheck/cron
+ * machinery so a mint watched by N users is fetched and snapshotted once, not N
+ * times. Compatibility snapshots/diffs are per-mint (identical for everyone).
+ */
+export async function listDistinctMints(): Promise<string[]> {
+  const rows = (await db().prepare("SELECT DISTINCT mint FROM monitored_mints").all()) as {
+    mint: string;
+  }[];
+  return rows.map((r) => r.mint);
+}
+
+export async function updateLastChecked(mint: string, checkedAt: string): Promise<void> {
+  await db()
+    .prepare("UPDATE monitored_mints SET last_checked_at = ? WHERE mint = ?")
+    .run(checkedAt, mint);
+}
+
+export async function saveSnapshot(mint: string, snapshot: CompatibilitySnapshot): Promise<void> {
+  await db()
+    .prepare(
+      "INSERT INTO compatibility_snapshots (mint, captured_at, results_json) VALUES (?, ?, ?)",
+    )
+    .run(mint, snapshot.capturedAt, JSON.stringify(snapshot.results));
+}
+
+export async function getLatestSnapshot(mint: string): Promise<CompatibilitySnapshot | null> {
+  const row = (await db()
+    .prepare(
+      "SELECT * FROM compatibility_snapshots WHERE mint = ? ORDER BY captured_at DESC LIMIT 1",
+    )
+    .get(mint)) as { mint: string; captured_at: string; results_json: string } | undefined;
+
+  if (!row) return null;
+  return {
+    mint: row.mint,
+    capturedAt: row.captured_at,
+    results: JSON.parse(row.results_json),
+  };
+}
+
+export async function saveDiff(mint: string, diffs: CompatibilityDiff[]): Promise<void> {
+  const detectedAt = diffs[0]?.detectedAt ?? new Date().toISOString();
+  await db()
+    .prepare("INSERT INTO compatibility_diffs (mint, detected_at, diffs_json) VALUES (?, ?, ?)")
+    .run(mint, detectedAt, JSON.stringify(diffs));
+}
+
+export async function getLatestDiff(mint: string): Promise<CompatibilityDiff[] | null> {
+  const row = (await db()
+    .prepare("SELECT * FROM compatibility_diffs WHERE mint = ? ORDER BY detected_at DESC LIMIT 1")
+    .get(mint)) as { diffs_json: string } | undefined;
+
+  if (!row) return null;
+  return JSON.parse(row.diffs_json);
+}
+
+type WebhookRow = { id: string; url: string; added_at: string; active: number };
+
+function rowToWebhook(row: WebhookRow): AlertWebhook {
+  return {
+    id: row.id,
+    url: row.url,
+    addedAt: row.added_at,
+    active: row.active === 1,
+  };
+}
+
+export async function addWebhook(url: string): Promise<AlertWebhook> {
+  const id = randomUUID();
+  const addedAt = new Date().toISOString();
+  await db()
+    .prepare("INSERT INTO alert_webhooks (id, url, added_at, active) VALUES (?, ?, ?, 1)")
+    .run(id, url, addedAt);
+  return { id, url, addedAt, active: true };
+}
+
+export async function listWebhooks(): Promise<AlertWebhook[]> {
+  const rows = (await db()
+    .prepare("SELECT * FROM alert_webhooks WHERE active = 1 ORDER BY added_at ASC")
+    .all()) as WebhookRow[];
+  return rows.map(rowToWebhook);
+}
+
+export async function removeWebhook(id: string): Promise<void> {
+  await db().prepare("DELETE FROM alert_webhooks WHERE id = ?").run(id);
+}
+
+/**
+ * Sliding-window rate limit backed by the shared DB, so the count survives
+ * across serverless instances (every Vercel cold start shares the same Turso row set).
+ * Returns true if the request is allowed, false if the limit is exceeded.
+ */
+export async function checkRateLimit(
+  bucketKey: string,
+  maxRequests: number,
+  windowMs: number,
+): Promise<boolean> {
+  const d = db();
+  const now = Date.now();
+  const cutoff = now - windowMs;
+
+  // Housekeeping only (not required for correctness): drop hits that have aged
+  // out of this key's window so the table stays small.
+  await d
+    .prepare("DELETE FROM rate_limit_hits WHERE bucket_key = ? AND ts < ?")
+    .run(bucketKey, cutoff);
+
+  // Atomic check-and-insert: the row is inserted only if the in-window count is
+  // under the limit, evaluated inside a single statement. Because SQLite/libSQL
+  // serializes writers, the COUNT and INSERT see one consistent snapshot — no
+  // check-then-act race where two concurrent requests both pass the limit.
+  // rowsAffected tells us whether THIS request was admitted.
+  const inserted = (await d
+    .prepare(
+      `INSERT INTO rate_limit_hits (bucket_key, ts)
+       SELECT ?, ?
+       WHERE (SELECT COUNT(*) FROM rate_limit_hits WHERE bucket_key = ? AND ts >= ?) < ?`,
+    )
+    .run(bucketKey, now, bucketKey, cutoff, maxRequests)) as number;
+
+  return inserted > 0;
+}
+
+// ── auth nonces (single-use, expiring) ──────────────────────────────────────────
+
+export async function saveNonce(nonce: string, issuedAt: number): Promise<void> {
+  await db()
+    .prepare("INSERT INTO auth_nonces (nonce, issued_at) VALUES (?, ?)")
+    .run(nonce, issuedAt);
+}
+
+/**
+ * Consume a sign-in nonce: returns true only if it existed AND is within
+ * maxAgeMs. The nonce is deleted regardless (single use), so a replayed or
+ * brute-forced nonce can never be reused. Also purges expired nonces.
+ */
+export async function consumeNonce(nonce: string, maxAgeMs: number): Promise<boolean> {
+  const d = db();
+  const now = Date.now();
+  const row = (await d.prepare("SELECT issued_at FROM auth_nonces WHERE nonce = ?").get(nonce)) as
+    | { issued_at: number }
+    | undefined;
+  await d.prepare("DELETE FROM auth_nonces WHERE nonce = ?").run(nonce);
+  await d.prepare("DELETE FROM auth_nonces WHERE issued_at < ?").run(now - maxAgeMs);
+  if (!row) return false;
+  return now - row.issued_at <= maxAgeMs;
+}

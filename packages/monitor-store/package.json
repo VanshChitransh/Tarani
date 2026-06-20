@@ -1,0 +1,15 @@
+{
+  "name": "@tarani/monitor-store",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@libsql/client": "^0.14.0",
+    "@tarani/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "*",
+    "better-sqlite3": "*"
+  }
+}

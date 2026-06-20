@@ -52,13 +52,13 @@ flowchart TD
     Raw -->|parseMintProfile| Profile["MintProfile (normalized, validated)"]
     Profile -->|runCompatibilityEngine| Adapters["7 venue adapters<br/>rule eval -> live probe -> override"]
     Adapters --> Results["VenueCompatibilityResult[]"]
-    Results --> Risk["scoreRisk (21 checks)"]
+    Results --> Risk["scoreRisk (18 checks)"]
     Results -->|optional| Sim["POST /simulate -> Kotler<br/>boot validator -> clone hook<br/>-> structure-equiv mint -> execute tx -> log post-mortem"]
     Risk --> Recs["generateRecommendations"]
     Recs --> Report["AnalyzeReport"]
     Sim --> SimReport["SimulationReport"]
     SimReport --> Report
-    Report --> Out["render report + badge"]
+    Report --> Out["persist history + render report + badge"]
 ```
 
 ---
@@ -244,28 +244,24 @@ This prevents a high-confidence `blocked` verdict from inflating the confidence 
 
 ### 3.4 Live probes & verdict refinement
 
-A rule-derived verdict carries `source: "heuristic"`. Three adapters then _refine_ it against live protocol state and promote `source` to `"probe"`. All three fold their probe through one shared reconciler — [`reconcileProbe`](apps/gilfoyle/src/adapters/probeReconcile.ts) — so the behavior is identical across venues:
+A rule-derived verdict carries `source: "heuristic"`. Three adapters then _refine_ it against live protocol state and promote `source` accordingly:
 
-- **A confirmed live market is ground truth.** If a pool/route exists for the mint, it is tradeable here _regardless_ of the rule verdict — any worse-than-`supported` status is overridden to `supported` (`source: "probe"`, `confidence: "high"`). This is what catches permissioned/whitelisted pools the static rules can't see (e.g. xStocks on Raydium, an already-issued Orca TokenBadge).
-- **Absence never fabricates support.** If the venue API responds but reports no market, a `supported` rule verdict is softened to `partial`; worse verdicts are left untouched (evidence appended only).
-- **An inconclusive probe (`unknown`) leaves the verdict untouched** — a flaky upstream never degrades the report.
+| Adapter     | Probe endpoint                                                                                        | Refinement rule                                    |
+| ----------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| **Jupiter** | `lite-api.jup.ag/swap/v1/quote`                                                                       | no route ⇒ `supported → partial`                   |
+| **Orca**    | `api.mainnet.orca.so/v1/whirlpool/list` (≈18 MB, process-cached, 5-min TTL, single in-flight promise) | live pool ⇒ `conditional → supported`              |
+| **Raydium** | `api-v3.raydium.io/pools/info/mint`                                                                   | appends pool-existence evidence (no status change) |
 
-| Adapter     | Probe endpoint                                                                                        | Probe signal                                                                |
-| ----------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| **Jupiter** | `lite-api.jup.ag/swap/v1/quote` (quotes mint → wSOL; USDC → wSOL when the mint _is_ USDC)             | only HTTP 400 `TOKEN_NOT_TRADABLE` ⇒ no route; transient errors ⇒ `unknown` |
-| **Orca**    | `api.mainnet.orca.so/v1/whirlpool/list` (≈18 MB, process-cached, 5-min TTL, single in-flight promise) | whirlpool present ⇒ live market                                             |
-| **Raydium** | `api-v3.raydium.io/pools/info/mint` (mint-scoped v3 endpoint; `count > 0` ⇒ pool exists)              | live pool ⇒ live market                                                     |
-
-The synthetic prelaunch sentinel mint skips probes entirely.
+Probe failures (`unknown`) leave the heuristic verdict untouched — the engine never degrades on its own network errors. The synthetic prelaunch sentinel mint skips probes entirely.
 
 **Precedence (final word last):** `heuristic` → `probe` → `override`. `applyOverride` ([`overrides.ts`](apps/gilfoyle/src/adapters/overrides.ts)) reads [`rules/overrides.json`](apps/gilfoyle/rules/overrides.json) and can force any verdict, stamping `source: "override"` with the human-authored reason as evidence.
 
 ### 3.5 Risk scoring & remediation
 
-`scoreRisk(profile, compatibility)` ([`riskEngine.ts`](apps/gilfoyle/src/risk/riskEngine.ts)) runs **21 deterministic checks** across four modules, dedups by `id`, and sorts by `(severity, category)`:
+`scoreRisk(profile, compatibility)` ([`riskEngine.ts`](apps/gilfoyle/src/risk/riskEngine.ts)) runs **18 deterministic checks** across four modules, dedups by `id`, and sorts by `(severity, category)`:
 
 - **Authority** — un-renounced mint (`HIGH`), freeze (`MED`), update (`MED`), metadata (`MED`); active permanent delegate (`HIGH`).
-- **Extension** — genuine misconfigurations are `CRITICAL`: `scaledUiAmount × interestBearing` (mutually exclusive math), and a `confidentialTransferFee` with no fee config. A transfer fee is **rate-aware**: rate > 0 ⇒ `MED` (`transfer-fee-presence`), an inactive 0-bps fee ⇒ `INFO` (`transfer-fee-inactive`). Combinations that are merely _inert_ — `nonTransferable × transferHook`, `nonTransferable × transferFee` — are `LOW` (the gating extension makes the other a no-op, so it is not a real risk); `confidential × transferHook` (amount-blind) and an unconfigured transfer hook are `INFO`; `confidential × permanentDelegate` is `LOW`.
+- **Extension** — incompatible combinations are `CRITICAL`: `nonTransferable × transferHook`, `nonTransferable × transferFee`, `confidentialTransfer × transferHook`, `confidentialTransfer × transferFee`; `confidential × permanentDelegate` is `HIGH`; lone transfer fee is `MED`.
 - **Compatibility** — blocked on _all_ DEXes (`CRITICAL`), blocked on _some_ (`HIGH`), conditional venues (`MED`), all-unknown (`INFO`).
 - **Metadata** — missing (`HIGH`), partial (`MED`), off-chain-only name (`LOW`).
 
@@ -300,7 +296,7 @@ $$
 
 Rules and probes tell you what _should_ happen. **Kotler proves what _does_ happen** by executing real transactions against a real validator. This is the project's technical moat: instead of mocking outcomes, it boots an ephemeral `solana-test-validator`, constructs a **structure-equivalent Token-2022 mint** that mirrors the target's extension profile, runs behavioral scenarios as genuine on-chain transactions, and performs a post-mortem on the program logs.
 
-> **Honest scope.** Kotler does **not** fork mainnet ledger slots or clone the live mint account. It (a) optionally `--clone`s the target's _transfer-hook program_ into the local ledger, and (b) **re-creates** a mint locally with the same extensions via `createInitializeMint*` instructions. This isolates extension _behavior_ deterministically and cheaply. Where a scenario can't be reproduced on a local ledger (e.g. pure-metadata analysis, or a transfer hook whose mainnet dependencies aren't cloned), it transparently falls back to heuristic analysis and labels itself accordingly (`mode: "analysis"`). Fidelity is high, but it is a **structure-equivalent harness**, not a mainnet fork.
+> **Honest scope.** Kotler does **not** fork mainnet ledger slots or clone the live mint account. It (a) optionally `--clone`s the target's _transfer-hook program_ into the local ledger, and (b) **re-creates** a mint locally with the same extensions via `createInitializeMint*` instructions. This isolates extension _behavior_ deterministically and cheaply. Where on-chain replication is impossible (e.g. a freeze authority Tarani does not control), the scenario transparently falls back to heuristic analysis and labels itself accordingly. Fidelity is high, but it is a **structure-equivalent harness**, not a mainnet fork.
 
 ### 4.1 Request lifecycle
 
@@ -338,17 +334,17 @@ flowchart TD
 
 `SCENARIO_REGISTRY` ([`scenarios/index.ts`](apps/kotler/src/scenarios/index.ts)) holds **9 scenarios**, each implementing both a `heuristic(ctx)` and a `live(ctx)` path:
 
-| Scenario                  | Live behavior                                                                                  |
-| ------------------------- | ---------------------------------------------------------------------------------------------- |
-| `transfer`                | mint + transfer 500k units; detects `nonTransferable` / `pausable` blocks                      |
-| `transfer_fee`            | transfer and measure withheld fee against basis-points config                                  |
-| `transfer_hook`           | attempt transfer with the cloned hook program in-ledger                                        |
-| `memo_required`           | transfer without memo (expect block) then with an SPL-Memo instruction                         |
-| `associated_token_create` | create an ATA; report frozen state under `defaultAccountState`                                 |
-| `freeze_check`            | mint with a local freeze authority, freeze an account, prove the transfer is rejected on-chain |
-| `metadata_check`          | delegates to heuristic — pure metadata analysis                                                |
-| `swap`                    | probe Jupiter Quote for a live route                                                           |
-| `wrap_sol`                | probe Raydium for pool existence                                                               |
+| Scenario                  | Live behavior                                                             |
+| ------------------------- | ------------------------------------------------------------------------- |
+| `transfer`                | mint + transfer 500k units; detects `nonTransferable` / `pausable` blocks |
+| `transfer_fee`            | transfer and measure withheld fee against basis-points config             |
+| `transfer_hook`           | attempt transfer with the cloned hook program in-ledger                   |
+| `memo_required`           | transfer without memo (expect block) then with an SPL-Memo instruction    |
+| `associated_token_create` | create an ATA; report frozen state under `defaultAccountState`            |
+| `freeze_check`            | delegates to heuristic — freeze authority can't be replicated             |
+| `metadata_check`          | delegates to heuristic — pure metadata analysis                           |
+| `swap`                    | probe Jupiter Quote for a live route                                      |
+| `wrap_sol`                | probe Raydium for pool existence                                          |
 
 ### 4.4 State post-mortem
 
@@ -366,10 +362,6 @@ interface ScenarioResult {
   id: string;
   kind: ScenarioKind;
   outcome: "success" | "blocked" | "warning" | "error";
-  mode: "validator" | "api" | "analysis"; // how the verdict was reached:
-  //   validator — real tx on the local test validator
-  //   api       — external protocol probe (swap/wrap_sol)
-  //   analysis  — static analysis only, no execution
   summary: string;
   durationMs: number;
   failureCode?: string; // e.g. "0x1772" — the on-chain custom program error

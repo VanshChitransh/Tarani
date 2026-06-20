@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
 import { VENUE_IDS, venueCompatibilityResultSchema } from "@tarani/shared";
 import type { MintProfile } from "@tarani/shared";
 import { runCompatibilityEngine } from "./engine";
@@ -32,30 +32,38 @@ const fixtureProfile: MintProfile = {
   fetchedAt: new Date().toISOString(),
 };
 
+beforeEach(() => {
+  vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(null, { status: 400 })));
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
 describe("runCompatibilityEngine", () => {
-  it("returns exactly 5 results", () => {
-    const results = runCompatibilityEngine(fixtureProfile);
-    expect(results).toHaveLength(5);
+  it("returns exactly 7 results", async () => {
+    const results = await runCompatibilityEngine(fixtureProfile);
+    expect(results).toHaveLength(7);
   });
 
-  it("results are in VENUE_IDS order", () => {
-    const results = runCompatibilityEngine(fixtureProfile);
+  it("results are in VENUE_IDS order", async () => {
+    const results = await runCompatibilityEngine(fixtureProfile);
     const venues = results.map((r) => r.venue);
     expect(venues).toEqual([...VENUE_IDS]);
   });
 
-  it("every result validates against venueCompatibilityResultSchema", () => {
-    const results = runCompatibilityEngine(fixtureProfile);
+  it("every result validates against venueCompatibilityResultSchema", async () => {
+    const results = await runCompatibilityEngine(fixtureProfile);
     for (const result of results) {
       const parsed = venueCompatibilityResultSchema.safeParse(result);
       expect(parsed.success, `${result.venue} failed schema validation`).toBe(true);
     }
   });
 
-  it("every result has source heuristic", () => {
-    const results = runCompatibilityEngine(fixtureProfile);
+  it("every result has a valid source", async () => {
+    const results = await runCompatibilityEngine(fixtureProfile);
     for (const result of results) {
-      expect(result.source).toBe("heuristic");
+      expect(["heuristic", "probe", "override"]).toContain(result.source);
     }
   });
 });

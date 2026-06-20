@@ -32,5 +32,8 @@ jobs:
       - name: Quality gates
         run: bun run check
 
+      - name: Rule freshness gate
+        run: bun run check:freshness
+
       - name: Build all apps
-        run: bun run build:all
+        run: bun run build

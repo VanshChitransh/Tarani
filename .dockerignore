@@ -1,0 +1,16 @@
+node_modules
+.next
+dist
+build
+coverage
+*.log
+.env
+.env.local
+.env.*.local
+*.db
+monitor.db
+test-ledger
+tarani-kit-main
+.DS_Store
+apps/pixel
+apps/sentinel

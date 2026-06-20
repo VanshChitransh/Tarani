@@ -6,3 +6,5 @@ export * from "./raydium";
 export * from "./orca";
 export * from "./phantom";
 export * from "./solflare";
+export * from "./solscan";
+export * from "./solana-explorer";

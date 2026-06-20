@@ -1,0 +1,46 @@
+{
+  "interface": "FungibleToken",
+  "id": "HoNeYy4S3p5N1RfRy7Sw1FZuYxnDpQpqxXJEUmwwHZGv",
+  "content": {
+    "json_uri": "https://example.com/metadata/honey.json",
+    "metadata": {
+      "name": "Hivemapper",
+      "symbol": "HONEY",
+      "description": "Hivemapper rewards token",
+      "token_standard": "Fungible"
+    }
+  },
+  "authorities": [],
+  "ownership": {
+    "ownership_model": "token"
+  },
+  "mutable": true,
+  "burnt": false,
+  "token_info": {
+    "symbol": "HONEY",
+    "decimals": 9,
+    "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+    "mint_authority": null,
+    "freeze_authority": null,
+    "supply": "10000000000000000000"
+  },
+  "mint_extensions": {
+    "metadata_pointer": {
+      "authority": null,
+      "metadata_address": "HoNeYy4S3p5N1RfRy7Sw1FZuYxnDpQpqxXJEUmwwHZGv"
+    },
+    "metadata": {
+      "authority": null,
+      "mint": "HoNeYy4S3p5N1RfRy7Sw1FZuYxnDpQpqxXJEUmwwHZGv",
+      "name": "Hivemapper",
+      "symbol": "HONEY",
+      "uri": "https://example.com/metadata/honey.json",
+      "additional_metadata": []
+    },
+    "transfer_hook": {
+      "authority": "HHkVVZ1xJ9P3WkfNYjT2yiyHmZ9o5sDgKwQbAjJzALjW",
+      "program_id": "HookProg1111111111111111111111111111111111"
+    },
+    "non_transferable": {}
+  }
+}

@@ -1,45 +1,194 @@
 {
   "venue": "phantom",
-  "version": "0.2.0",
-  "last_updated": "2026-05-29",
+  "version": "1.0.0",
+  "last_updated": "2026-05-31",
   "features": [
-    {
-      "id": "nonTransferable",
-      "status": "blocked",
-      "confidence": "high",
-      "evidence": ["https://phantom.app/learn/developers/tokens"],
-      "notes": ["Non-transferable tokens cannot be sent from Phantom; send button is disabled"]
-    },
-    {
-      "id": "transferHook",
-      "status": "supported",
-      "confidence": "medium",
-      "evidence": ["https://phantom.app/learn/developers/tokens"],
-      "notes": ["Phantom displays transfer-hook tokens but shows a warning banner to the user"]
-    },
     {
       "id": "transferFeeConfig",
       "status": "supported",
       "confidence": "high",
-      "evidence": ["https://phantom.app/learn/developers/tokens"],
-      "notes": ["Phantom shows transfer fee info in the send UI; user confirms before sending"]
+      "evidence": [
+        "https://docs.phantom.com/developer-powertools/solana-token-extensions-token22",
+        "https://phantom.com/learn/crypto-101/solana-token-extensions"
+      ],
+      "notes": [
+        "Phantom displays the fee on the confirmation screen of every send; user confirms before sending."
+      ]
+    },
+    {
+      "id": "transferHook",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://docs.phantom.com/developer-powertools/solana-token-extensions-token22",
+        "https://solana.com/news/developer-spotlight-phantom"
+      ],
+      "notes": [
+        "Phantom supports transfer-hook tokens; it builds the extra hook accounts so sends succeed."
+      ]
     },
     {
       "id": "permanentDelegate",
       "status": "conditional",
+      "confidence": "high",
+      "evidence": ["https://docs.phantom.com/developer-powertools/solana-token-extensions-token22"],
+      "notes": [
+        "Phantom displays a warning for any token with this extension (the delegate can burn or transfer any amount)."
+      ]
+    },
+    {
+      "id": "interestBearingConfig",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://docs.phantom.com/developer-powertools/solana-token-extensions-token22"],
+      "notes": ["Phantom displays the current interest rate on the token's detail screen."]
+    },
+    {
+      "id": "memoTransfer",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://docs.phantom.com/developer-powertools/solana-token-extensions-token22"],
+      "notes": [
+        "Phantom supports required-memo-on-transfer and lets users input a memo on transfers."
+      ]
+    },
+    {
+      "id": "metadataPointer",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://docs.phantom.com/developer-powertools/solana-token-extensions-token22"],
+      "notes": ["Phantom follows the metadata pointer to render name/symbol/image."]
+    },
+    {
+      "id": "tokenMetadata",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://docs.phantom.com/developer-powertools/solana-token-extensions-token22"],
+      "notes": [
+        "Phantom reads name and symbol from the mint's metadata extension and fetches the image from the uri field."
+      ]
+    },
+    {
+      "id": "groupPointer",
+      "status": "supported",
       "confidence": "medium",
-      "evidence": ["https://phantom.app/learn/developers/tokens"],
-      "notes": ["Phantom flags permanent delegate in token detail view as a risk indicator"]
+      "evidence": ["https://docs.phantom.com/developer-powertools/solana-token-extensions-token22"],
+      "notes": [
+        "Phantom uses group/group-pointer info to display members under the Collectibles tab."
+      ]
+    },
+    {
+      "id": "tokenGroup",
+      "status": "supported",
+      "confidence": "medium",
+      "evidence": [
+        "https://docs.phantom.com/developer-powertools/solana-token-extensions-token22",
+        "https://phantom.com/learn/crypto-101/solana-token-extensions"
+      ],
+      "notes": ["Group extension recognized for associating tokens with a parent collection."]
+    },
+    {
+      "id": "groupMemberPointer",
+      "status": "supported",
+      "confidence": "medium",
+      "evidence": ["https://docs.phantom.com/developer-powertools/solana-token-extensions-token22"],
+      "notes": [
+        "Member/group-pointer relationship used to associate a token with its group for display."
+      ]
+    },
+    {
+      "id": "tokenGroupMember",
+      "status": "supported",
+      "confidence": "medium",
+      "evidence": ["https://docs.phantom.com/developer-powertools/solana-token-extensions-token22"],
+      "notes": ["Member metadata used to group collectibles, matched against the group address."]
+    },
+    {
+      "id": "mintCloseAuthority",
+      "status": "supported",
+      "confidence": "medium",
+      "evidence": ["https://phantom.com/learn/crypto-101/solana-token-extensions"],
+      "notes": [
+        "Recognized extension; balances render normally, no special send restriction documented."
+      ]
     },
     {
       "id": "confidentialTransferMint",
       "status": "partial",
+      "confidence": "medium",
+      "evidence": [
+        "https://phantom.com/learn/crypto-101/solana-token-extensions",
+        "https://www.helius.dev/blog/what-is-token-2022"
+      ],
+      "notes": [
+        "Phantom acknowledges confidential transfer, but encrypted balances do not render like normal balances; display is partial."
+      ]
+    },
+    {
+      "id": "confidentialTransferFeeConfig",
+      "status": "partial",
       "confidence": "low",
-      "evidence": ["https://spl.solana.com/token-2022/extensions#confidential-transfers"],
-      "notes": ["Phantom may display the token but confidential balances may not render correctly"]
+      "evidence": ["https://www.helius.dev/blog/what-is-token-2022"],
+      "notes": [
+        "Sub-extension of confidential transfer; same partial-display caveat for encrypted amounts."
+      ]
+    },
+    {
+      "id": "defaultAccountState",
+      "status": "conditional",
+      "confidence": "low",
+      "evidence": ["https://solana.com/docs/tokens/extensions/default-state"],
+      "notes": [
+        "Token displays, but if the account is frozen-by-default the send fails until thawed (mechanical inference)."
+      ]
+    },
+    {
+      "id": "scaledUiAmountConfig",
+      "status": "supported",
+      "confidence": "low",
+      "evidence": ["https://solana.com/docs/tokens/extensions/scaled-ui-amount"],
+      "notes": [
+        "Display-only UI scaling; Phantom renders Token-2022 mints, so the scaled amount is expected to display (low confidence, not separately documented)."
+      ]
+    },
+    {
+      "id": "cpiGuard",
+      "status": "supported",
+      "confidence": "low",
+      "evidence": ["https://solana.com/docs/tokens/extensions"],
+      "notes": ["Account-level extension; does not block display or normal sends."]
+    },
+    {
+      "id": "pausable",
+      "status": "conditional",
+      "confidence": "low",
+      "evidence": ["https://solana.com/docs/tokens/extensions"],
+      "notes": ["Token displays, but sends fail while the mint is paused (mechanical inference)."]
+    },
+    {
+      "id": "nonTransferable",
+      "status": "blocked",
+      "confidence": "medium",
+      "evidence": [
+        "https://help.phantom.com/hc/en-us/articles/38483775767443-Why-can-t-I-send-crypto-from-Phantom",
+        "https://solana.com/docs/tokens/extensions/non-transferrable-tokens"
+      ],
+      "notes": [
+        "Non-transferable tokens cannot be sent: the Token-2022 program rejects any Transfer instruction. Phantom displays the balance but the send fails."
+      ]
+    },
+    {
+      "id": "unknown",
+      "status": "supported",
+      "confidence": "low",
+      "evidence": ["https://docs.phantom.com/developer-powertools/solana-token-extensions-token22"],
+      "notes": [
+        "Phantom renders any Token-2022 mint; an unrecognized extension still displays as a balance (no documented block)."
+      ]
     }
   ],
   "notes": [
-    "Day 2 first-cut rules; Phantom wallet behavior sourced from public docs and community reports"
+    "Phantom has the most thoroughly documented Token-2022 support of any consumer Solana wallet, with a dedicated developer page enumerating per-extension behavior.",
+    "Wallet context: 'supported' = displays and sends fine, 'conditional' = shows a warning or depends on state, 'blocked' = cannot send. Extensions not individually documented by Phantom are mechanical inferences at low confidence."
   ]
 }

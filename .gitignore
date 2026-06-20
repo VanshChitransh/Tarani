@@ -14,9 +14,6 @@ dist/
 build/
 coverage/
 
-# Solana test-validator ledger (runtime artifact, regenerated each run)
-test-ledger/
-
 # Logs
 *.log
 
@@ -25,12 +22,23 @@ test-ledger/
 .env.local
 .env.*.local
 
+# SQLite monitoring DB
+monitor.db
+*.db
+
 # Bun/lock
 bun.lockb
 
 # IDE
 .vscode/
 .idea/
+.claude/
 
 # Misc
 *.tsbuildinfo
+
+# Solana test validator runtime state
+test-ledger/
+
+# Private project notes
+PROJECT_AUDIT.md

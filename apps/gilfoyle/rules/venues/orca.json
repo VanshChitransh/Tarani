@@ -1,47 +1,172 @@
 {
   "venue": "orca",
-  "version": "0.2.0",
-  "last_updated": "2026-05-29",
+  "version": "1.0.0",
+  "last_updated": "2026-05-31",
   "features": [
     {
       "id": "transferFeeConfig",
-      "status": "conditional",
-      "confidence": "medium",
-      "evidence": [
-        "https://orca-so.gitbook.io/orca-developer-portal/whirlpools/interacting-with-whirlpools"
-      ],
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
       "notes": [
-        "Orca Whirlpools can support transfer-fee tokens but require explicit pool configuration"
+        "Supported without restriction; anyone can initialize a Whirlpool with a TransferFeeConfig token. No TokenBadge required."
+      ]
+    },
+    {
+      "id": "interestBearingConfig",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": ["Supported without restriction (display/amount-scaling extension)."]
+    },
+    {
+      "id": "scaledUiAmountConfig",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": ["Supported without restriction (ScaledUiAmount; display/amount-scaling extension)."]
+    },
+    {
+      "id": "memoTransfer",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": ["Listed under Supported (account-level extension)."]
+    },
+    {
+      "id": "metadataPointer",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": ["Listed under Supported; also used by Whirlpools for position NFTs."]
+    },
+    {
+      "id": "tokenMetadata",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": ["Listed under Supported; also leveraged by Whirlpools for position NFTs."]
+    },
+    {
+      "id": "confidentialTransferMint",
+      "status": "partial",
+      "confidence": "high",
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": [
+        "Supported as non-confidential transfer only — the mint may carry the extension but Whirlpools uses only the public transfer path."
       ]
     },
     {
       "id": "transferHook",
       "status": "conditional",
-      "confidence": "medium",
-      "evidence": ["https://orca-so.gitbook.io/orca-developer-portal/"],
-      "notes": ["Transfer hook tokens require whirlpool-specific setup; not all pools accept them"]
+      "confidence": "high",
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": [
+        "Supported only if the token has an initialized TokenBadge (per-WhirlpoolsConfig whitelist). The hook is called after transfer processing and cannot modify the amount."
+      ]
+    },
+    {
+      "id": "permanentDelegate",
+      "status": "conditional",
+      "confidence": "high",
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": [
+        "Supported only with an initialized TokenBadge; unrestricted pool creation was deemed too risky."
+      ]
+    },
+    {
+      "id": "defaultAccountState",
+      "status": "conditional",
+      "confidence": "high",
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": [
+        "Supported only with an initialized TokenBadge; freeze authority should be disabled unless there is a reasonable reason."
+      ]
+    },
+    {
+      "id": "mintCloseAuthority",
+      "status": "conditional",
+      "confidence": "high",
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": ["Supported only with an initialized TokenBadge (whitelist)."]
+    },
+    {
+      "id": "pausable",
+      "status": "conditional",
+      "confidence": "high",
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": ["Supported only with an initialized TokenBadge (added June 2025)."]
     },
     {
       "id": "nonTransferable",
       "status": "blocked",
       "confidence": "high",
-      "evidence": ["https://spl.solana.com/token-2022/extensions#non-transferable-tokens"],
-      "notes": ["Non-transferable tokens cannot be deposited or swapped in any Orca pool"]
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": ["Listed explicitly under Not Supported."]
     },
     {
-      "id": "permanentDelegate",
-      "status": "supported",
-      "confidence": "medium",
-      "evidence": ["https://orca-so.gitbook.io/orca-developer-portal/"],
-      "notes": ["Permanent delegate does not affect Orca pool routing directly"]
+      "id": "groupPointer",
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": ["Listed explicitly under Not Supported (Group, GroupPointer)."]
     },
     {
-      "id": "confidentialTransferMint",
+      "id": "tokenGroup",
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": [
+        "Group is listed under Not Supported (TokenGroup is the SPL implementation of Group)."
+      ]
+    },
+    {
+      "id": "groupMemberPointer",
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": ["Listed explicitly under Not Supported (Member, MemberPointer)."]
+    },
+    {
+      "id": "tokenGroupMember",
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": [
+        "Member is listed under Not Supported (TokenGroupMember is the SPL implementation of Member)."
+      ]
+    },
+    {
+      "id": "cpiGuard",
       "status": "blocked",
       "confidence": "medium",
-      "evidence": ["https://spl.solana.com/token-2022/extensions#confidential-transfers"],
-      "notes": ["Confidential transfer amounts break Orca's pool pricing invariants"]
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": [
+        "Not in the supported list; falls under the page's catch-all 'all other extensions not listed above' = not supported."
+      ]
+    },
+    {
+      "id": "confidentialTransferFeeConfig",
+      "status": "blocked",
+      "confidence": "low",
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": [
+        "Not named on the page; only non-confidential transfer is honored, so the confidential fee sub-extension falls under the catch-all."
+      ]
+    },
+    {
+      "id": "unknown",
+      "status": "blocked",
+      "confidence": "high",
+      "evidence": ["https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"],
+      "notes": [
+        "The page states all extensions not explicitly listed are Not Supported, so any unrecognized extension blocks pool creation by default."
+      ]
     }
   ],
-  "notes": ["Day 2 first-cut rules; refine on Day 6 with probe evidence"]
+  "notes": [
+    "Orca Whirlpools uses a positive/closed support list with three tiers: freely supported, TokenBadge-gated (conditional), and not supported.",
+    "TokenBadge is a per-WhirlpoolsConfig PDA whitelist that permits pools for higher-risk extensions (TransferHook, PermanentDelegate, MintCloseAuthority, DefaultAccountState, Pausable).",
+    "Anything not on the supported list — including the catch-all 'all other extensions' — is treated as Not Supported. ConfidentialTransfer is honored only in non-confidential mode."
+  ]
 }

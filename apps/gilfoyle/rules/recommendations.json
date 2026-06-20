@@ -1,1 +1,120 @@
-{ "rules": [] }
+{
+  "rules": [
+    {
+      "id": "mint-authority-live",
+      "title": "Consider renouncing mint authority",
+      "description": "If you do not need to mint additional tokens, renouncing the mint authority permanently caps supply. This reduces investor risk and may improve exchange listing eligibility. Use `spl-token authorize <MINT> mint --disable`.",
+      "links": ["https://www.solana-program.com/docs/token"]
+    },
+    {
+      "id": "freeze-authority-active",
+      "title": "Consider renouncing freeze authority",
+      "description": "If account freezing is not a core feature of your token, renouncing the freeze authority removes the issuer's ability to lock holder accounts. This improves holder trust. Use `spl-token authorize <MINT> freeze --disable`.",
+      "links": ["https://www.solana-program.com/docs/token"]
+    },
+    {
+      "id": "update-authority-live",
+      "title": "Consider renouncing the update authority",
+      "description": "Once your token's metadata is final, renouncing the update authority makes the name, symbol, and image immutable — protecting holders from a post-launch rebrand or impersonation. If you must retain it (e.g., to fix a broken image URI), hold it in a multisig and disclose that.",
+      "links": ["https://www.solana-program.com/docs/token"]
+    },
+    {
+      "id": "metadata-authority-live",
+      "title": "Consider renouncing the metadata authority",
+      "description": "The Token-2022 metadata authority can rewrite on-chain name, symbol, and URI. Renounce it to lock the token's identity, or assign it to a multisig if updates may still be required. Disclose the authority address and its governance to holders.",
+      "links": ["https://solana.com/docs/tokens/extensions/metadata"]
+    },
+    {
+      "id": "permanent-delegate-present",
+      "title": "Document permanent delegate behavior clearly",
+      "description": "If the permanent delegate is required (e.g., for compliance clawback), publish the delegate address and the conditions under which it will act. Consider a multisig delegate address to prevent unilateral use. Disclose this extension prominently in your token documentation.",
+      "links": ["https://solana.com/docs/tokens/extensions/permanent-delegate"]
+    },
+    {
+      "id": "incompatible-scaled-ui-interest-bearing",
+      "title": "Remove either ScaledUiAmount or InterestBearing",
+      "description": "These two extensions are mutually exclusive — the Token-2022 program rejects a mint that carries both at initialization (InvalidExtensionCombination). Both rescale displayed amounts, so pick one: ScaledUiAmount for a fixed/updatable multiplier (e.g. stock splits), or InterestBearing for a continuously compounding rate.",
+      "links": ["https://solana.com/docs/tokens/extensions/scaled-ui-amount"]
+    },
+    {
+      "id": "confidential-fee-missing-fee-config",
+      "title": "Add the ConfidentialTransferFeeConfig extension",
+      "description": "A mint with both ConfidentialTransfer and TransferFee must also include ConfidentialTransferFeeConfig, or mint initialization fails with InvalidExtensionCombination. Add it — fees on confidential transfers are then withheld as encrypted (ElGamal) amounts via the TransferWithFee instruction.",
+      "links": ["https://solana.com/docs/tokens/extensions/confidential-transfer"]
+    },
+    {
+      "id": "non-transferable-hook-inert",
+      "title": "Drop the redundant TransferHook (or reconsider NonTransferable)",
+      "description": "These extensions coexist fine, but the transfer hook can never run on a non-transferable mint — every transfer is rejected before the hook fires, and each account still pays for a forced TransferHookAccount. If the token is soulbound, remove the TransferHook; if the hook is genuinely needed, NonTransferable is the wrong primitive.",
+      "links": ["https://solana.com/docs/tokens/extensions"]
+    },
+    {
+      "id": "non-transferable-fee-inert",
+      "title": "Drop the redundant TransferFeeConfig",
+      "description": "The fee can never be collected on a non-transferable mint — transfers are blocked, so the fee path never runs and the withheld amount stays zero. It is harmless but misleading to integrators. Remove TransferFeeConfig for a soulbound token, or use a different primitive if a fee is actually intended.",
+      "links": ["https://solana.com/docs/tokens/extensions"]
+    },
+    {
+      "id": "confidential-hook-amount-blind",
+      "title": "Handle the u64::MAX sentinel in your transfer hook",
+      "description": "ConfidentialTransfer + TransferHook is supported, but on confidential transfers the program invokes the hook with amount = u64::MAX (the real amount is encrypted). Gating hooks (allowlist / KYC / freeze) work as-is. If your hook enforces per-transfer limits or amount-based accounting, either reject/handle the u64::MAX sentinel or do not enable ConfidentialTransfer — otherwise those rules are bypassable on confidential transfers.",
+      "links": ["https://solana.com/docs/tokens/extensions/confidential-transfer"]
+    },
+    {
+      "id": "confidential-delegate-public-only",
+      "title": "Disclose the permanent delegate's bounded clawback scope",
+      "description": "On a confidential-transfer mint the permanent delegate cannot touch confidential balances (that needs the holder's ElGamal keys) — it can only seize or burn the public balance. If the delegate exists for compliance, log its actions off-chain and clearly inform holders that only public balances are reachable.",
+      "links": ["https://solana.com/docs/tokens/extensions/confidential-transfer"]
+    },
+    {
+      "id": "transfer-hook-unconfigured",
+      "title": "Set a hook program or drop the TransferHook extension",
+      "description": "The TransferHook extension is enabled but no hook program is set (programId is null), so it does nothing today. If you need custom transfer logic (allowlist, KYC, royalties), deploy the hook program and set it. If not, drop the extension — it forces a TransferHookAccount on every token account for no benefit.",
+      "links": ["https://solana.com/docs/tokens/extensions"]
+    },
+    {
+      "id": "transfer-fee-presence",
+      "title": "Publish your transfer fee configuration",
+      "description": "Make the fee rate and fee recipient address visible in your token documentation and website. DEX integrators and wallet providers need this information to display accurate amounts to users.",
+      "links": ["https://solana.com/docs/tokens/extensions/transfer-fees"]
+    },
+    {
+      "id": "blocked-on-all-dexes",
+      "title": "Review extension configuration before deploying",
+      "description": "Your current extension combination blocks this token from all major DEXes. Consider whether each extension is required. If trading is critical, consult each DEX's Token-2022 support docs for any whitelisting or permissioned pool paths.",
+      "links": [
+        "https://support.jup.ag/hc/en-us/articles/22634616157340-Are-all-kinds-of-tokens-supported-on-Instant-Limit-and-Recurring",
+        "https://docs.raydium.io/raydium/updates/token-2022-support",
+        "https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"
+      ]
+    },
+    {
+      "id": "blocked-on-major-dex",
+      "title": "Check DEX-specific Token-2022 support documentation",
+      "description": "One or more major DEXes have blocked this token's extension configuration. Review each affected venue's Token-2022 documentation to understand if a permissioned pool, whitelist, or TokenBadge application can restore access.",
+      "links": [
+        "https://support.jup.ag/hc/en-us/articles/22634616157340-Are-all-kinds-of-tokens-supported-on-Instant-Limit-and-Recurring",
+        "https://docs.raydium.io/raydium/updates/token-2022-support",
+        "https://dev.orca.so/Architecture%20Overview/TokenExtensions%20Support/"
+      ]
+    },
+    {
+      "id": "metadata-missing",
+      "title": "Add token metadata before launch",
+      "description": "Upload a JSON metadata file to a permanent storage provider (Arweave or IPFS), then set the metadata URI on your mint. Include at minimum: name, symbol, description, and image. Without metadata, wallets will show your token as 'Unknown'.",
+      "links": ["https://developers.metaplex.com/token-metadata"]
+    },
+    {
+      "id": "metadata-partial",
+      "title": "Complete missing metadata fields",
+      "description": "Ensure your metadata URI resolves to a valid JSON file with name, symbol, description, and image. Missing fields cause inconsistent display across wallets and explorers.",
+      "links": ["https://developers.metaplex.com/token-metadata"]
+    },
+    {
+      "id": "no-on-chain-name",
+      "title": "Consider writing name on-chain with TokenMetadata extension",
+      "description": "Off-chain metadata can be changed or made unavailable by the metadata authority. The Token-2022 TokenMetadata extension stores name and symbol directly on the mint account, making them resistant to modification without governance.",
+      "links": ["https://solana.com/docs/tokens/extensions/metadata"]
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "interface": "FungibleToken",
+  "id": "MinimalT22Mint11111111111111111111111111111",
+  "content": {},
+  "authorities": [],
+  "ownership": {
+    "ownership_model": "token"
+  },
+  "mutable": false,
+  "burnt": false,
+  "token_info": {
+    "decimals": 0,
+    "token_program": "TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb",
+    "supply": "0"
+  }
+}

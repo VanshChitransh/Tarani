@@ -1,0 +1,210 @@
+{
+  "venue": "solscan",
+  "version": "1.0.0",
+  "last_updated": "2026-05-31",
+  "features": [
+    {
+      "id": "transferFeeConfig",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://solana.com/docs/tokens/extensions",
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
+      ],
+      "notes": [
+        "Token details page has a dedicated Extensions tab; transfer fee config is parsed by the jsonParsed RPC decoder Solscan consumes."
+      ]
+    },
+    {
+      "id": "transferHook",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
+      ],
+      "notes": ["Hook program address rendered in the extensions panel."]
+    },
+    {
+      "id": "defaultAccountState",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
+      ],
+      "notes": ["DefaultAccountState parsed and shown."]
+    },
+    {
+      "id": "permanentDelegate",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://chainstack.com/solana-token-2022-utility-extensions/",
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
+      ],
+      "notes": ["Permanent delegate address visible in the extensions section."]
+    },
+    {
+      "id": "nonTransferable",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
+      ],
+      "notes": ["NonTransferable flag rendered."]
+    },
+    {
+      "id": "interestBearingConfig",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs",
+        "https://solana.com/docs/tokens/extensions"
+      ],
+      "notes": ["Interest rate / config fields parsed and shown."]
+    },
+    {
+      "id": "cpiGuard",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
+      ],
+      "notes": ["Account-level CpiGuard parsed."]
+    },
+    {
+      "id": "memoTransfer",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
+      ],
+      "notes": ["Account-level MemoTransfer (require incoming memos) parsed."]
+    },
+    {
+      "id": "confidentialTransferMint",
+      "status": "partial",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs",
+        "https://solana.com/docs/tokens/extensions/confidential-transfer"
+      ],
+      "notes": [
+        "Extension presence and mint config (authorities, auditor ElGamal pubkey) shown, but encrypted ElGamal balances/amounts are opaque ciphertext and cannot be rendered as plaintext."
+      ]
+    },
+    {
+      "id": "confidentialTransferFeeConfig",
+      "status": "partial",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs",
+        "https://solana.com/docs/tokens/extensions/confidential-transfer"
+      ],
+      "notes": [
+        "Config authority shown; withheld confidential fee amounts are encrypted ciphertext, not decodable."
+      ]
+    },
+    {
+      "id": "metadataPointer",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
+      ],
+      "notes": ["Metadata pointer authority and metadata address rendered."]
+    },
+    {
+      "id": "tokenMetadata",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs",
+        "https://solana.com/docs/tokens/extensions"
+      ],
+      "notes": ["On-chain name/symbol/URI/additional metadata parsed and used for token display."]
+    },
+    {
+      "id": "groupPointer",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
+      ],
+      "notes": ["GroupPointer parsed by the upstream decoder."]
+    },
+    {
+      "id": "tokenGroup",
+      "status": "supported",
+      "confidence": "medium",
+      "evidence": [
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
+      ],
+      "notes": [
+        "TokenGroup parsed by the jsonParsed decoder; dedicated Solscan label not separately documented but raw fields available."
+      ]
+    },
+    {
+      "id": "groupMemberPointer",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
+      ],
+      "notes": ["GroupMemberPointer parsed."]
+    },
+    {
+      "id": "tokenGroupMember",
+      "status": "supported",
+      "confidence": "medium",
+      "evidence": [
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
+      ],
+      "notes": ["TokenGroupMember parsed by the jsonParsed decoder."]
+    },
+    {
+      "id": "mintCloseAuthority",
+      "status": "supported",
+      "confidence": "high",
+      "evidence": [
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
+      ],
+      "notes": ["Close authority rendered."]
+    },
+    {
+      "id": "scaledUiAmountConfig",
+      "status": "supported",
+      "confidence": "medium",
+      "evidence": ["https://solana.com/docs/tokens/extensions/scaled-ui-amount/integration-guide"],
+      "notes": [
+        "jsonParsed exposes ScaledUiAmountConfig (multiplier + effective timestamp); Solscan applies the multiplier to displayed balances."
+      ]
+    },
+    {
+      "id": "pausable",
+      "status": "supported",
+      "confidence": "medium",
+      "evidence": [
+        "https://github.com/solana-program/token-2022/blob/main/interface/src/extension/mod.rs"
+      ],
+      "notes": [
+        "PausableConfig is a recent extension shown as an extension/raw field; Solscan-specific dedicated rendering not separately documented."
+      ]
+    },
+    {
+      "id": "unknown",
+      "status": "supported",
+      "confidence": "medium",
+      "evidence": [
+        "https://github.com/anza-xyz/agave/blob/master/account-decoder/src/parse_token_extension.rs"
+      ],
+      "notes": [
+        "The jsonParsed decoder returns UnparseableExtension for unrecognized types rather than failing, so Solscan can still list an unknown extension's presence."
+      ]
+    }
+  ],
+  "notes": [
+    "Solscan is a read-only explorer; it never blocks or executes anything. The token details page has a dedicated Extensions tab.",
+    "It relies on the standard jsonParsed RPC encoding (solana account-decoder), which decodes all stable Token-2022 extensions.",
+    "Confidential transfer extensions are partial: config/authorities are shown but ElGamal-encrypted balances and amounts are ciphertext no read-only viewer can render as plaintext."
+  ]
+}

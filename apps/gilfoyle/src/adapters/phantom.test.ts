@@ -47,25 +47,25 @@ const baseRule: VenueRule = {
 };
 
 describe("phantomAdapter", () => {
-  it("has venue id 'phantom'", () => {
+  it("has venue id 'phantom'", async () => {
     expect(phantomAdapter.venue).toBe("phantom");
   });
 
-  it("returns a VenueCompatibilityResult for a matching profile", () => {
-    const result = phantomAdapter.evaluate({ profile: baseProfile, rule: baseRule });
+  it("returns a VenueCompatibilityResult for a matching profile", async () => {
+    const result = await phantomAdapter.evaluate({ profile: baseProfile, rule: baseRule });
     expect(result.venue).toBe("phantom");
     expect(result.status).toBe("blocked");
     expect(result.source).toBe("heuristic");
   });
 
-  it("output validates against venueCompatibilityResultSchema", () => {
-    const result = phantomAdapter.evaluate({ profile: baseProfile, rule: baseRule });
+  it("output validates against venueCompatibilityResultSchema", async () => {
+    const result = await phantomAdapter.evaluate({ profile: baseProfile, rule: baseRule });
     expect(venueCompatibilityResultSchema.safeParse(result).success).toBe(true);
   });
 
-  it("returns unknown when profile has no matching extensions", () => {
+  it("returns supported when profile has no extensions", async () => {
     const profile = { ...baseProfile, extensions: [] };
-    const result = phantomAdapter.evaluate({ profile, rule: baseRule });
-    expect(result.status).toBe("unknown");
+    const result = await phantomAdapter.evaluate({ profile, rule: baseRule });
+    expect(result.status).toBe("supported");
   });
 });

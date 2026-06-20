@@ -1,27 +1,40 @@
 import { z } from "zod";
-import { MONITOR_EVENT_KINDS, SCENARIO_KINDS, SCENARIO_OUTCOME_VALUES } from "../constants";
+import {
+  MONITOR_EVENT_KINDS,
+  SCENARIO_KINDS,
+  SCENARIO_MODE_VALUES,
+  SCENARIO_OUTCOME_VALUES,
+} from "../constants";
 import { compatibilityStatusSchema, venueIdSchema } from "./compatibility.schema";
 
 export const scenarioKindSchema = z.enum(SCENARIO_KINDS);
 
 export const scenarioOutcomeSchema = z.enum(SCENARIO_OUTCOME_VALUES);
 
+export const scenarioModeSchema = z.enum(SCENARIO_MODE_VALUES);
+
 export const scenarioResultSchema = z.object({
   id: z.string().min(1),
   kind: scenarioKindSchema,
   outcome: scenarioOutcomeSchema,
+  // How this scenario was executed: a real validator tx, an external API probe,
+  // or static profile analysis. Lets the UI label each row honestly instead of
+  // implying every scenario ran on the validator.
+  mode: scenarioModeSchema,
   summary: z.string().min(1),
   durationMs: z.number().int().nonnegative(),
   failureCode: z.string().optional(),
+  logs: z.array(z.string()).optional(),
 });
 
 export const simulationReportSchema = z.object({
   mint: z.string().min(32).max(44),
   results: z.array(scenarioResultSchema),
+  validatorMode: z.enum(["live", "heuristic"]),
   generatedAt: z.iso.datetime(),
 });
 
-export const badgeDataSchema = z.object({
+export const simulationBadgeDataSchema = z.object({
   mint: z.string().min(32).max(44),
   overall: compatibilityStatusSchema,
   venues: z.array(

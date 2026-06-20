@@ -5,7 +5,12 @@
   "type": "module",
   "main": "src/index.ts",
   "scripts": {
-    "dev": "bun run src/index.ts",
+    "dev": "bun run --watch src/index.ts",
     "build": "echo 'No build step yet for kotler'"
+  },
+  "dependencies": {
+    "@tarani/shared": "workspace:*",
+    "@tarani/gilfoyle": "workspace:*",
+    "@solana/web3.js": "^1.98.0"
   }
 }

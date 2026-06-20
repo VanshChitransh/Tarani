@@ -22,6 +22,13 @@ export const compatibilityEvidenceSchema = z.object({
   observedAt: z.iso.datetime(),
 });
 
+export const venueFeatureStatusSchema = z.object({
+  status: compatibilityStatusSchema,
+  confidence: confidenceLevelSchema,
+  evidence: z.array(compatibilityEvidenceSchema),
+  notes: z.array(z.string()),
+});
+
 export const venueCompatibilityResultSchema = z.object({
   venue: venueIdSchema,
   status: compatibilityStatusSchema,
@@ -29,4 +36,5 @@ export const venueCompatibilityResultSchema = z.object({
   confidence: confidenceLevelSchema,
   evidence: z.array(compatibilityEvidenceSchema),
   notes: z.array(z.string()),
+  features: z.record(z.string(), venueFeatureStatusSchema).optional(),
 });

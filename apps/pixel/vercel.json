@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "cd ../.. && bun install --frozen-lockfile",
+  "crons": [
+    {
+      "path": "/api/sentinel/tick",
+      "schedule": "0 6 * * *"
+    }
+  ]
+}

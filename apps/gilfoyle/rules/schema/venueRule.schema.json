@@ -9,7 +9,7 @@
   "properties": {
     "venue": {
       "type": "string",
-      "enum": ["jupiter", "raydium", "orca", "phantom", "solflare"],
+      "enum": ["jupiter", "raydium", "orca", "phantom", "solflare", "solscan", "solana-explorer"],
       "description": "Venue identifier. Must match a known VenueId in @tarani/shared."
     },
     "version": {
@@ -43,6 +43,11 @@
           "type": "string",
           "minLength": 1,
           "description": "Token-2022 extension kind or capability identifier."
+        },
+        "scope": {
+          "type": "string",
+          "minLength": 1,
+          "description": "Venue sub-feature this rule applies to (e.g. 'swap', 'limitOrders', 'dca'). Omit for rules that apply to the venue as a whole."
         },
         "status": {
           "type": "string",

@@ -2,6 +2,7 @@ import type { CompatibilityStatus, ConfidenceLevel, VenueId } from "@tarani/shar
 
 export interface VenueRuleFeature {
   id: string;
+  scope?: string;
   status: CompatibilityStatus;
   confidence?: ConfidenceLevel;
   evidence?: string[];

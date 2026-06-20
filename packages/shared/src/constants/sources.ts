@@ -1,6 +1,14 @@
 export const COMPATIBILITY_SOURCE_VALUES = ["probe", "heuristic", "override"] as const;
 
-export const VENUE_IDS = ["jupiter", "raydium", "orca", "phantom", "solflare"] as const;
+export const VENUE_IDS = [
+  "jupiter",
+  "raydium",
+  "orca",
+  "phantom",
+  "solflare",
+  "solscan",
+  "solana-explorer",
+] as const;
 
 export const COMPATIBILITY_EVIDENCE_KINDS = ["rule", "probe", "doc"] as const;
 
@@ -44,6 +52,7 @@ export const RISK_CATEGORIES = [
   "authority",
   "metadata",
   "extension",
+  "compatibility",
   "supply",
   "ownership",
   "liquidity",
@@ -55,6 +64,10 @@ export const SCENARIO_KINDS = [
   "wrap_sol",
   "associated_token_create",
   "freeze_check",
+  "transfer_hook",
+  "transfer_fee",
+  "memo_required",
+  "metadata_check",
 ] as const;
 
 export const MONITOR_EVENT_KINDS = [
@@ -64,3 +77,5 @@ export const MONITOR_EVENT_KINDS = [
   "metadata_change",
   "supply_change",
 ] as const;
+
+export const COMPATIBILITY_DIFF_KINDS = ["improved", "degraded", "changed"] as const;
