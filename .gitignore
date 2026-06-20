@@ -14,6 +14,9 @@ dist/
 build/
 coverage/
 
+# Solana test-validator ledger (runtime artifact, regenerated each run)
+test-ledger/
+
 # Logs
 *.log
 

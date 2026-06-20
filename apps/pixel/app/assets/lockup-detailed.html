@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarani — The Sluice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    background: #E8E4DE;
+    color: #1A1714;
+    padding: 60px 40px 100px;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #8B8377;
+    margin-bottom: 56px;
+  }
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #A8A29E;
+    margin-bottom: 16px;
+    margin-top: 56px;
+  }
+  .card {
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    min-height: 180px;
+  }
+  .card.light { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .card.dark { background: #1A1714; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .grid-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 16px; }
+  .lockup {
+    display: inline-flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .lockup svg.mark { flex-shrink: 0; }
+  .lockup .wordmark {
+    font-family: 'Outfit', sans-serif;
+    font-size: 32px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+  .stacked {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .stacked .wordmark {
+    font-family: 'Outfit', sans-serif;
+    font-size: 34px;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+  }
+  .scale-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  .scale-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .scale-item .box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+  }
+  .scale-item .box.light { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .scale-item .box.dark { background: #1A1714; }
+  .scale-item span { font-size: 10px; color: #A8A29E; }
+  .concept-note {
+    font-size: 13px;
+    color: #6B6560;
+    line-height: 1.6;
+    margin-bottom: 32px;
+  }
+</style>
+</head>
+<body>
+
+<h1>Tarani — The Sluice</h1>
+<p class="concept-note">
+  A tall rounded rectangle with a diagonal slot cut through it — the sluice gate that controls water flow and passage.
+  The diagonal creates energy and direction within a stable container. Solid form meets decisive void.
+</p>
+
+<!-- ============================================ -->
+<!-- MARK ONLY                                    -->
+<!-- ============================================ -->
+<p class="section-label">Mark — large</p>
+<div class="grid-2">
+  <div class="card light" style="min-height:280px;">
+    <svg viewBox="0 0 200 200" width="140" height="140" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#1A1714"/>
+    </svg>
+  </div>
+  <div class="card dark" style="min-height:280px;">
+    <svg viewBox="0 0 200 200" width="140" height="140" xmlns="http://www.w3.org/2000/svg">
+      <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#F5F3EF"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- HORIZONTAL LOCKUP                            -->
+<!-- ============================================ -->
+<p class="section-label">Horizontal lockup</p>
+<div class="grid-2">
+  <div class="card light">
+    <div class="lockup">
+      <svg class="mark" viewBox="0 0 200 200" width="38" height="38" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#1A1714"/>
+      </svg>
+      <span class="wordmark" style="color:#1A1714;">Tarani</span>
+    </div>
+  </div>
+  <div class="card dark">
+    <div class="lockup">
+      <svg class="mark" viewBox="0 0 200 200" width="38" height="38" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#F5F3EF"/>
+      </svg>
+      <span class="wordmark" style="color:#F5F3EF;">Tarani</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- STACKED LOCKUP                               -->
+<!-- ============================================ -->
+<p class="section-label">Stacked lockup</p>
+<div class="grid-2">
+  <div class="card light" style="min-height:260px;">
+    <div class="stacked">
+      <svg viewBox="0 0 200 200" width="68" height="68" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#1A1714"/>
+      </svg>
+      <span class="wordmark" style="color:#1A1714;">Tarani</span>
+    </div>
+  </div>
+  <div class="card dark" style="min-height:260px;">
+    <div class="stacked">
+      <svg viewBox="0 0 200 200" width="68" height="68" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#F5F3EF"/>
+      </svg>
+      <span class="wordmark" style="color:#F5F3EF;">Tarani</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- COLOR OPTIONS                                -->
+<!-- ============================================ -->
+<p class="section-label">Brand color options</p>
+<div class="grid-2" style="gap:16px;">
+
+  <!-- Sage -->
+  <div class="card dark">
+    <div class="lockup">
+      <svg class="mark" viewBox="0 0 200 200" width="38" height="38" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#7A9A6A"/>
+      </svg>
+      <span class="wordmark" style="color:#7A9A6A;">Tarani</span>
+    </div>
+  </div>
+
+  <!-- Oxblood -->
+  <div class="card dark">
+    <div class="lockup">
+      <svg class="mark" viewBox="0 0 200 200" width="38" height="38" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#9B4455"/>
+      </svg>
+      <span class="wordmark" style="color:#9B4455;">Tarani</span>
+    </div>
+  </div>
+
+  <!-- Slate Teal -->
+  <div class="card dark">
+    <div class="lockup">
+      <svg class="mark" viewBox="0 0 200 200" width="38" height="38" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#4A7A72"/>
+      </svg>
+      <span class="wordmark" style="color:#4A7A72;">Tarani</span>
+    </div>
+  </div>
+
+  <!-- Copper Rose -->
+  <div class="card dark">
+    <div class="lockup">
+      <svg class="mark" viewBox="0 0 200 200" width="38" height="38" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#A8796E"/>
+      </svg>
+      <span class="wordmark" style="color:#A8796E;">Tarani</span>
+    </div>
+  </div>
+
+  <!-- Deep Forest -->
+  <div class="card dark">
+    <div class="lockup">
+      <svg class="mark" viewBox="0 0 200 200" width="38" height="38" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#3B6B4A"/>
+      </svg>
+      <span class="wordmark" style="color:#3B6B4A;">Tarani</span>
+    </div>
+  </div>
+
+  <!-- On light for contrast -->
+  <div class="card light">
+    <div class="lockup">
+      <svg class="mark" viewBox="0 0 200 200" width="38" height="38" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#9B4455"/>
+      </svg>
+      <span class="wordmark" style="color:#9B4455;">Tarani</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============================================ -->
+<!-- SCALABILITY                                  -->
+<!-- ============================================ -->
+<p class="section-label">Scalability</p>
+<div class="card light">
+  <div class="scale-row">
+    <div class="scale-item">
+      <div class="box light" style="width:128px;height:128px;">
+        <svg viewBox="0 0 200 200" width="96" height="96" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#1A1714"/>
+        </svg>
+      </div>
+      <span>128px</span>
+    </div>
+    <div class="scale-item">
+      <div class="box light" style="width:64px;height:64px;">
+        <svg viewBox="0 0 200 200" width="48" height="48" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#1A1714"/>
+        </svg>
+      </div>
+      <span>64px</span>
+    </div>
+    <div class="scale-item">
+      <div class="box light" style="width:32px;height:32px;">
+        <svg viewBox="0 0 200 200" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#1A1714"/>
+        </svg>
+      </div>
+      <span>32px</span>
+    </div>
+    <div class="scale-item">
+      <div class="box light" style="width:16px;height:16px;">
+        <svg viewBox="0 0 200 200" width="14" height="14" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#1A1714"/>
+        </svg>
+      </div>
+      <span>16px</span>
+    </div>
+    <div style="width:24px;"></div>
+    <div class="scale-item">
+      <div class="box dark" style="width:128px;height:128px;">
+        <svg viewBox="0 0 200 200" width="96" height="96" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#F5F3EF"/>
+        </svg>
+      </div>
+      <span>128px</span>
+    </div>
+    <div class="scale-item">
+      <div class="box dark" style="width:64px;height:64px;">
+        <svg viewBox="0 0 200 200" width="48" height="48" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#F5F3EF"/>
+        </svg>
+      </div>
+      <span>64px</span>
+    </div>
+    <div class="scale-item">
+      <div class="box dark" style="width:32px;height:32px;">
+        <svg viewBox="0 0 200 200" width="24" height="24" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#F5F3EF"/>
+        </svg>
+      </div>
+      <span>32px</span>
+    </div>
+    <div class="scale-item">
+      <div class="box dark" style="width:16px;height:16px;">
+        <svg viewBox="0 0 200 200" width="14" height="14" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#F5F3EF"/>
+        </svg>
+      </div>
+      <span>16px</span>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
