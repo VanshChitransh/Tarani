@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tarani — Logo Lockup Reference</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    background: #E8E4DE;
+    color: #1A1714;
+    padding: 60px 40px 100px;
+    max-width: 1080px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #8B8377;
+    margin-bottom: 8px;
+  }
+  .subtitle {
+    font-size: 13px;
+    color: #6B6560;
+    margin-bottom: 56px;
+    line-height: 1.6;
+  }
+  .section-label {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #A8A29E;
+    margin-bottom: 16px;
+    margin-top: 56px;
+  }
+
+  /* Lockup */
+  .lockup {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--lockup-gap, 14px);
+  }
+  .lockup svg {
+    width: var(--mark-size, 36px);
+    height: var(--mark-size, 36px);
+    flex-shrink: 0;
+  }
+  .lockup .wordmark {
+    font-family: 'Outfit', sans-serif;
+    font-size: var(--wordmark-size, 32px);
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    line-height: 1;
+  }
+
+  /* Cards */
+  .card {
+    border-radius: 16px;
+    padding: 52px 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 160px;
+  }
+  .card.light { background: #FFFFFF; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+  .card.dark  { background: #1A1714; }
+
+  /* Color option block */
+  .color-option {
+    margin-bottom: 40px;
+  }
+  .color-option-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .color-option-header h2 { font-size: 16px; font-weight: 600; }
+  .color-option-header .hex {
+    font-family: 'SF Mono', 'Fira Code', monospace;
+    font-size: 13px;
+    color: #8B8377;
+  }
+  .color-option-header .desc {
+    font-size: 12px;
+    color: #A8A29E;
+    margin-left: auto;
+  }
+  .color-option .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  /* Info panel */
+  .info-panel {
+    background: #fff;
+    border-radius: 16px;
+    padding: 28px 32px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    margin-bottom: 40px;
+  }
+  .info-row {
+    font-size: 13px;
+    line-height: 1.8;
+    color: #4A4843;
+  }
+
+  /* Scalability */
+  .scale-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 28px;
+    flex-wrap: wrap;
+  }
+  .scale-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+  .scale-item .box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+  }
+  .scale-item .box.light { background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+  .scale-item .box.dark { background: #1A1714; }
+  .scale-item span { font-size: 10px; color: #A8A29E; font-variant-numeric: tabular-nums; }
+
+  /* Stacked */
+  .stacked-lockup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .stacked-lockup .wordmark-text {
+    font-family: 'Outfit', sans-serif;
+    font-weight: 500;
+    font-size: 34px;
+    letter-spacing: 0.04em;
+  }
+</style>
+</head>
+<body>
+
+<h1>Tarani — Logo Lockup Reference</h1>
+<p class="subtitle">
+  Mark: The Sluice (rounded rectangle with diagonal slot cutout) &nbsp;/&nbsp;
+  Wordmark font: <strong>Outfit Medium (500)</strong> &nbsp;/&nbsp;
+  Letter-spacing: 0.04em
+</p>
+
+<!-- ============================================ -->
+<!-- MONOCHROME (PRIMARY)                         -->
+<!-- ============================================ -->
+<p class="section-label">Primary lockup — monochrome</p>
+<div class="color-option">
+  <div class="color-option-header">
+    <h2>Dark</h2>
+    <span class="hex">#1A1714</span>
+    <span class="desc">Default mark on light backgrounds</span>
+  </div>
+  <div class="grid">
+    <div class="card light">
+      <div class="lockup" style="--mark-size:40px; --wordmark-size:38px; --lockup-gap:14px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#1A1714"/>
+        </svg>
+        <span class="wordmark" style="color:#1A1714;">Tarani</span>
+      </div>
+    </div>
+    <div class="card dark">
+      <div class="lockup" style="--mark-size:40px; --wordmark-size:38px; --lockup-gap:14px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#F5F3EF"/>
+        </svg>
+        <span class="wordmark" style="color:#F5F3EF;">Tarani</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- COLOR OPTIONS                                -->
+<!-- ============================================ -->
+<p class="section-label">Brand color options</p>
+
+<!-- 1. Sage -->
+<div class="color-option">
+  <div class="color-option-header">
+    <h2>Sage</h2>
+    <span class="hex">#7A9A6A</span>
+    <span class="desc">Organic, grounded — Aesop-like calm authority</span>
+  </div>
+  <div class="grid">
+    <div class="card light">
+      <div class="lockup" style="--mark-size:40px; --wordmark-size:38px; --lockup-gap:14px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#7A9A6A"/>
+        </svg>
+        <span class="wordmark" style="color:#7A9A6A;">Tarani</span>
+      </div>
+    </div>
+    <div class="card dark">
+      <div class="lockup" style="--mark-size:40px; --wordmark-size:38px; --lockup-gap:14px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#7A9A6A"/>
+        </svg>
+        <span class="wordmark" style="color:#7A9A6A;">Tarani</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 2. Oxblood -->
+<div class="color-option">
+  <div class="color-option-header">
+    <h2>Oxblood</h2>
+    <span class="hex">#9B4455</span>
+    <span class="desc">Heritage, leather, wine — deep confidence</span>
+  </div>
+  <div class="grid">
+    <div class="card light">
+      <div class="lockup" style="--mark-size:40px; --wordmark-size:38px; --lockup-gap:14px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#9B4455"/>
+        </svg>
+        <span class="wordmark" style="color:#9B4455;">Tarani</span>
+      </div>
+    </div>
+    <div class="card dark">
+      <div class="lockup" style="--mark-size:40px; --wordmark-size:38px; --lockup-gap:14px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#9B4455"/>
+        </svg>
+        <span class="wordmark" style="color:#9B4455;">Tarani</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. Slate Teal -->
+<div class="color-option">
+  <div class="color-option-header">
+    <h2>Slate Teal</h2>
+    <span class="hex">#4A7A72</span>
+    <span class="desc">Aged copper, ocean stone — nautical tie to "vessel"</span>
+  </div>
+  <div class="grid">
+    <div class="card light">
+      <div class="lockup" style="--mark-size:40px; --wordmark-size:38px; --lockup-gap:14px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#4A7A72"/>
+        </svg>
+        <span class="wordmark" style="color:#4A7A72;">Tarani</span>
+      </div>
+    </div>
+    <div class="card dark">
+      <div class="lockup" style="--mark-size:40px; --wordmark-size:38px; --lockup-gap:14px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#4A7A72"/>
+        </svg>
+        <span class="wordmark" style="color:#4A7A72;">Tarani</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 4. Copper Rose -->
+<div class="color-option">
+  <div class="color-option-header">
+    <h2>Copper Rose</h2>
+    <span class="hex">#A8796E</span>
+    <span class="desc">Dusty, tactile, architectural — terracotta meets blush</span>
+  </div>
+  <div class="grid">
+    <div class="card light">
+      <div class="lockup" style="--mark-size:40px; --wordmark-size:38px; --lockup-gap:14px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#A8796E"/>
+        </svg>
+        <span class="wordmark" style="color:#A8796E;">Tarani</span>
+      </div>
+    </div>
+    <div class="card dark">
+      <div class="lockup" style="--mark-size:40px; --wordmark-size:38px; --lockup-gap:14px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#A8796E"/>
+        </svg>
+        <span class="wordmark" style="color:#A8796E;">Tarani</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 5. Deep Forest -->
+<div class="color-option">
+  <div class="color-option-header">
+    <h2>Deep Forest</h2>
+    <span class="hex">#3B6B4A</span>
+    <span class="desc">Old money, Harrods green — strongest trust signal</span>
+  </div>
+  <div class="grid">
+    <div class="card light">
+      <div class="lockup" style="--mark-size:40px; --wordmark-size:38px; --lockup-gap:14px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#3B6B4A"/>
+        </svg>
+        <span class="wordmark" style="color:#3B6B4A;">Tarani</span>
+      </div>
+    </div>
+    <div class="card dark">
+      <div class="lockup" style="--mark-size:40px; --wordmark-size:38px; --lockup-gap:14px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#3B6B4A"/>
+        </svg>
+        <span class="wordmark" style="color:#3B6B4A;">Tarani</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SCALABILITY TEST                             -->
+<!-- ============================================ -->
+<p class="section-label">Mark only — scalability test</p>
+<div class="card light">
+  <div class="scale-row">
+    <div class="scale-item">
+      <div class="box light" style="width:128px;height:128px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="96" height="96">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#1A1714"/>
+        </svg>
+      </div>
+      <span>128px</span>
+    </div>
+    <div class="scale-item">
+      <div class="box light" style="width:64px;height:64px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#1A1714"/>
+        </svg>
+      </div>
+      <span>64px</span>
+    </div>
+    <div class="scale-item">
+      <div class="box light" style="width:32px;height:32px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#1A1714"/>
+        </svg>
+      </div>
+      <span>32px</span>
+    </div>
+    <div class="scale-item">
+      <div class="box light" style="width:16px;height:16px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="14" height="14">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#1A1714"/>
+        </svg>
+      </div>
+      <span>16px</span>
+    </div>
+    <div style="width:24px;"></div>
+    <div class="scale-item">
+      <div class="box dark" style="width:128px;height:128px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="96" height="96">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#F5F3EF"/>
+        </svg>
+      </div>
+      <span>128px</span>
+    </div>
+    <div class="scale-item">
+      <div class="box dark" style="width:64px;height:64px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="48" height="48">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#F5F3EF"/>
+        </svg>
+      </div>
+      <span>64px</span>
+    </div>
+    <div class="scale-item">
+      <div class="box dark" style="width:32px;height:32px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="24" height="24">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#F5F3EF"/>
+        </svg>
+      </div>
+      <span>32px</span>
+    </div>
+    <div class="scale-item">
+      <div class="box dark" style="width:16px;height:16px;">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="14" height="14">
+          <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#F5F3EF"/>
+        </svg>
+      </div>
+      <span>16px</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- STACKED VARIANT                              -->
+<!-- ============================================ -->
+<p class="section-label">Stacked variant</p>
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+  <div class="card light" style="min-height:240px;">
+    <div class="stacked-lockup">
+      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="64" height="64">
+        <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#1A1714"/>
+      </svg>
+      <span class="wordmark-text" style="color:#1A1714;">Tarani</span>
+    </div>
+  </div>
+  <div class="card dark" style="min-height:240px;">
+    <div class="stacked-lockup">
+      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" width="64" height="64">
+        <path fill-rule="evenodd" d="M 56,16 L 144,16 Q 176,16 176,48 L 176,152 Q 176,184 144,184 L 56,184 Q 24,184 24,152 L 24,48 Q 24,16 56,16 Z M 52,122 L 128,62 L 148,78 L 72,138 Z" fill="#F5F3EF"/>
+      </svg>
+      <span class="wordmark-text" style="color:#F5F3EF;">Tarani</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- SPEC SUMMARY                                 -->
+<!-- ============================================ -->
+<p class="section-label">Specification summary</p>
+<div class="info-panel">
+  <div class="info-row">
+    <dl style="display:grid; grid-template-columns: 140px 1fr; gap: 6px 24px;">
+      <dt style="color:#8B8377;">Wordmark font</dt>
+      <dd style="font-weight:500;">Outfit (Google Fonts)</dd>
+      <dt style="color:#8B8377;">Font weight</dt>
+      <dd style="font-weight:500;">500 (Medium)</dd>
+      <dt style="color:#8B8377;">Letter spacing</dt>
+      <dd style="font-weight:500;">0.04em</dd>
+      <dt style="color:#8B8377;">Mark style</dt>
+      <dd style="font-weight:500;">The Sluice — rounded rectangle with diagonal slot, evenodd cutout, controlled passage</dd>
+      <dt style="color:#8B8377;">Dark foreground</dt>
+      <dd style="font-family:monospace; font-weight:500;">#1A1714</dd>
+      <dt style="color:#8B8377;">Light foreground</dt>
+      <dd style="font-family:monospace; font-weight:500;">#F5F3EF</dd>
+    </dl>
+  </div>
+  <hr style="border:none; border-top:1px solid #EDEBE6; margin:20px 0;">
+  <h2 style="font-size:13px; color:#8B8377; margin-bottom:10px;">Brand color candidates</h2>
+  <div style="display:grid; grid-template-columns:140px 100px 1fr; gap:6px 24px; font-size:13px; line-height:1.8;">
+    <span style="color:#8B8377;">Sage</span>
+    <code style="font-size:12px; color:#7A9A6A; font-weight:600;">#7A9A6A</code>
+    <span style="color:#6B6560;">Organic, grounded, calm authority</span>
+    <span style="color:#8B8377;">Oxblood</span>
+    <code style="font-size:12px; color:#9B4455; font-weight:600;">#9B4455</code>
+    <span style="color:#6B6560;">Heritage, leather, wine, deep confidence</span>
+    <span style="color:#8B8377;">Slate Teal</span>
+    <code style="font-size:12px; color:#4A7A72; font-weight:600;">#4A7A72</code>
+    <span style="color:#6B6560;">Aged copper, ocean stone, nautical vessel tie</span>
+    <span style="color:#8B8377;">Copper Rose</span>
+    <code style="font-size:12px; color:#A8796E; font-weight:600;">#A8796E</code>
+    <span style="color:#6B6560;">Dusty, tactile, terracotta meets blush</span>
+    <span style="color:#8B8377;">Deep Forest</span>
+    <code style="font-size:12px; color:#3B6B4A; font-weight:600;">#3B6B4A</code>
+    <span style="color:#6B6560;">Old money, Harrods, strongest trust signal</span>
+  </div>
+</div>
+
+</body>
+</html>

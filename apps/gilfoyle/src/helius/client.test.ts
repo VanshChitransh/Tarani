@@ -57,14 +57,12 @@ describe("HeliusClient", () => {
 
   describe("not-found path", () => {
     it("throws NOT_FOUND when Helius returns null result", async () => {
-      globalThis.fetch = vi
-        .fn()
-        .mockResolvedValue(
-          new Response(JSON.stringify({ jsonrpc: "2.0", id: "tarani-gilfoyle", result: null }), {
-            status: 200,
-            headers: { "Content-Type": "application/json" },
-          }),
-        ) as typeof fetch;
+      globalThis.fetch = vi.fn().mockResolvedValue(
+        new Response(JSON.stringify({ jsonrpc: "2.0", id: "tarani-gilfoyle", result: null }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      ) as typeof fetch;
 
       const client = new HeliusClient({ rpcUrl: FAKE_URL, maxRetries: 0 });
       await expect(
