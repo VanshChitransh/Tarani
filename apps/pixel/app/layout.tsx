@@ -5,12 +5,29 @@ import Nav from "../components/Nav";
 import { Providers } from "../components/Providers";
 import SocialCard from "../components/SocialCard";
 
+const TITLE = "Tarani";
+const DESCRIPTION = "Token-2022 compatibility intelligence for Solana.";
+// Canonical production origin — used to make og:image / icon URLs absolute.
+const SITE_URL = "https://tarani.io";
+
 export const metadata: Metadata = {
-  // metadataBase resolves relative OG/icon URLs; update to the production origin.
-  metadataBase: new URL("https://tarani.io"),
-  title: "Tarani",
-  description: "Tarani — Solana token risk analysis.",
-  // app/icon.svg is picked up automatically by Next.js as the favicon.
+  metadataBase: new URL(SITE_URL),
+  title: TITLE,
+  description: DESCRIPTION,
+  // app/icon.svg is the favicon; app/opengraph-image + app/twitter-image
+  // supply the link-preview poster automatically — no `images` needed here.
+  openGraph: {
+    type: "website",
+    siteName: TITLE,
+    title: TITLE,
+    description: DESCRIPTION,
+    url: SITE_URL,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 // Runs before first paint to apply the saved theme, avoiding a flash of the
